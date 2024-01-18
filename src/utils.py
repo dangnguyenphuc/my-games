@@ -13,4 +13,8 @@ def drawTextOnScreen(surface, text, font, textColor, x, y):
 
     surface.blit(img, (x,y))
 
+def convertGameTime2Minute(time):
+    minute = (time // 1000) // 60
+    second = (time // 1000) - 60 * minute
+    return "{:02d}:{:02d}".format(minute, second)
 
