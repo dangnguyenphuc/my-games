@@ -3,10 +3,11 @@ print("Hello World!")
 
 from config import *
 from utils import *
-from mole import *
 
+from mole import Mole
 from button import Button
 from menu import Menu
+from cursor import Cursor
 
 pygame.init()
 
@@ -39,9 +40,9 @@ normalFont = pygame.font.Font(
 )
 
 # Images
-startImage = pygame.image.load("static/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayIcon/Default.png").convert_alpha()
-resumeImage = pygame.image.load("static/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayText/Default.png").convert_alpha()
-timeImage = pygame.image.load("static/Prinbles_Asset_UNDER/png/Counter/Example.png").convert_alpha()
+startImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayIcon/Default.png").convert_alpha()
+resumeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayText/Default.png").convert_alpha()
+timeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Counter/Example.png").convert_alpha()
 
 # Game buttons
 startButton = Button(startImage, padding=(0,100))
@@ -57,19 +58,34 @@ pauseMenu = Menu([resumeButton])
 '''Moving Sprites'''
 exampleSprites = pygame.sprite.Group()
 frog = Mole([
-    pygame.image.load("static/example-sprite/attack_1.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_2.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_3.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_4.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_5.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_6.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_7.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_8.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_9.png").convert_alpha(),
-    pygame.image.load("static/example-sprite/attack_10.png").convert_alpha()
+    pygame.image.load("static/image/example-sprite/attack_1.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_2.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_3.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_4.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_5.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_6.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_7.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_8.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_9.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_10.png").convert_alpha()
 ], (0,0))
 exampleSprites.add(frog)
 
+'''Cursor'''
+pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+pygame.mouse.set_visible(True)
+
+
+hammer = pygame.image.load("static/image/cursor/hammer.png").convert_alpha()
+cursor = Cursor([
+    hammer,
+    pygame.transform.rotate(hammer.copy(), 10),
+    pygame.transform.rotate(hammer.copy(), 20),
+    pygame.transform.rotate(hammer.copy(), 30),
+    pygame.transform.rotate(hammer.copy(), 40),
+    pygame.transform.rotate(hammer.copy(), 50)
+
+], padding=(16,25))
 
 # Game clock
 clock = pygame.time.Clock()
@@ -92,9 +108,10 @@ while isRunning:
         # get button toggle
         if startButton.draw(screen):
             isStart = True
-            frog.animate()
-    elif not pauseMenu.getIsDisplay():
+            pygame.mouse.set_visible(True)
 
+    elif not pauseMenu.getIsDisplay():
+        frog.animate()
 
         drawTextOnScreen(
             screen,
@@ -115,7 +132,10 @@ while isRunning:
             10)
 
         exampleSprites.draw(screen)
-        exampleSprites.update()
+        exampleSprites.update(0.25)
+
+        cursor.update(speed = 0.5)
+        cursor.draw(screen)
 
         currentTime = pygame.time.get_ticks() - pausedTime
 
@@ -127,7 +147,6 @@ while isRunning:
         # if resume is pressed
         if pauseMenuValues[0]:
             pauseMenu.setIsDisplay(False)
-            frog.animate()
 
 
     for event in pygame.event.get():
@@ -137,6 +156,7 @@ while isRunning:
             # If pressed PAUSE_KEY
             if event.key == PAUSE_KEY:
                 pauseMenu.setIsDisplay(True)
+                pygame.mouse.set_visible(True)
 
         # If quit
         if event.type == pygame.QUIT:

@@ -11,7 +11,7 @@ WINDOW_BACKGROUND = (0,30,0,155)
 
 # PLAY TIME IN ms
 PLAY_TIME = 30 * 1000
-FPS = 24
+FPS = 60
 
 # Key binding
 PAUSE_KEY = pygame.K_SPACE

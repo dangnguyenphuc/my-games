@@ -16,11 +16,12 @@ class Mole(pygame.sprite.Sprite):
   def deanimate(self):
     self.isAnimate = False
 
-  def update(self):
+  def update(self, speed = 1):
     if self.isAnimate:
-      self.currentSprite += 1
+      self.currentSprite += speed
 
       if self.currentSprite >= len(self.sprite):
         self.currentSprite = 0
+        self.isAnimate = False
 
-      self.image = self.sprite[self.currentSprite]
+      self.image = self.sprite[int(self.currentSprite)]
