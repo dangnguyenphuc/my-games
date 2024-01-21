@@ -9,19 +9,44 @@ class Button:
         width = image.get_width()
         height = image.get_height()
         self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
-        self.rectangle = self.image.get_rect()
+
+        self.background = background
 
         if background:
-            bgWidth = background.get_width()
-            bgHeight = background.get_height()
-            self.background = pygame.transform.scale(background, (int(bgWidth*scale), int(bgHeight*scale)))
+            self.background = pygame.transform.scale(background,
+                                    (   int(background.get_width()*scale),
+                                        int(background.get_height()*scale)
+                                    )
+                                )
+            self.rectangle = self.background.get_rect()
+
+        else:
+            self.rectangle = self.image.get_rect()
 
         if xy:
             self.rectangle.topleft = (xy[0],xy[1])
         elif padding:
-            self.rectangle.topleft = (SCREEN_WIDTH//2 - width//2 - padding[0], SCREEN_HEIGHT//2 - height//2 - padding[1])
+            if background:
+                self.rectangle.topleft = (
+                    SCREEN_WIDTH//2 - int(background.get_width()*scale)//2 - padding[0],
+                    SCREEN_HEIGHT//2 - int(background.get_height()*scale)//2 - padding[1]
+                )
+            else:
+                self.rectangle.topleft = (
+                    SCREEN_WIDTH//2 - int(width*scale)//2 - padding[0],
+                    SCREEN_HEIGHT//2 - int(height*scale)//2 - padding[1]
+                )
         else:
             self.rectangle.topleft = (0,0)
+
+        # set image center in background
+        if background:
+            self.imageRect = self.image.get_rect()
+            self.imageRect.center = (
+                self.rectangle.topleft[0] + int(background.get_width()*scale)//2,
+                self.rectangle.topleft[1] + int(background.get_height()*scale)//2
+            )
+
         self.clicked = False
 
     def draw(self, surface):
@@ -38,7 +63,9 @@ class Button:
             self.clicked = False
 
         if self.background:
+            surface.blit(self.background, (self.rectangle.x, self.rectangle.y))
+            surface.blit(self.image, self.imageRect)
+        else:
             surface.blit(self.image, (self.rectangle.x, self.rectangle.y))
-        surface.blit(self.image, (self.rectangle.x, self.rectangle.y))
         return action
 

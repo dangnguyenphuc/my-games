@@ -34,9 +34,7 @@ class Menu:
                 pygame.draw.rect(surface, backgroundColor, (self.x, self.y, self.size[0], self.size[1]) , border)
 
             for i in range(len(self.buttons)):
-                if self.buttons[i].draw(surface):
-                    self.buttonsValue[i] = True
-                else: self.buttonsValue[i] = False
+                self.buttonsValue[i] = self.buttons[i].draw(surface)
 
         return self.buttonsValue
 

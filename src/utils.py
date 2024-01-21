@@ -9,6 +9,7 @@
     - y(int): vertical coordinate.
 '''
 def drawTextOnScreen(surface, text, font, textColor, x, y):
+
     img = font.render(text, True, textColor)
 
     surface.blit(img, (x,y))

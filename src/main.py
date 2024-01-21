@@ -3,6 +3,7 @@ print("Hello World!")
 
 from config import *
 from utils import *
+from mole import *
 
 from button import Button
 from menu import Menu
@@ -34,7 +35,7 @@ introFont = pygame.font.Font(
 )
 normalFont = pygame.font.Font(
     TEXT_FONT,
-    size = 30
+    size = 25
 )
 
 # Images
@@ -48,12 +49,26 @@ resumeButton = Button(resumeImage, padding=(0,100))
 
 # Game instances
 '''Start Menu'''
-startMenu = Menu([startImage])
+startMenu = Menu([startButton])
 
 '''Pause Menu'''
-pauseMenu = Menu([resumeImage])
+pauseMenu = Menu([resumeButton])
 
-
+'''Moving Sprites'''
+exampleSprites = pygame.sprite.Group()
+frog = Mole([
+    pygame.image.load("static/example-sprite/attack_1.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_2.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_3.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_4.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_5.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_6.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_7.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_8.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_9.png").convert_alpha(),
+    pygame.image.load("static/example-sprite/attack_10.png").convert_alpha()
+], (0,0))
+exampleSprites.add(frog)
 
 
 # Game clock
@@ -77,22 +92,42 @@ while isRunning:
         # get button toggle
         if startButton.draw(screen):
             isStart = True
+            frog.animate()
     elif not pauseMenu.getIsDisplay():
 
 
-        drawTextOnScreen(screen, "Press SPACE to pause", introFont, TEXT_COLOR, 160, 250)
-        drawTextOnScreen(screen, convertGameTime2Minute(PLAY_TIME - currentTime), normalFont, TEXT_COLOR,
-                                SCREEN_WIDTH - timeImgTemplate.get_width(),0)
+        drawTextOnScreen(
+            screen,
+            "Press SPACE to pause",
+            introFont,
+            TEXT_COLOR,
+            160,
+            250)
+
+        screen.blit(timeImage, (SCREEN_WIDTH - timeImage.get_width(),0))
+
+        drawTextOnScreen(
+            screen,
+            convertGameTime2Minute(PLAY_TIME - currentTime),
+            normalFont,
+            TEXT_COLOR,
+            SCREEN_WIDTH - timeImgTemplate.get_width() - 10,
+            10)
+
+        exampleSprites.draw(screen)
+        exampleSprites.update()
 
         currentTime = pygame.time.get_ticks() - pausedTime
 
     else:
+        frog.deanimate()
         pausedTime = pygame.time.get_ticks() - currentTime
-
         pauseMenuValues = pauseMenu.getButtonsToggle(screen, backgroundColor = (255,255,255), border = 0)
 
         # if resume is pressed
-        if pauseMenuValues[0]: pauseMenu.setIsDisplay(False)
+        if pauseMenuValues[0]:
+            pauseMenu.setIsDisplay(False)
+            frog.animate()
 
 
     for event in pygame.event.get():
@@ -109,7 +144,7 @@ while isRunning:
 
 
 
-    pygame.display.update()
+    pygame.display.flip()
     clock.tick(FPS)
 
 
