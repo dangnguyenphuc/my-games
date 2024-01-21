@@ -5,12 +5,17 @@ from config import *
 from utils import *
 
 from button import Button
+from menu import Menu
 
 pygame.init()
 
-'''GAME STATES'''
-isPaused = False
+'''MENU VALUES'''
+startMenuValues = None
+pauseMenuValues = None
 
+'''GAME STATES'''
+isStart = False
+isRunning = True
 
 '''
 init a window screen that has:
@@ -38,8 +43,16 @@ resumeImage = pygame.image.load("static/Prinbles_Asset_UNDER/png/Buttons/Rect/Pl
 timeImage = pygame.image.load("static/Prinbles_Asset_UNDER/png/Counter/Example.png").convert_alpha()
 
 # Game buttons
-startButton = Button(startImage, 1, padding=(0,100))
-resumeButton = Button(resumeImage, 1, padding=(0,100))
+startButton = Button(startImage, padding=(0,100))
+resumeButton = Button(resumeImage, padding=(0,100))
+
+# Game instances
+'''Start Menu'''
+startMenu = Menu([startImage])
+
+'''Pause Menu'''
+pauseMenu = Menu([resumeImage])
+
 
 
 
@@ -50,8 +63,6 @@ pausedTime = 0
 timeImgTemplate = normalFont.render('60:60', True, TEXT_COLOR)
 
 # Game loop
-isRunning = True
-isStart = False
 while isRunning:
 
     # set window background
@@ -66,7 +77,7 @@ while isRunning:
         # get button toggle
         if startButton.draw(screen):
             isStart = True
-    elif not isPaused:
+    elif not pauseMenu.getIsDisplay():
 
 
         drawTextOnScreen(screen, "Press SPACE to pause", introFont, TEXT_COLOR, 160, 250)
@@ -77,19 +88,21 @@ while isRunning:
 
     else:
         pausedTime = pygame.time.get_ticks() - currentTime
-        pygame.draw.rect(screen, (255,255,255,100), ( SCREEN_WIDTH//2  - 450//2, SCREEN_HEIGHT//2 - 450//2 ,450,450), 0, 15)
 
-        # display buttons
-        if resumeButton.draw(screen):
-            isPaused = False
+        pauseMenuValues = pauseMenu.getButtonsToggle(screen, backgroundColor = (255,255,255), border = 0)
+
+        # if resume is pressed
+        if pauseMenuValues[0]: pauseMenu.setIsDisplay(False)
+
 
     for event in pygame.event.get():
 
-        # If pressed any button
+        # If pressed any buttons
         if event.type == pygame.KEYDOWN:
             # If pressed PAUSE_KEY
             if event.key == PAUSE_KEY:
-                isPaused = True
+                pauseMenu.setIsDisplay(True)
+
         # If quit
         if event.type == pygame.QUIT:
             isRunning = False
