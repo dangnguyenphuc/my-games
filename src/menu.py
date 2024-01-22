@@ -24,13 +24,13 @@ class Menu:
 
 
     # draw buttons, also get buttons value
-    def getButtonsToggle(self, surface, backgroundColor = None, border = None):
+    def getButtonsToggle(self, surface, backgroundColor = None, border = 0):
         if self.isDisplay:
 
             # draw background
             if self.menuBackground:
                 surface.blit(self.menuBackground, (self.x, self.y))
-            else:
+            elif backgroundColor:
                 pygame.draw.rect(surface, backgroundColor, (self.x, self.y, self.size[0], self.size[1]) , border)
 
             for i in range(len(self.buttons)):

@@ -31,26 +31,36 @@ pygame.display.set_caption(WINDOW_TITLE)
 
 # Set text font
 introFont = pygame.font.Font(
-    TEXT_FONT, # file_path
-    size = 40   # font_size
+    INTRO_FONT, # file_path
+    size = INTRO_FONT_SIZE   # font_size
 )
+buttonFont = pygame.font.Font(
+    BUTTON_FONT,
+    size = BUTTON_FONT_SIZE
+)
+
 normalFont = pygame.font.Font(
     TEXT_FONT,
-    size = 25
+    size = TEXT_FONT_SIZE
 )
 
 # Images
-startImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayIcon/Default.png").convert_alpha()
+startImage = buttonFont.render('PLAY', True, BUTTON_TEXT_COLOR)
+optionsImage = buttonFont.render('OPTS', True, BUTTON_TEXT_COLOR)
+quitImage = buttonFont.render('QUIT', True, BUTTON_TEXT_COLOR)
 resumeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayText/Default.png").convert_alpha()
 timeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Counter/Example.png").convert_alpha()
+buttonBackgroundImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Button/Rect/Default.png").convert_alpha()
 
 # Game buttons
-startButton = Button(startImage, padding=(0,100))
+startButton = Button(startImage, padding=(0,-BUTTON_FONT_SIZE*0), background=buttonBackgroundImage)
+optionsButton = Button(optionsImage, padding=(0,-BUTTON_FONT_SIZE*2.5), background=buttonBackgroundImage)
+quitButton = Button(quitImage, padding=(0,-BUTTON_FONT_SIZE*5), background=buttonBackgroundImage)
 resumeButton = Button(resumeImage, padding=(0,100))
 
 # Game instances
 '''Start Menu'''
-startMenu = Menu([startButton])
+startMenu = Menu([startButton, optionsButton, quitButton])
 
 '''Pause Menu'''
 pauseMenu = Menu([resumeButton])
@@ -91,35 +101,45 @@ cursor = Cursor([
 clock = pygame.time.Clock()
 currentTime = 30
 pausedTime = 0
-timeImgTemplate = normalFont.render('60:60', True, TEXT_COLOR)
 
+
+timeImgTemplate = normalFont.render('60:60', True, TEXT_COLOR)
+logoImageTemplate = introFont.render(logo[0], True, TEXT_COLOR)
 # Game loop
+startMenu.setIsDisplay(True)
 while isRunning:
 
     # set window background
     screen.fill(WINDOW_BACKGROUND)
 
 
-    if not isStart:
+    if startMenu.getIsDisplay():
         currentTime = 0
         pausedTime = pygame.time.get_ticks()
-        pygame.draw.rect(screen, (255,255,255,100), ( SCREEN_WIDTH//2  - 450//2, SCREEN_HEIGHT//2 - 450//2 ,450,450), 0, 15)
 
-        # get button toggle
-        if startButton.draw(screen):
-            isStart = True
-            pygame.mouse.set_visible(True)
+        for i in range(len(logo)):
+            drawTextOnScreen(
+            screen,
+            logo[i],
+            introFont,
+            TEXT_COLOR,
+            SCREEN_WIDTH//2 - logoImageTemplate.get_width()//2 ,
+            SCREEN_HEIGHT//2 - logoImageTemplate.get_height()//2 - 250 +INTRO_FONT_SIZE*i)
 
+        startMenuValues = startMenu.getButtonsToggle(screen)
+
+        # if play is pressed
+        if startMenuValues[0]:
+            startMenu.setIsDisplay(False)
+
+        if startMenuValues[1]:
+            pass
+
+        if startMenuValues[-1]:
+            isRunning = False
     elif not pauseMenu.getIsDisplay():
         frog.animate()
 
-        drawTextOnScreen(
-            screen,
-            "Press SPACE to pause",
-            introFont,
-            TEXT_COLOR,
-            160,
-            250)
 
         screen.blit(timeImage, (SCREEN_WIDTH - timeImage.get_width(),0))
 
