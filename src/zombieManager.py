@@ -26,7 +26,7 @@ class ZombieManager:
             zombie.hole = selected_hole
             zombie.animate()
             self.zombies.add(zombie)
-            
+
 
 
     def despawn_zombies(self, current_time):
@@ -50,9 +50,9 @@ class ZombieManager:
             self.spawn_zombie()
             self.last_spawn_time = current_time
 
-    def check_on_click(self, click_pos, score):
+    def check_on_click(self, click_pos, mouse, score):
         for zombie in self.zombies:
-            if zombie.rect.collidepoint(click_pos):
+            if zombie.rect.collidepoint(click_pos) and mouse[0]:
                 # Phát âm thanh khi click trúng zombie
                 self.sound_manager.play_sound("hit")
                 self.sound_manager.play_sound("dead")

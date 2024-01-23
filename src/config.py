@@ -39,9 +39,9 @@ TEXT_FONT = 'static/font/JetBrainsMonoNerdFontMono-Regular.ttf'
 TEXT_COLOR = (255,255,255)
 TEXT_FONT_SIZE = 25
 
-# PLAY TIME IN ms
-PLAY_TIME = 30 * 1000
+# PLAY TIME IN TICK
 FPS = 60
+PLAY_TIME = 31
 
 # Key binding
 PAUSE_KEY = pygame.K_SPACE

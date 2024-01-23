@@ -23,15 +23,13 @@ class Cursor:
   def draw(self, surface):
     surface.blit(self.image, (self.x  - self.padding[0], self.y - self.padding[1]))
 
-  def update(self, speed = 1):
+  def update(self, mousePosition, mouse, speed = 1):
 
-    position = pygame.mouse.get_pos()
-    self.x = position[0]
-    self.y = position[1]
+    self.x = mousePosition[0]
+    self.y = mousePosition[1]
     self.rectangle = pygame.rect.Rect(self.x, self.y, self.width, self.height)
 
-    mouse_presses = pygame.mouse.get_pressed()
-    if mouse_presses[0]:
+    if mouse[0]:
       self.isAnimate = True
 
     if self.isAnimate:

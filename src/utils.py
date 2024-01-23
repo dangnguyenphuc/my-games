@@ -1,3 +1,6 @@
+import pygame
+from config import *
+
 '''
 @funtion drawText: renders text in (x,y) coordinate.
 @params:
@@ -8,17 +11,14 @@
     - x(int): horizontal coordinate.
     - y(int): vertical coordinate.
 '''
-import pygame
-
 def drawTextOnScreen(surface, text, font, textColor, x, y):
 
     img = font.render(text, True, textColor)
-
     surface.blit(img, (x,y))
 
 def convertGameTime2Minute(time):
-    minute = (time // 1000) // 60
-    second = (time // 1000) - 60 * minute
+    minute = (time // FPS) // 60
+    second = (time // FPS) - 60 * minute
     return "{:02d}:{:02d}".format(minute, second)
 
 def load_sprite_sheet(file_path, rows, cols, scale=1):
@@ -36,4 +36,24 @@ def load_sprite_sheet(file_path, rows, cols, scale=1):
             scaled_frames.append(scaled_frame)
 
     return scaled_frames
+
+class Timer:
+    def __init__(self, time ,fps=FPS):
+        self.time = time*FPS
+        self.currentTime = time*FPS
+        self.flag = False
+
+    def getFlag(self):
+        return self.flag
+
+    def runTimer(self):
+        self.currentTime -= 1
+
+        if self.currentTime <= 0:
+            self.flag = True
+
+    def resetTimer(self):
+        self.flag = False
+        self.currentTime = self.time
+
 
