@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 *__pycache*
 .git
+=======
+__pycache
+.git
+>>>>>>> 4986525ef1bac36e67a85b522aff11f1eb9ef3e8
