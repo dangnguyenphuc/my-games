@@ -163,6 +163,11 @@ zombie_imgs = [
 holes_pos = [(110,550), (370, 550), (620, 550), (160, 470), (370, 470), (580, 470)]
 zombies_manager = ZombieManager(zombie, 2000, holes_pos, 3000)
 
+# sounds
+pygame.mixer.music.load(backgroundSoundPath)
+pygame.mixer.music.set_volume(backgroundSoundVolume)
+pygame.mixer.music.play(-1)
+
 # Game loop
 startMenu.setIsDisplay(True)
 while isRunning:
@@ -221,6 +226,22 @@ while isRunning:
 
 
         screen.blit(timeImage, (SCREEN_WIDTH - timeImage.get_width(),0))
+
+        drawTextOnScreen(
+            screen,
+            "SCORE: " + str(score.score),
+            introFont,
+            TEXT_COLOR,
+            150,
+            20)
+
+        drawTextOnScreen(
+            screen,
+            "MISS: " + str(score.miss),
+            introFont,
+            TEXT_COLOR,
+            400,
+            20)
 
         drawTextOnScreen(
             screen,
