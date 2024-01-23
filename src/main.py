@@ -8,6 +8,8 @@ from mole import Mole
 from button import Button
 from menu import Menu
 from cursor import Cursor
+from zombieManager import ZombieManager
+from score import ScoreManager
 from slider import Slider
 
 pygame.init()
@@ -59,6 +61,7 @@ soundImagePosition = (SCREEN_WIDTH//2 - soundImage.get_width() - 20 ,
                         SCREEN_HEIGHT//2 - soundImage.get_height()//2 )
 resumeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayText/Default.png").convert_alpha()
 timeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Counter/Example.png").convert_alpha()
+background_image = pygame.image.load("static/image/background/background.png")
 backImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Icon/ArrowLeft-Thin.png").convert_alpha()
 buttonBackgroundImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Button/Rect/Default.png").convert_alpha()
 
@@ -68,6 +71,8 @@ sliderBackgroundImage = sliderBackgroundImage.subsurface(3, 3, sliderBackgroundI
 
 timeImgTemplate = normalFont.render('60:60', True, TEXT_COLOR)
 logoImageTemplate = introFont.render(logo[0], True, TEXT_COLOR)
+background_image = pygame.image.load("static/image/background/background.png")
+
 # Game buttons
 startButton = Button(startImage, padding=(0,-BUTTON_FONT_SIZE*0), background=buttonBackgroundImage)
 optionsButton = Button(optionsImage, padding=(0,-BUTTON_FONT_SIZE*2.5), background=buttonBackgroundImage)
@@ -115,7 +120,9 @@ frog = Mole([
     pygame.image.load("static/image/example-sprite/attack_9.png").convert_alpha(),
     pygame.image.load("static/image/example-sprite/attack_10.png").convert_alpha()
 ], (0,0))
+zombie = load_sprite_sheet('static/image/zombie/zombie.png', rows=5, cols=5, scale=1)
 exampleSprites.add(frog)
+
 
 '''Cursor'''
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -138,10 +145,23 @@ clock = pygame.time.Clock()
 currentTime = 30
 pausedTime = 0
 
-# sounds
-pygame.mixer.music.load(backgroundSoundPath)
-pygame.mixer.music.set_volume(backgroundSoundVolume)
-pygame.mixer.music.play(-1)
+# Score manager
+score = ScoreManager()
+
+zombie_imgs = [
+    pygame.image.load("static/image/example-sprite/attack_1.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_2.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_3.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_4.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_5.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_6.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_7.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_8.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_9.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_10.png").convert_alpha()
+]
+holes_pos = [(110,550), (370, 550), (620, 550), (160, 470), (370, 470), (580, 470)]
+zombies_manager = ZombieManager(zombie, 2000, holes_pos, 3000)
 
 # Game loop
 startMenu.setIsDisplay(True)
@@ -176,6 +196,21 @@ while isRunning:
             TEXT_COLOR,
             SCREEN_WIDTH//2 - logoImageTemplate.get_width()//2 ,
             SCREEN_HEIGHT//2 - logoImageTemplate.get_height()//2 - 250 +INTRO_FONT_SIZE*i)
+
+
+        # get button toggle
+        if startButton.draw(screen):
+            isStart = True
+            pygame.mouse.set_visible(True)
+
+    elif not pauseMenu.getIsDisplay():
+        screen.blit(background_image, (0, 0))
+        zombies_manager.manage_spawn(currentTime)
+        zombies_manager.update_zombies()
+        zombies_manager.draw_zombies(screen)
+
+        # frog.animate()
+
 
         startMenuButtonValues = startMenu.draw(screen, mousePosition, mouse)['buttons']
 
@@ -221,7 +256,6 @@ while isRunning:
         if pauseMenuButtonValues[0]:
             pauseMenu.setIsDisplay(False)
 
-
     for event in pygame.event.get():
 
         # If pressed any buttons
@@ -231,6 +265,10 @@ while isRunning:
             if event.key == PAUSE_KEY:
                 pauseMenu.setIsDisplay(True)
                 pygame.mouse.set_visible(True)
+        # If click left mouse
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            click_pos = pygame.mouse.get_pos()
+            zombies_manager.check_on_click(click_pos, score)
 
         # If quit
         if event.type == pygame.QUIT:
