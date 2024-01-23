@@ -198,20 +198,6 @@ while isRunning:
             SCREEN_HEIGHT//2 - logoImageTemplate.get_height()//2 - 250 +INTRO_FONT_SIZE*i)
 
 
-        # get button toggle
-        if startButton.draw(screen):
-            isStart = True
-            pygame.mouse.set_visible(True)
-
-    elif not pauseMenu.getIsDisplay():
-        screen.blit(background_image, (0, 0))
-        zombies_manager.manage_spawn(currentTime)
-        zombies_manager.update_zombies()
-        zombies_manager.draw_zombies(screen)
-
-        # frog.animate()
-
-
         startMenuButtonValues = startMenu.draw(screen, mousePosition, mouse)['buttons']
 
         # if play is pressed
@@ -226,7 +212,12 @@ while isRunning:
             isRunning = False
 
     elif not pauseMenu.getIsDisplay() and not optionsMenu.getIsDisplay():
-        frog.animate()
+        screen.blit(background_image, (0, 0))
+        zombies_manager.manage_spawn(currentTime)
+        zombies_manager.update_zombies()
+        zombies_manager.draw_zombies(screen)
+
+        # frog.animate()
 
 
         screen.blit(timeImage, (SCREEN_WIDTH - timeImage.get_width(),0))
@@ -239,8 +230,8 @@ while isRunning:
             SCREEN_WIDTH - timeImgTemplate.get_width() - 10,
             10)
 
-        exampleSprites.draw(screen)
-        exampleSprites.update(0.25)
+        # exampleSprites.draw(screen)
+        # exampleSprites.update(0.25)
 
         cursor.update(speed = 0.5)
         cursor.draw(screen)
