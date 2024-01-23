@@ -1,10 +1,11 @@
 # this is MENU class
 from button import Button
 from config import *
+from slider import *
 import pygame
 
 class Menu:
-    def __init__(self, buttons ,menuBackground=None, size = (500,500), xy = None):
+    def __init__(self, buttons , sliders = [], images = [], imagesPosition = [], menuBackground=None, size = (500,500), xy = None):
 
         self.menuBackground = menuBackground
         self.size = size
@@ -13,7 +14,6 @@ class Menu:
             self.y = xy[1]
 
         else:
-
             #center align
             self.x = SCREEN_WIDTH // 2 - size[0] // 2
             self.y = SCREEN_HEIGHT // 2 - size[1] // 2
@@ -21,10 +21,15 @@ class Menu:
         self.isDisplay = False
         self.buttonsValue = [False] * len(buttons)
         self.buttons = buttons
+        self.sliders = sliders
+        self.images = images
+        self.imagesPosition = imagesPosition
 
+        self.slidersValue = None
+        if sliders: self.slidersValue = [slider.getValue() for slider in sliders]
 
     # draw buttons, also get buttons value
-    def getButtonsToggle(self, surface, backgroundColor = None, border = 0):
+    def draw(self, surface, mousePosition, mouse,backgroundColor = None, border = 0, sliderFont = None):
         if self.isDisplay:
 
             # draw background
@@ -33,10 +38,22 @@ class Menu:
             elif backgroundColor:
                 pygame.draw.rect(surface, backgroundColor, (self.x, self.y, self.size[0], self.size[1]) , border)
 
-            for i in range(len(self.buttons)):
-                self.buttonsValue[i] = self.buttons[i].draw(surface)
+            for i in range(len(self.images)):
+                surface.blit(self.images[i], self.imagesPosition[i])
 
-        return self.buttonsValue
+            for i in range(len(self.sliders)):
+                self.sliders[i].update(mousePosition, mouse)
+                self.sliders[i].draw(surface, displayValue=True, font=sliderFont)
+                self.slidersValue[i] = self.sliders[i].getValue()
+
+            for i in range(len(self.buttons)):
+                self.buttonsValue[i] = self.buttons[i].draw(surface, mousePosition, mouse)
+
+
+        return {
+            "buttons": self.buttonsValue,
+            "sliders": self.slidersValue,
+        }
 
     def setButtonValue2False(self, buttonIndex = None, value=False):
         if buttonIndex:
