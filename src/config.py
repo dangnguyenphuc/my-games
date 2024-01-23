@@ -1,7 +1,7 @@
 import pygame
 
 SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_HEIGHT = 650
 
 TEXT_FONT = 'static/font/JetBrainsMonoNerdFontMono-Regular.ttf'
 TEXT_COLOR = (255,255,255)
@@ -15,5 +15,10 @@ FPS = 60
 
 # Key binding
 PAUSE_KEY = pygame.K_SPACE
+
+# SOUND
+
+SOUND_HIT = "static/sound/punch.mp3"
+SOUND_DEAD  ="static/sound/dead.mp3"
 
 

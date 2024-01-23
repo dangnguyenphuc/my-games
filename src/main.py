@@ -8,6 +8,8 @@ from mole import Mole
 from button import Button
 from menu import Menu
 from cursor import Cursor
+from zombieManager import ZombieManager
+from score import ScoreManager
 
 pygame.init()
 
@@ -43,6 +45,7 @@ normalFont = pygame.font.Font(
 startImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayIcon/Default.png").convert_alpha()
 resumeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Rect/PlayText/Default.png").convert_alpha()
 timeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Counter/Example.png").convert_alpha()
+background_image = pygame.image.load("static/image/background/background.png") 
 
 # Game buttons
 startButton = Button(startImage, padding=(0,100))
@@ -69,7 +72,9 @@ frog = Mole([
     pygame.image.load("static/image/example-sprite/attack_9.png").convert_alpha(),
     pygame.image.load("static/image/example-sprite/attack_10.png").convert_alpha()
 ], (0,0))
+zombie = load_sprite_sheet('static/image/zombie/zombie.png', rows=5, cols=5, scale=1)
 exampleSprites.add(frog)
+
 
 '''Cursor'''
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -93,13 +98,29 @@ currentTime = 30
 pausedTime = 0
 timeImgTemplate = normalFont.render('60:60', True, TEXT_COLOR)
 
+# Score manager
+score = ScoreManager()
+
+zombie_imgs = [
+    pygame.image.load("static/image/example-sprite/attack_1.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_2.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_3.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_4.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_5.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_6.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_7.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_8.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_9.png").convert_alpha(),
+    pygame.image.load("static/image/example-sprite/attack_10.png").convert_alpha()
+]
+holes_pos = [(110,550), (370, 550), (620, 550), (160, 470), (370, 470), (580, 470)]
+zombies_manager = ZombieManager(zombie, 2000, holes_pos, 3000) 
+
 # Game loop
 while isRunning:
 
     # set window background
     screen.fill(WINDOW_BACKGROUND)
-
-
     if not isStart:
         currentTime = 0
         pausedTime = pygame.time.get_ticks()
@@ -111,8 +132,12 @@ while isRunning:
             pygame.mouse.set_visible(True)
 
     elif not pauseMenu.getIsDisplay():
-        frog.animate()
+        screen.blit(background_image, (0, 0))
+        zombies_manager.manage_spawn(currentTime)
+        zombies_manager.update_zombies()
+        zombies_manager.draw_zombies(screen)
 
+        frog.animate()
         drawTextOnScreen(
             screen,
             "Press SPACE to pause",
@@ -120,7 +145,20 @@ while isRunning:
             TEXT_COLOR,
             160,
             250)
-
+        drawTextOnScreen(
+            screen,
+            "SCORE: " + str(score.score),
+            introFont,
+            TEXT_COLOR,
+            150,
+            20)
+        drawTextOnScreen(
+            screen,
+            "MISS: " + str(score.miss),
+            introFont,
+            TEXT_COLOR,
+            400,
+            20)
         screen.blit(timeImage, (SCREEN_WIDTH - timeImage.get_width(),0))
 
         drawTextOnScreen(
@@ -148,7 +186,6 @@ while isRunning:
         if pauseMenuValues[0]:
             pauseMenu.setIsDisplay(False)
 
-
     for event in pygame.event.get():
 
         # If pressed any buttons
@@ -157,12 +194,14 @@ while isRunning:
             if event.key == PAUSE_KEY:
                 pauseMenu.setIsDisplay(True)
                 pygame.mouse.set_visible(True)
+        # If click left mouse
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: 
+            click_pos = pygame.mouse.get_pos()
+            zombies_manager.check_on_click(click_pos, score)
 
         # If quit
         if event.type == pygame.QUIT:
             isRunning = False
-
-
 
     pygame.display.flip()
     clock.tick(FPS)

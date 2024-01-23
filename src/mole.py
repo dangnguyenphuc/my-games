@@ -8,7 +8,8 @@ class Mole(pygame.sprite.Sprite):
     self.currentSprite = 0
     self.image = self.sprite[self.currentSprite]
     self.rect = self.image.get_rect()
-    self.rect.topleft = position
+    self.rect.center = position
+    self.hole = -1
 
   def animate(self):
     self.isAnimate = True
@@ -22,6 +23,5 @@ class Mole(pygame.sprite.Sprite):
 
       if self.currentSprite >= len(self.sprite):
         self.currentSprite = 0
-        self.isAnimate = False
 
       self.image = self.sprite[int(self.currentSprite)]
