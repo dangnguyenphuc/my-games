@@ -3,62 +3,84 @@ import random
 from mole import Mole
 from sound import SoundManager
 from config import *
+from utils import Timer
 
 class ZombieManager:
-    def __init__(self, zombie_images, spawn_interval, hole_positions, despawn_interval):
-        sound = SoundManager()
+    def __init__(self, zombie_images, zombieDeathImages ,spawn_interval, hole_positions, despawn_interval, loopFrames: tuple=None):
         self.zombies = pygame.sprite.Group()
         self.zombie_images = zombie_images
+        self.zombieDeathImages = zombieDeathImages
+
+
+        self.zombie_images = zombie_images[:loopFrames[0]] + (FPS*despawn_interval - len(zombie_images[:loopFrames[0]]) - len(zombie_images[loopFrames[1]+1:]))//(len(zombie_images[loopFrames[0]:loopFrames[1]+1])) * zombie_images[loopFrames[0]:loopFrames[1]+1] + zombie_images[loopFrames[1]+1:]
+        print(len(self.zombie_images))
         self.spawn_interval = spawn_interval
-        self.last_spawn_time = pygame.time.get_ticks()
-        self.last_despawn_time = 0
-        self.hole_positions = hole_positions
+        self.spawnTimer = Timer(spawn_interval)
+        self.spawnTimer = Timer(spawn_interval)
+
         self.despawn_interval = despawn_interval
-        self.used_hole = [0]*6
-        self.sound_manager = sound
+        self.despawnTimer = Timer(despawn_interval)
+
+        self.hole_positions = hole_positions
+        self.used_hole = [False]*6
+        self.isReset = False
+
+        self.isSpawning = False
 
     def spawn_zombie(self):
         available_holes = [i for i in range(6) if not self.used_hole[i]]
         if available_holes:
             selected_hole = random.choice(available_holes)
             self.used_hole[selected_hole] = 1
-            zombie = Mole(self.zombie_images, self.hole_positions[selected_hole])
+            zombie = Mole(self.zombie_images, self.hole_positions[selected_hole], deathFrames=self.zombieDeathImages)
             zombie.hole = selected_hole
             zombie.animate()
             self.zombies.add(zombie)
 
-
-
-    def despawn_zombies(self, current_time):
-        if current_time - self.last_despawn_time > self.despawn_interval:
+    def despawn_zombies(self):
+        if self.despawnTimer.getFlag():
+            self.isSpawning = False
             if self.zombies:
                 zombie = self.zombies.sprites()[0]
+                self.used_hole[zombie.hole] = False
+                self.zombies.remove(zombie)
+            self.despawnTimer.resetTimer()
+
+        for zombie in self.zombies:
+            if not zombie.isAnimate:
                 self.used_hole[zombie.hole] = 0
                 self.zombies.remove(zombie)
-                self.last_despawn_time = current_time
+                self.isSpawning = False
+                self.despawnTimer.resetTimer()
 
-    def update_zombies(self, speed=1):
-        self.despawn_zombies(pygame.time.get_ticks())
-        self.zombies.update(speed=0.1)
+    def update_zombies(self, click_pos, mouse, sound_manager, speed=1):
+        self.zombies.update(click_pos, mouse, sound_manager, speed=speed)
+        self.despawn_zombies()
+
+
+        if self.isSpawning:
+            self.despawnTimer.runTimer()
+        else: self.spawnTimer.runTimer()
 
     def draw_zombies(self, screen):
         self.zombies.draw(screen)
 
-    def manage_spawn(self, current_time):
+    def manage_spawn(self):
         # Kiểm tra và quản lý việc spawn zombie
-        if current_time - self.last_spawn_time > self.spawn_interval:
+        if self.spawnTimer.getFlag():
             self.spawn_zombie()
-            self.last_spawn_time = current_time
+            self.spawnTimer.resetTimer()
+            self.isSpawning = True
 
-    def check_on_click(self, click_pos, mouse, score):
-        for zombie in self.zombies:
-            if zombie.rect.collidepoint(click_pos) and mouse[0]:
-                # Phát âm thanh khi click trúng zombie
-                self.sound_manager.play_sound("hit")
-                self.sound_manager.play_sound("dead")
-                self.used_hole[zombie.hole] = 0
-                self.zombies.remove(zombie)
-                score.increase_score()
-            else:
-                self.sound_manager.play_sound("hit")
-                score.increase_miss()
+#     def check_on_click(self, click_pos, mouse, score):
+#         for zombie in self.zombies:
+
+#             if zombie.rect.collidepoint(click_pos) and mouse[0]:
+#                 # Phát âm thanh khi click trúng zombie
+
+
+#                 self.used_hole[zombie.hole] = 0
+#                 self.zombies.remove(zombie)
+#                 score.increase_score()
+#             else:
+#                 score.increase_miss()

@@ -23,7 +23,7 @@ class Cursor:
   def draw(self, surface):
     surface.blit(self.image, (self.x  - self.padding[0], self.y - self.padding[1]))
 
-  def update(self, mousePosition, mouse, speed = 1):
+  def update(self, mousePosition, mouse, sound_manager,speed = 1):
 
     self.x = mousePosition[0]
     self.y = mousePosition[1]
@@ -31,6 +31,7 @@ class Cursor:
 
     if mouse[0]:
       self.isAnimate = True
+      sound_manager.play_sound("miss")
 
     if self.isAnimate:
       self.currentImage += speed

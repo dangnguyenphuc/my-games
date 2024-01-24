@@ -50,5 +50,5 @@ PAUSE_KEY = pygame.K_SPACE
 
 SOUND_HIT = "static/sound/punch.mp3"
 SOUND_DEAD  ="static/sound/dead.mp3"
-
+SOUND_MISS  ="static/sound/miss.wav"
 
