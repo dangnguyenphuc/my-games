@@ -37,6 +37,23 @@ def load_sprite_sheet(file_path, rows, cols, scale=1):
 
     return scaled_frames
 
+def load_frames_from_sprite_sheet(file_path, size, rowIndex, numberOfCol=0, scale=1):
+    sheet = pygame.image.load(file_path).convert_alpha()
+    sheet_rect = sheet.get_rect()
+    frame_width = size[0]
+    frame_height = size[1]
+
+    scaled_frames = []
+
+    for col in range(numberOfCol):
+        frame_rect = pygame.Rect(col * frame_width, rowIndex * frame_height, frame_width, frame_height)
+        frame = sheet.subsurface(frame_rect)
+        scaled_frame = pygame.transform.scale(frame, (int(frame_width * scale), int(frame_height * scale)))
+        scaled_frames.append(scaled_frame)
+
+    return scaled_frames
+
+
 class Timer:
     def __init__(self, time ,fps=FPS):
         self.time = time*FPS

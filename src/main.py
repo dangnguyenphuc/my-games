@@ -4,6 +4,7 @@ print("Hello World!")
 from config import *
 from utils import *
 
+from sound import SoundManager
 from gamestate import GameState
 from mole import Mole
 from button import Button
@@ -113,8 +114,10 @@ optionsMenu = Menu(
 )
 
 '''Moving Sprites'''
-zombie = load_sprite_sheet('static/image/zombie/zombie.png', rows=5, cols=5, scale=1)
-
+zombieMoving = load_frames_from_sprite_sheet('static/image/zombie/Zombie.png', size=(32,32), rowIndex=0, numberOfCol=8, scale=3)
+zombieDie = load_frames_from_sprite_sheet('static/image/zombie/Zombie.png', size=(32,32), rowIndex=5, numberOfCol=8, scale=3)
+zombieBeingSmashed = load_frames_from_sprite_sheet('static/image/zombie/Zombie.png', size=(32,32), rowIndex=3, numberOfCol=13, scale=3)
+zombieSpawn = zombieDie[::-1]
 
 '''Cursor'''
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -123,14 +126,13 @@ pygame.mouse.set_visible(True)
 
 hammer = pygame.image.load("static/image/cursor/hammer.png").convert_alpha()
 cursor = Cursor([
-    hammer,
-    pygame.transform.rotate(hammer.copy(), 10),
-    pygame.transform.rotate(hammer.copy(), 20),
-    pygame.transform.rotate(hammer.copy(), 30),
-    pygame.transform.rotate(hammer.copy(), 40),
-    pygame.transform.rotate(hammer.copy(), 50)
-
-], padding=(16,45))
+        hammer,
+        pygame.transform.rotate(hammer.copy(), 10),
+        pygame.transform.rotate(hammer.copy(), 20),
+        pygame.transform.rotate(hammer.copy(), 30),
+        pygame.transform.rotate(hammer.copy(), 40),
+        pygame.transform.rotate(hammer.copy(), 50)
+    ], padding=(16,45))
 mouse = None
 mousePosition = None
 
@@ -143,42 +145,33 @@ playTimer = Timer(PLAY_TIME)
 # Score manager
 score = ScoreManager()
 
-holes_pos = [(110,550), (370, 550), (620, 550), (160, 470), (370, 470), (580, 470)]
-zombies_manager = ZombieManager(zombie, 2000, holes_pos, 3000)
-
 # sounds
 pygame.mixer.music.load(backgroundSoundPath)
 pygame.mixer.music.set_volume(backgroundSoundVolume)
 pygame.mixer.music.play(-1)
 
+sound = SoundManager()
 
-zombie_imgs = [
-    pygame.image.load("static/image/example-sprite/attack_1.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_2.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_3.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_4.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_5.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_6.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_7.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_8.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_9.png").convert_alpha(),
-    pygame.image.load("static/image/example-sprite/attack_10.png").convert_alpha()
-]
 
-death_imgs = load_sprite_sheet("static/image/zombie/zombie.png", 5,5)
-frog = Mole(zombie_imgs, (40,40), deathFrames=death_imgs)
+zombie_imgs = zombieSpawn + zombieMoving + zombieDie
+death_imgs = zombieBeingSmashed
 
-exampleSprites = pygame.sprite.Group()
-exampleSprites.add(frog)
-
+holes_pos = [(110,550), (370, 550), (620, 550), (160, 470), (370, 470), (580, 470)]
+zombies_manager = ZombieManager(
+        zombie_imgs,
+        death_imgs,
+        spawn_interval=2,
+        hole_positions=holes_pos,
+        despawn_interval=3,
+        loopFrames=(len(zombieSpawn), len(zombieSpawn) + len(zombieMoving)))
 
 '''GAME STATES'''
 gameState = GameState.IS_START
-
+startMenu.setIsDisplay(True)
 
 # Game loop
-startMenu.setIsDisplay(True)
 while gameState:
+
     # get mouse pressed and mouse positions
     mouse = pygame.mouse.get_pressed()
     mousePosition = pygame.mouse.get_pos()
@@ -229,27 +222,24 @@ while gameState:
     elif gameState ==  GameState.IS_PLAY:
 
         screen.blit(background_image, (0, 0))
-        zombies_manager.manage_spawn(playTimer.currentTime)
-        zombies_manager.update_zombies()
-        zombies_manager.draw_zombies(screen)
 
         screen.blit(timeImage, (SCREEN_WIDTH - timeImage.get_width(),0))
 
-        drawTextOnScreen(
-            screen,
-            "SCORE: " + str(score.score),
-            introFont,
-            TEXT_COLOR,
-            150,
-            20)
+        # drawTextOnScreen(
+        #     screen,
+        #     "SCORE: " + str(score.score),
+        #     introFont,
+        #     TEXT_COLOR,
+        #     150,
+        #     20)
 
-        drawTextOnScreen(
-            screen,
-            "MISS: " + str(score.miss),
-            introFont,
-            TEXT_COLOR,
-            400,
-            20)
+        # drawTextOnScreen(
+        #     screen,
+        #     "MISS: " + str(score.miss),
+        #     introFont,
+        #     TEXT_COLOR,
+        #     400,
+        #     20)
 
         drawTextOnScreen(
             screen,
@@ -259,7 +249,12 @@ while gameState:
             SCREEN_WIDTH - timeImgTemplate.get_width() - 10,
             10)
 
-        cursor.update(mousePosition, mouse,speed = 0.6)
+        zombies_manager.manage_spawn()
+        zombies_manager.update_zombies(mousePosition, mouse, sound, speed = 1)
+        zombies_manager.draw_zombies(screen)
+
+
+        cursor.update(mousePosition, mouse, sound, speed = 0.6)
         cursor.draw(screen)
 
         playTimer.runTimer()
@@ -308,14 +303,13 @@ while gameState:
         # If click left mouse
         # if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
         #     click_pos = pygame.mouse.get_pos()
-        zombies_manager.check_on_click(mousePosition, mouse, score)
+
+        # zombies_manager.check_on_click(mousePosition, mouse, score)
 
         # If quit
         if event.type == pygame.QUIT:
             gameState = GameState.IS_EXIT
 
-    exampleSprites.draw(screen)
-    exampleSprites.update(mousePosition, mouse, 0.1)
 
     pygame.display.flip()
     clock.tick(FPS)
