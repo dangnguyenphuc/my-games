@@ -53,6 +53,20 @@ def load_frames_from_sprite_sheet(file_path, size, rowIndex, numberOfCol=0, scal
 
     return scaled_frames
 
+def fillImageColor(surface, color):
+    """Fill all pixels of the surface with color, preserve transparency."""
+    w, h = surface.get_size()
+    r, g, b, _ = color
+
+    # Create a new surface with the same size and transparency
+    newSurface = pygame.Surface((w, h), pygame.SRCALPHA)
+
+    for x in range(w):
+        for y in range(h):
+            a = surface.get_at((x, y))[3]
+            newSurface.set_at((x, y), pygame.Color(r, g, b, a))
+
+    return newSurface
 
 class Timer:
     def __init__(self, time ,fps=FPS):
@@ -72,5 +86,10 @@ class Timer:
     def resetTimer(self):
         self.flag = False
         self.currentTime = self.time
+
+    def removeAndSetOtherTime(self, time, fps=FPS):
+        self.time = time*FPS
+        self.currentTime = time*FPS
+        self.flag = False
 
 

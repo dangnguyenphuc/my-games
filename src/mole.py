@@ -20,7 +20,7 @@ class Mole(pygame.sprite.Sprite):
   def deanimate(self):
     self.isAnimate = False
 
-  def update(self, mousePosition, mouse, sound_manager, speed = 1, loop=False, frameRangeToLoop=None):
+  def update(self, mousePosition, mouse, sound_manager, score, speed = 1, loop=False, frameRangeToLoop=None):
     if self.isAnimate:
 
       if self.isDeath:
@@ -40,10 +40,18 @@ class Mole(pygame.sprite.Sprite):
           self.deanimate()
 
         self.image = self.sprite[int(self.currentSprite)]
-        self.rect = self.image.get_rect()
+        # self.rect = self.image.get_rect()
 
-        if self.rect.collidepoint(mousePosition) and mouse[0]:
-          self.isDeath = True
-          sound_manager.play_sound("hit")
-          sound_manager.play_sound("dead")
-          self.currentSprite = 0
+        if mouse:
+          if self.rect.collidepoint(mousePosition):
+            self.isDeath = True
+            sound_manager.play_sound("hit")
+            sound_manager.play_sound("dead")
+            self.currentSprite = 0
+            score.increase_score()
+            score.decrease_miss()
+
+
+
+
+

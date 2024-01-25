@@ -23,7 +23,6 @@ class ZombieManager:
 
         self.hole_positions = hole_positions
         self.used_hole = [False]*6
-        self.isReset = False
 
         self.isSpawning = False
 
@@ -53,14 +52,18 @@ class ZombieManager:
                 self.isSpawning = False
                 self.despawnTimer.resetTimer()
 
-    def update_zombies(self, click_pos, mouse, sound_manager, speed=1):
-        self.zombies.update(click_pos, mouse, sound_manager, speed=speed)
+    def update_zombies(self, click_pos, mouse, sound_manager, score, speed=1):
+        self.zombies.update(click_pos, mouse, sound_manager, score, speed=speed)
         self.despawn_zombies()
 
 
         if self.isSpawning:
             self.despawnTimer.runTimer()
         else: self.spawnTimer.runTimer()
+
+        # self.spawnTimer.runTimer()
+        # self.despawnTimer.runTimer()
+
 
     def draw_zombies(self, screen):
         self.zombies.draw(screen)
@@ -72,15 +75,11 @@ class ZombieManager:
             self.spawnTimer.resetTimer()
             self.isSpawning = True
 
-#     def check_on_click(self, click_pos, mouse, score):
-#         for zombie in self.zombies:
+    def reset(self):
+        self.used_hole = [False]*6
 
-#             if zombie.rect.collidepoint(click_pos) and mouse[0]:
-#                 # Phát âm thanh khi click trúng zombie
+        for zombie in self.zombies:
+            self.zombies.remove(zombie)
 
-
-#                 self.used_hole[zombie.hole] = 0
-#                 self.zombies.remove(zombie)
-#                 score.increase_score()
-#             else:
-#                 score.increase_miss()
+        self.spawnTimer.resetTimer()
+        self.despawnTimer.resetTimer()

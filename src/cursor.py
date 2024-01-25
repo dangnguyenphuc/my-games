@@ -23,15 +23,16 @@ class Cursor:
   def draw(self, surface):
     surface.blit(self.image, (self.x  - self.padding[0], self.y - self.padding[1]))
 
-  def update(self, mousePosition, mouse, sound_manager,speed = 1):
+  def update(self, mousePosition, mouse, sound_manager, score, speed = 1):
 
     self.x = mousePosition[0]
     self.y = mousePosition[1]
     self.rectangle = pygame.rect.Rect(self.x, self.y, self.width, self.height)
 
-    if mouse[0]:
+    if mouse:
       self.isAnimate = True
       sound_manager.play_sound("miss")
+      score.increase_miss()
 
     if self.isAnimate:
       self.currentImage += speed
