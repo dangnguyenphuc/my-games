@@ -50,7 +50,7 @@ class Slider:
       )
 
   def update(self, mousePosition, mouse):
-    if self.containerRect.collidepoint(mousePosition) and mouse[0]:
+    if self.containerRect.collidepoint(mousePosition) and mouse:
       # self.buttonRect.centerx = mousePosition[0]
       self.buttonRect = pygame.Rect(self.leftPosition, self.topPosition, mousePosition[0] - self.leftPosition, self.size[1] - self.padding[1]//2)
 

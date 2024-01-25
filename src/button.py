@@ -42,10 +42,7 @@ class Button:
         # set image center in background
         if background:
             self.imageRect = self.image.get_rect()
-            self.imageRect.center = (
-                self.rectangle.topleft[0] + int(background.get_width()*scale)//2,
-                self.rectangle.topleft[1] + int(background.get_height()*scale)//2
-            )
+            self.imageRect.center = self.rectangle.center
 
         self.clicked = False
 
@@ -53,11 +50,11 @@ class Button:
         action = False
 
         if self.rectangle.collidepoint(mousePosition):
-            if mouse[0] == 1 and self.clicked== False:
+            if mouse == 1 and self.clicked== False:
                 self.clicked = True
                 action = True
 
-        if mouse[0] == 0:
+        if mouse == 0:
             self.clicked = False
 
         if self.background:

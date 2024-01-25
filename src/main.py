@@ -53,38 +53,55 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(WINDOW_TITLE)
 
 # Images
+pauseImage = pygame.font.Font(BUTTON_FONT,size = 70).render('PAUSE', True, BUTTON_TEXT_COLOR)
 startImage = buttonFont.render('PLAY', True, BUTTON_TEXT_COLOR)
 optionsImage = buttonFont.render('OPTS', True, BUTTON_TEXT_COLOR)
 quitImage = buttonFont.render('QUIT', True, BUTTON_TEXT_COLOR)
-soundImage = normalFont.render("Sound", True, BUTTON_TEXT_COLOR)
-soundImagePosition = (SCREEN_WIDTH//2 - soundImage.get_width() - 50 ,
-                        SCREEN_HEIGHT//2 - 5 )
-
+soundImage = normalFont.render("Sound", True, (0,0,0))
 timeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Counter/Example.png").convert_alpha()
 background_image = pygame.image.load("static/image/background/background.png")
 backImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Icon/ArrowLeft-Thin.png").convert_alpha()
 buttonBackgroundImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Button/Rect/Default.png").convert_alpha()
-
-sliderBackgroundImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Load/Magazine/Dummy.png")
-sliderBackgroundImage = sliderBackgroundImage.subsurface(3, 3, sliderBackgroundImage.get_width()-3, sliderBackgroundImage.get_height()-3)
-
+menuBackgroundImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Level/Button/Dummy.png").convert_alpha()
+optsImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Icon/Levels.png").convert_alpha()
+sliderBackgroundImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Load/Magazine/Dummy.png").convert_alpha()
+squareButtonImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Button/Square/Default.png").convert_alpha()
 homeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Square/Home/Default.png").convert_alpha()
 resumeImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Square/Play/Default.png").convert_alpha()
 repeatImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Buttons/Square/Repeat/Default.png").convert_alpha()
-
 timeImgTemplate = normalFont.render('60:60', True, TEXT_COLOR)
 logoImageTemplate = introFont.render(logo[0], True, TEXT_COLOR)
 background_image = pygame.image.load("static/image/background/background.png")
 
+# Image Positions
+pauseImagePosition = (SCREEN_WIDTH//2 - pauseImage.get_width()//2,
+                        SCREEN_HEIGHT//2 - pauseImage.get_height()//2 - 40)
+soundImagePosition = (SCREEN_WIDTH//2 - soundImage.get_width() - 65 ,
+                        SCREEN_HEIGHT//2 - 5 )
+
+# Modified Images
+optsImageMod = fillImageColor(optsImage, (219,244,162, 100))
+sliderBackgroundImage = sliderBackgroundImage.subsurface(3, 3, sliderBackgroundImage.get_width()-3, sliderBackgroundImage.get_height()-3)
+
+# menuBackgroundImage = menuBackgroundImage.subsurface(25, 25, menuBackgroundImage.get_width()-45, menuBackgroundImage.get_height()-30)
+
+menuBackgroundImagePause = pygame.transform.scale(menuBackgroundImage, (menuBackgroundImage.get_width()*5, menuBackgroundImage.get_width()*4))
+menuBackgroundImageOpt = pygame.transform.scale(menuBackgroundImage, (menuBackgroundImage.get_width()*5, menuBackgroundImage.get_width()*3))
+menuBackgroundImageComplete = menuBackgroundImageOpt
 # Game buttons
+## '''Start Menu Buttons'''
 startButton = Button(startImage, padding=(0,-BUTTON_FONT_SIZE*0), background=buttonBackgroundImage)
 optionsButton = Button(optionsImage, padding=(0,-BUTTON_FONT_SIZE*2.5), background=buttonBackgroundImage)
 quitButton = Button(quitImage, padding=(0,-BUTTON_FONT_SIZE*5), background=buttonBackgroundImage)
 
-homeButton = Button(homeImage, padding=(-100,0))
-repeatButton = Button(repeatImage, padding=(0,0))
-resumeButton = Button(resumeImage, padding=(100,0))
-backButton = Button(backImage, padding=(125,90))
+homeButton = Button(homeImage, padding=(-150,-75))
+optsButton = Button(optsImageMod, padding=(-50,-75), background=squareButtonImage)
+repeatButton = Button(repeatImage, padding=(50,-75))
+resumeButton = Button(resumeImage, padding=(150,-75))
+
+
+
+backButton = Button(backImage, padding=(160,60))
 
 # Sliders
 soundSlider = Slider(
@@ -102,7 +119,12 @@ soundSlider = Slider(
 startMenu = Menu([startButton, optionsButton, quitButton])
 
 '''Pause Menu'''
-pauseMenu = Menu([resumeButton, repeatButton, homeButton], size = (300,100))
+pauseMenu = Menu(
+    [resumeButton, repeatButton, optsButton, homeButton],
+    images = [pauseImage],
+    imagesPosition = [pauseImagePosition],
+    menuBackground = menuBackgroundImagePause,
+    size = (400,250))
 
 '''Opts Menu'''
 optionsMenu = Menu(
@@ -110,8 +132,18 @@ optionsMenu = Menu(
     sliders = [soundSlider],
     images = [soundImage],
     imagesPosition = [soundImagePosition],
+    menuBackground = menuBackgroundImageOpt,
     size = (300,250)
 )
+
+# '''Opts Menu'''
+# optionsMenu = Menu(
+#     [backButton],
+#     sliders = [soundSlider],
+#     images = [soundImage],
+#     imagesPosition = [soundImagePosition],
+#     size = (300,400)
+# )
 
 '''Moving Sprites'''
 zombieMoving = load_frames_from_sprite_sheet('static/image/zombie/Zombie.png', size=(32,32), rowIndex=0, numberOfCol=8, scale=3)
@@ -156,7 +188,7 @@ sound = SoundManager()
 zombie_imgs = zombieSpawn + zombieMoving + zombieDie
 death_imgs = zombieBeingSmashed
 
-holes_pos = [(110,550), (370, 550), (620, 550), (160, 470), (370, 470), (580, 470)]
+holes_pos = [(120,550), (380, 550), (630, 550), (170, 470), (380, 470), (590, 470)]
 zombies_manager = ZombieManager(
         zombie_imgs,
         death_imgs,
@@ -166,24 +198,52 @@ zombies_manager = ZombieManager(
         loopFrames=(len(zombieSpawn), len(zombieSpawn) + len(zombieMoving)))
 
 '''GAME STATES'''
+previosState = None
 gameState = GameState.IS_START
 startMenu.setIsDisplay(True)
 
 # Game loop
 while gameState:
-
-    # get mouse pressed and mouse positions
-    mouse = pygame.mouse.get_pressed()
+    mouse = 0
     mousePosition = pygame.mouse.get_pos()
+    for event in pygame.event.get():
+
+        # If pressed any buttons
+        if gameState == GameState.IS_PLAY:
+            if event.type == pygame.KEYDOWN:
+
+                # If pressed PAUSE_KEY
+                if event.key == PAUSE_KEY:
+                    pauseMenu.setIsDisplay(True)
+                    pygame.mouse.set_visible(True)
+                    previosState = gameState
+                    gameState = GameState.IS_PAUSE
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mouse = 1
+
+
+        # If quit
+        if event.type == pygame.QUIT:
+            previosState = gameState
+            gameState = GameState.IS_EXIT
+
 
     # Handle Options Menu
     if gameState ==  GameState.OPEN_OPTS:
         optValue = optionsMenu.draw(screen, mousePosition, mouse, backgroundColor = (10,220,10), border = 0, sliderFont = sliderFont)
 
         if optValue["buttons"][0]:
-            optionsMenu.setIsDisplay(False)
-            startMenu.setIsDisplay(True)
-            gameState =  GameState.IS_START
+            if previosState == GameState.IS_PAUSE:
+                optionsMenu.setIsDisplay(False)
+                previosState = gameState
+                gameState =  GameState.IS_PAUSE
+
+            if previosState == GameState.IS_START:
+                optionsMenu.setIsDisplay(False)
+                startMenu.setIsDisplay(True)
+                previosState = gameState
+                gameState =  GameState.IS_START
 
         pygame.mixer.music.set_volume(optValue["sliders"][0]/100)
 
@@ -208,15 +268,17 @@ while gameState:
         if startMenuButtonValues[0]:
             startMenu.setIsDisplay(False)
             playTimer.resetTimer()
+            previosState = gameState
             gameState =  GameState.IS_PLAY
 
         if startMenuButtonValues[1]:
             startMenu.setIsDisplay(False)
             optionsMenu.setIsDisplay(True)
+            previosState = gameState
             gameState =  GameState.OPEN_OPTS
 
         if startMenuButtonValues[2]:
-            isRunning = False
+            previosState = gameState
             gameState = GameState.IS_EXIT
 
     elif gameState ==  GameState.IS_PLAY:
@@ -225,21 +287,21 @@ while gameState:
 
         screen.blit(timeImage, (SCREEN_WIDTH - timeImage.get_width(),0))
 
-        # drawTextOnScreen(
-        #     screen,
-        #     "SCORE: " + str(score.score),
-        #     introFont,
-        #     TEXT_COLOR,
-        #     150,
-        #     20)
+        drawTextOnScreen(
+            screen,
+            "SCORE: " + str(score.score),
+            introFont,
+            TEXT_COLOR,
+            150,
+            20)
 
-        # drawTextOnScreen(
-        #     screen,
-        #     "MISS: " + str(score.miss),
-        #     introFont,
-        #     TEXT_COLOR,
-        #     400,
-        #     20)
+        drawTextOnScreen(
+            screen,
+            "MISS: " + str(score.miss),
+            introFont,
+            TEXT_COLOR,
+            400,
+            20)
 
         drawTextOnScreen(
             screen,
@@ -250,16 +312,17 @@ while gameState:
             10)
 
         zombies_manager.manage_spawn()
-        zombies_manager.update_zombies(mousePosition, mouse, sound, speed = 1)
+        zombies_manager.update_zombies(mousePosition, mouse, sound, score, speed = 1)
         zombies_manager.draw_zombies(screen)
 
 
-        cursor.update(mousePosition, mouse, sound, speed = 0.6)
+        cursor.update(mousePosition, mouse, sound, score,speed = 1)
         cursor.draw(screen)
 
         playTimer.runTimer()
 
         if playTimer.getFlag():
+            previosState = gameState
             gameState = GameState.IS_COMPLETE
 
     elif gameState == GameState.IS_PAUSE:
@@ -270,48 +333,43 @@ while gameState:
         # if resume is pressed
         if pauseMenuButtonValues[0]:
             pauseMenu.setIsDisplay(False)
+            previosState = gameState
             gameState =  GameState.IS_PLAY
 
         # if replay
         if pauseMenuButtonValues[1]:
             pauseMenu.setIsDisplay(False)
             playTimer.resetTimer()
+            score.reset_miss()
+            score.reset_score()
+            zombies_manager.reset()
+            previosState = gameState
             gameState =  GameState.IS_PLAY
 
         if pauseMenuButtonValues[2]:
+            optionsMenu.setIsDisplay(True)
+            previosState = gameState
+            gameState =  GameState.OPEN_OPTS
+
+        if pauseMenuButtonValues[3]:
             pauseMenu.setIsDisplay(False)
             startMenu.setIsDisplay(True)
             playTimer.resetTimer()
+            score.reset_miss()
+            score.reset_score()
+            zombies_manager.reset()
+            previosState = gameState
             gameState =  GameState.IS_START
 
     elif gameState == GameState.IS_COMPLETE:
+
+
         playTimer.resetTimer()
-        pass
-
-    for event in pygame.event.get():
-
-        # If pressed any buttons
-        if gameState == GameState.IS_PLAY:
-            if event.type == pygame.KEYDOWN:
-
-                # If pressed PAUSE_KEY
-                if event.key == PAUSE_KEY:
-                    pauseMenu.setIsDisplay(True)
-                    pygame.mouse.set_visible(True)
-                    gameState = GameState.IS_PAUSE
-
-        # If click left mouse
-        # if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-        #     click_pos = pygame.mouse.get_pos()
-
-        # zombies_manager.check_on_click(mousePosition, mouse, score)
-
-        # If quit
-        if event.type == pygame.QUIT:
-            gameState = GameState.IS_EXIT
+        score.reset_score()
+        score.reset_miss()
 
 
-    pygame.display.flip()
+    pygame.display.update()
     clock.tick(FPS)
 
 

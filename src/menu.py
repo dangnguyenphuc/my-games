@@ -8,11 +8,17 @@ class Menu:
     def __init__(self, buttons , sliders = [], images = [], imagesPosition = [], menuBackground=None, size = (500,500), xy = None):
 
         self.menuBackground = menuBackground
+        # if menuBackground:
+        #     self.menuBackground = pygame.transform.scale(menuBackground, (size[0]+50,size[1]+50))
+
         self.size = size
         if xy:
             self.x = xy[0]
             self.y = xy[1]
-
+        elif menuBackground:
+            #center align
+            self.x = SCREEN_WIDTH // 2 - menuBackground.get_width() // 2
+            self.y = SCREEN_HEIGHT // 2 - menuBackground.get_height() // 2
         else:
             #center align
             self.x = SCREEN_WIDTH // 2 - size[0] // 2
