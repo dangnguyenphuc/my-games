@@ -5,7 +5,7 @@ from config import *
 from utils import *
 
 from sound import SoundManager
-from gamestate import GameState
+from gamestate import GameState, Mode
 from mole import Mole
 from button import Button
 from menu import Menu
@@ -57,6 +57,8 @@ pauseImage = pygame.font.Font(BUTTON_FONT,size = 70).render('PAUSE', True, BUTTO
 completeImage = pygame.font.Font(BUTTON_FONT,size = 50).render('HOORAY !!!', True, (0,0,0))
 scoreImage = pygame.font.Font(BUTTON_FONT,size = 25).render('SCORE: ', True, (0,0,0))
 missImage = pygame.font.Font(BUTTON_FONT,size = 25).render('MISS: ', True, (0,0,0))
+starUnactiveImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Level/Star/Unactive.png").convert_alpha()
+starActiveImage = pygame.image.load("static/image/Prinbles_Asset_UNDER/png/Level/Star/Active.png").convert_alpha()
 startImage = buttonFont.render('PLAY', True, BUTTON_TEXT_COLOR)
 optionsImage = buttonFont.render('OPTS', True, BUTTON_TEXT_COLOR)
 quitImage = buttonFont.render('QUIT', True, BUTTON_TEXT_COLOR)
@@ -88,11 +90,17 @@ timeTextImagePosition = (SCREEN_WIDTH//2 - soundImage.get_width() - 65 ,
 modeTextImagePosition = (SCREEN_WIDTH//2 - soundImage.get_width() - 65 ,
                         SCREEN_HEIGHT//2 + 95 )
 completeImagePosition = (SCREEN_WIDTH//2 - completeImage.get_width() // 2 ,
-                        SCREEN_HEIGHT//2 - completeImage.get_height() // 2 - 50)
+                        SCREEN_HEIGHT//2 - completeImage.get_height() // 2 - 75)
 scoreImagePosition = (SCREEN_WIDTH//2 - scoreImage.get_width() // 2 ,
-                        SCREEN_HEIGHT//2 - scoreImage.get_height() // 2 )
+                        SCREEN_HEIGHT//2 - scoreImage.get_height() // 2 + 30)
 missImagePosition = (SCREEN_WIDTH//2 - missImage.get_width() // 2 ,
-                        SCREEN_HEIGHT//2 - missImage.get_height() // 2 + 50 )
+                        SCREEN_HEIGHT//2 - missImage.get_height() // 2 + 75 )
+starImage1Position = (SCREEN_WIDTH//2 - starUnactiveImage.get_width() // 2 - 30,
+                        SCREEN_HEIGHT//2 - starUnactiveImage.get_height() // 2 - 20)
+starImage2Position = (SCREEN_WIDTH//2 - starUnactiveImage.get_width() // 2 ,
+                        SCREEN_HEIGHT//2 - starUnactiveImage.get_height() // 2 - 20)
+starImage3Position = (SCREEN_WIDTH//2 - starUnactiveImage.get_width() // 2 + 30,
+                        SCREEN_HEIGHT//2 - starUnactiveImage.get_height() // 2 - 20)
 
 # Modified Images
 optsImageMod = fillImageColor(optsImage, (219,244,162, 100))
@@ -115,8 +123,8 @@ optsButtonPause = Button(optsImageMod, padding=(-50,-75), background=squareButto
 repeatButtonPause = Button(repeatImage, padding=(50,-75))
 resumeButtonPause = Button(resumeImage, padding=(150,-75))
 
-homeButtonComplete = Button(homeImage, padding=(-50,-140))
-repeatButtonComplete = Button(repeatImage, padding=(50,-140))
+homeButtonComplete = Button(homeImage, padding=(-50,-150))
+repeatButtonComplete = Button(repeatImage, padding=(50,-150))
 
 backButton = Button(backImage, padding=(160,60))
 
@@ -176,8 +184,8 @@ optionsMenu = Menu(
 # '''Complete Menu'''
 completeMenu = Menu(
     [repeatButtonComplete, homeButtonComplete],
-    images = [completeImage, scoreImage, missImage],
-    imagesPosition = [completeImagePosition, scoreImagePosition, missImagePosition],
+    images = [completeImage, scoreImage, missImage, starUnactiveImage, starUnactiveImage, starUnactiveImage],
+    imagesPosition = [completeImagePosition, scoreImagePosition, missImagePosition, starImage1Position, starImage2Position, starImage3Position],
     menuBackground = menuBackgroundImageComplete,
 )
 
@@ -237,6 +245,7 @@ zombies_manager = ZombieManager(
 previosState = None
 gameState = GameState.IS_START
 startMenu.setIsDisplay(True)
+currentMode = Mode.MEDIUM
 
 # Game loop
 while gameState:
@@ -289,6 +298,16 @@ while gameState:
             score.reset_miss()
             score.reset_score()
             zombies_manager.reset()
+            playTimer.resetTimer()
+
+        if currentMode != optValue["sliders"][2]:
+            currentMode = int(optValue["sliders"][2])
+            zombies_manager.setMode(currentMode)
+            score.reset_miss()
+            score.reset_score()
+            zombies_manager.reset()
+            playTimer.resetTimer()
+
 
     elif gameState ==  GameState.IS_START:
 
@@ -372,8 +391,19 @@ while gameState:
             completeMenu.setIsDisplay(True)
             scoreImage = pygame.font.Font(BUTTON_FONT,size = 25).render('SCORE: ' + str(score.score), True, (0,0,0))
             missImage = pygame.font.Font(BUTTON_FONT,size = 25).render('MISS: ' + str(score.miss), True, (0,0,0))
+
+            # get stars:
+            stars = getStars(
+                score.scoreEvaluation(zombies_manager.totalZombie),
+                starActiveImage,
+                starUnactiveImage
+            )
+
             completeMenu.setImage(scoreImage, 1)
             completeMenu.setImage(missImage, 2)
+            completeMenu.setImage(stars[0], 3)
+            completeMenu.setImage(stars[1], 4)
+            completeMenu.setImage(stars[2], 5)
 
             playTimer.resetTimer()
             score.reset_miss()

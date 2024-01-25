@@ -20,3 +20,15 @@ class ScoreManager:
 
     def decrease_miss(self, points=1):
         self.miss -= points
+
+    def scoreEvaluation(self, maxPoint):
+        if self.score < maxPoint/3:
+            return 0
+
+        if self.score < maxPoint/2:
+            return 1
+
+        if self.score < maxPoint*2/3:
+            return 2
+
+        return 3

@@ -21,12 +21,14 @@ class ZombieManager:
 
         self.hole_positions = hole_positions
         self.used_hole = [False]*6
+        self.totalZombie = 0
 
         self.isSpawning = False
 
     def spawn_zombie(self):
         available_holes = [i for i in range(6) if not self.used_hole[i]]
         if available_holes:
+            self.totalZombie += 1
             selected_hole = random.choice(available_holes)
             self.used_hole[selected_hole] = 1
             zombie = Mole(self.zombie_images, self.hole_positions[selected_hole], deathFrames=self.zombieDeathImages)
@@ -54,6 +56,7 @@ class ZombieManager:
         self.zombies.update(click_pos, mouse, sound_manager, score, speed=speed)
         self.despawn_zombies()
 
+        # print(self.spawn_interval)
 
         if self.isSpawning:
             self.despawnTimer.runTimer()
@@ -74,6 +77,7 @@ class ZombieManager:
             self.isSpawning = True
 
     def reset(self):
+        self.isSpawning = False
         self.used_hole = [False]*6
 
         for zombie in self.zombies:
@@ -81,8 +85,10 @@ class ZombieManager:
 
         self.spawnTimer.resetTimer()
         self.despawnTimer.resetTimer()
+        self.totalZombie = 0
 
     def setMode(self, mode=2):
+
         if mode == 1:
             self.spawn_interval = 2.5
             self.despawn_interval = 3.5
@@ -92,6 +98,15 @@ class ZombieManager:
         else:
             self.spawn_interval = 1
             self.despawn_interval = 1
-        self.zombie_images = self.images[:self.loopFrames[0]] + (FPS*self.despawnTimer - len(self.images[:self.loopFrames[0]]) - len(self.images[self.loopFrames[1]+1:]))//(len(self.images[self.loopFrames[0]:self.loopFrames[1]+1])) * self.images[self.loopFrames[0]:self.loopFrames[1]+1] + self.images[self.loopFrames[1]+1:]
+
+        self.zombie_images = self.images[:self.loopFrames[0]] +\
+            (
+                int(FPS*self.despawn_interval) - len(self.images[:self.loopFrames[0]]) -\
+                len(self.images[self.loopFrames[1]+1:]))//(len(self.images[self.loopFrames[0]:self.loopFrames[1]+1])
+            ) * \
+            self.images[self.loopFrames[0]:self.loopFrames[1]+1] + \
+            self.images[self.loopFrames[1]+1:]
+
         self.spawnTimer = Timer(self.spawn_interval)
         self.despawnTimer = Timer(self.despawn_interval)
+        self.reset()
