@@ -72,3 +72,6 @@ class Menu:
 
     def getIsDisplay(self):
         return self.isDisplay
+
+    def setImage(self, image, index):
+        self.images[index] = image
