@@ -68,6 +68,18 @@ def fillImageColor(surface, color):
 
     return newSurface
 
+def getStars(points, acticeStar, unActiveStar):
+    if points == 0:
+        return 3*[unActiveStar]
+
+    if points == 1:
+        return [acticeStar] + 2*[unActiveStar]
+
+    if points == 2:
+        return 2*[acticeStar] + [unActiveStar]
+
+    return 3*[acticeStar]
+
 class Timer:
     def __init__(self, time ,fps=FPS):
         self.time = time*FPS
