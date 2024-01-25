@@ -8,14 +8,12 @@ from utils import Timer
 class ZombieManager:
     def __init__(self, zombie_images, zombieDeathImages ,spawn_interval, hole_positions, despawn_interval, loopFrames: tuple=None):
         self.zombies = pygame.sprite.Group()
-        self.zombie_images = zombie_images
+        self.images = zombie_images
         self.zombieDeathImages = zombieDeathImages
+        self.loopFrames = loopFrames
 
-
-        self.zombie_images = zombie_images[:loopFrames[0]] + (FPS*despawn_interval - len(zombie_images[:loopFrames[0]]) - len(zombie_images[loopFrames[1]+1:]))//(len(zombie_images[loopFrames[0]:loopFrames[1]+1])) * zombie_images[loopFrames[0]:loopFrames[1]+1] + zombie_images[loopFrames[1]+1:]
-        print(len(self.zombie_images))
+        self.zombie_images = self.images[:self.loopFrames[0]] + (FPS*despawn_interval - len(self.images[:self.loopFrames[0]]) - len(self.images[self.loopFrames[1]+1:]))//(len(self.images[self.loopFrames[0]:self.loopFrames[1]+1])) * self.images[self.loopFrames[0]:self.loopFrames[1]+1] + self.images[self.loopFrames[1]+1:]
         self.spawn_interval = spawn_interval
-        self.spawnTimer = Timer(spawn_interval)
         self.spawnTimer = Timer(spawn_interval)
 
         self.despawn_interval = despawn_interval
@@ -83,3 +81,17 @@ class ZombieManager:
 
         self.spawnTimer.resetTimer()
         self.despawnTimer.resetTimer()
+
+    def setMode(self, mode=2):
+        if mode == 1:
+            self.spawn_interval = 2.5
+            self.despawn_interval = 3.5
+        elif mode == 2:
+            self.spawn_interval = 2
+            self.despawn_interval = 3
+        else:
+            self.spawn_interval = 1
+            self.despawn_interval = 1
+        self.zombie_images = self.images[:self.loopFrames[0]] + (FPS*self.despawnTimer - len(self.images[:self.loopFrames[0]]) - len(self.images[self.loopFrames[1]+1:]))//(len(self.images[self.loopFrames[0]:self.loopFrames[1]+1])) * self.images[self.loopFrames[0]:self.loopFrames[1]+1] + self.images[self.loopFrames[1]+1:]
+        self.spawnTimer = Timer(self.spawn_interval)
+        self.despawnTimer = Timer(self.despawn_interval)

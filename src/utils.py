@@ -92,4 +92,7 @@ class Timer:
         self.currentTime = time*FPS
         self.flag = False
 
+    def getTime(self):
+        return self.time//FPS
+
 

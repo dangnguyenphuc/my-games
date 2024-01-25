@@ -54,9 +54,9 @@ class Slider:
       # self.buttonRect.centerx = mousePosition[0]
       self.buttonRect = pygame.Rect(self.leftPosition, self.topPosition, mousePosition[0] - self.leftPosition, self.size[1] - self.padding[1]//2)
 
-  def getValue(self, padding = (1,1)):
-    valueRange = self.rightPosition - self.leftPosition - padding[0] -padding[1]
+  def getValue(self, padding = (1,0)):
+    valueRange = self.rightPosition - self.leftPosition - padding[0] - padding[1]
     buttonPosition = self.buttonRect.centerx - self.leftPosition
 
     # TODO: NORMALIZATION
-    return int((buttonPosition/valueRange)*(self.max-self.min))+self.min
+    return int((buttonPosition/valueRange)*(self.max-self.min)*2+self.min)
