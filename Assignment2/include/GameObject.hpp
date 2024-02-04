@@ -6,7 +6,7 @@
 
 class GameObject{
   public:
-    GameObject(const char* spritePath, SDL_Renderer* renderer);
+    GameObject(const char* spritePath, SDL_Renderer* renderer, int x=0, int y=0);
     ~GameObject();
 
     void update();
