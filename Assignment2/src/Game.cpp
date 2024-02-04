@@ -1,8 +1,9 @@
 #include "../include/Game.hpp"
 #include "../include/TextureManager.hpp"
+#include "../include/GameObject.hpp"
 
-SDL_Texture *tempTexture;
-SDL_Rect tempDestRect;
+
+GameObject* tempObj;
 
 Game::Game(){
 
@@ -13,7 +14,6 @@ Game::~Game(){
 }
 
 void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen){
-  counter = 0;
   int flag = 0;
   if(fullscreen)
   {
@@ -39,7 +39,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     this->isRunning = true;
 
-    tempTexture = TextureManager::LoadTexture(TEST_TEXTURE_FILE_PATH, this->renderer);
+    tempObj = new GameObject(TEST_TEXTURE_FILE_PATH, this->renderer);
 
   }
   else
@@ -65,17 +65,12 @@ void Game::handleEvent(){
 }
 
 void Game::update(){
-  counter += 1;
-  tempDestRect.h = 50;
-  tempDestRect.w = 50;
-
-  tempDestRect.x = counter;
-  tempDestRect.y = 0;
+  tempObj->update();
 }
 
 void Game::render(){
   SDL_RenderClear(this->renderer);
-  SDL_RenderCopy(this->renderer, tempTexture, NULL, &tempDestRect);
+  tempObj->render();
   SDL_RenderPresent(this->renderer);
 }
 
