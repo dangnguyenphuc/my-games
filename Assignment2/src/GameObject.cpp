@@ -1,11 +1,10 @@
 #include "../include/GameObject.hpp"
 #include "../include/TextureManager.hpp"
 
-GameObject::GameObject(const char* spritePath, SDL_Renderer* renderer, int x, int y){
+GameObject::GameObject(const char* spritePath, int x, int y){
   this->left = x;
   this->top = y;
-  this->renderer = renderer;
-  this->texture = TextureManager::loadTexture(spritePath, this->renderer);
+  this->texture = TextureManager::loadTexture(spritePath);
 
   this->srcRect = {0,0,0,0};
 
@@ -30,10 +29,10 @@ void GameObject::update(){
 void GameObject::render(){
   switch(this->srcRect.h){
     case 0:
-      SDL_RenderCopy(this->renderer, this->texture, NULL, &destRect);
+      SDL_RenderCopy(Game::renderer, this->texture, NULL, &destRect);
       break;
     default:
-      SDL_RenderCopy(this->renderer, this->texture, &srcRect, &destRect);
+      SDL_RenderCopy(Game::renderer, this->texture, &srcRect, &destRect);
       break;
   }
 }

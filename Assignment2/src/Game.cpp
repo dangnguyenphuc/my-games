@@ -1,11 +1,12 @@
 #include "../include/Game.hpp"
 #include "../include/TextureManager.hpp"
-#include "../include/GameObject.hpp"
 
 #include "../include/ECS/ECS.hpp"
 #include "../include/ECS/PositionComponent.hpp"
+#include "../include/ECS/SpriteComponent.hpp"
 
-GameObject* tempObj;
+SDL_Renderer* Game::renderer = nullptr;
+
 Manager manager;
 Entity& newPlayer = manager.addEntity();
 
@@ -38,9 +39,10 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     this->isRunning = true;
 
-    tempObj = new GameObject(TEST_TEXTURE_FILE_PATH, this->renderer);
     newPlayer.addComponent<PositionComponent>();
-    newPlayer.getComponent<PositionComponent>().setTopLeftPos(500,500);
+    newPlayer.addComponent<SpriteComponent>(TEST_TEXTURE_FILE_PATH, 0.2);
+
+    // newPlayer.getComponent<SpriteComponent>().setTexture();
 
   }
   else
@@ -66,19 +68,19 @@ void Game::handleEvent(){
 }
 
 void Game::update(){
-  tempObj->update();
+
   manager.update();
-  std::cout << newPlayer.getComponent<PositionComponent>().getTop() << "," << newPlayer.getComponent<PositionComponent>().getLeft() << std::endl;
+  // std::cout << newPlayer.getComponent<PositionComponent>().getTop() << "," << newPlayer.getComponent<PositionComponent>().getLeft() << std::endl;
 }
 
 void Game::render(){
   SDL_RenderClear(this->renderer);
-  tempObj->render();
+  manager.draw();
   SDL_RenderPresent(this->renderer);
 }
 
 void Game::clean(){
-  delete tempObj;
+
   SDL_DestroyWindow(this->window);
   SDL_DestroyRenderer(this->renderer);
   SDL_Quit();
