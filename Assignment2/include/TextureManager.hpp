@@ -7,7 +7,8 @@
 
 class TextureManager{
   public:
-    static SDL_Texture* loadTexture(const char* filePath, SDL_Renderer* renderer);
+    static SDL_Texture* loadTexture(const char* filePath);
+    static void draw(SDL_Texture* texture, SDL_Rect srcRect, SDL_Rect destRect);
 };
 
 #endif

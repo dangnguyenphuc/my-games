@@ -21,7 +21,7 @@ class PositionComponent : public Component {
     void update() override{
       this->top += 1;
       this->left += 1;
-      printf("Position update() being called\n");
+      // printf("Position update() being called\n");
     }
 
     void setTopLeftPos(int top, int left){
