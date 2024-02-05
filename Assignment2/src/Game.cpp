@@ -2,16 +2,15 @@
 #include "../include/TextureManager.hpp"
 #include "../include/GameObject.hpp"
 
+#include "../include/ECS/ECS.hpp"
+#include "../include/ECS/PositionComponent.hpp"
 
 GameObject* tempObj;
+Manager manager;
+Entity& newPlayer = manager.addEntity();
 
-Game::Game(){
-
-}
-
-Game::~Game(){
-
-}
+Game::Game(){}
+Game::~Game(){}
 
 void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen){
   int flag = 0;
@@ -40,6 +39,8 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     this->isRunning = true;
 
     tempObj = new GameObject(TEST_TEXTURE_FILE_PATH, this->renderer);
+    newPlayer.addComponent<PositionComponent>();
+    newPlayer.getComponent<PositionComponent>().setTopLeftPos(500,500);
 
   }
   else
@@ -66,6 +67,8 @@ void Game::handleEvent(){
 
 void Game::update(){
   tempObj->update();
+  manager.update();
+  std::cout << newPlayer.getComponent<PositionComponent>().getTop() << "," << newPlayer.getComponent<PositionComponent>().getLeft() << std::endl;
 }
 
 void Game::render(){
@@ -75,6 +78,7 @@ void Game::render(){
 }
 
 void Game::clean(){
+  delete tempObj;
   SDL_DestroyWindow(this->window);
   SDL_DestroyRenderer(this->renderer);
   SDL_Quit();
