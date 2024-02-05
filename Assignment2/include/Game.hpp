@@ -1,7 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
-#pragma once
 
+#include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "config.hpp"
