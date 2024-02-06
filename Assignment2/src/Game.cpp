@@ -2,7 +2,7 @@
 #include "../include/TextureManager.hpp"
 
 #include "../include/ECS/ECS.hpp"
-#include "../include/ECS/PositionComponent.hpp"
+#include "../include/ECS/TransformComponent.hpp"
 #include "../include/ECS/SpriteComponent.hpp"
 
 SDL_Renderer* Game::renderer = nullptr;
@@ -39,7 +39,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     this->isRunning = true;
 
-    newPlayer.addComponent<PositionComponent>();
+    newPlayer.addComponent<TransformComponent>();
     newPlayer.addComponent<SpriteComponent>(TEST_TEXTURE_FILE_PATH, 0.2);
 
   }
@@ -68,7 +68,7 @@ void Game::handleEvent(){
 void Game::update(){
 
   manager.update();
-  newPlayer.getComponent<PositionComponent>().position.Add(Vector2(1,1));
+  newPlayer.getComponent<TransformComponent>().position.Add(Vector2(1,1));
 }
 
 void Game::render(){
