@@ -21,22 +21,23 @@ class KeyboardController : public Component{
         switch(Game::event.key.keysym.sym){
           case SDLK_w:
             this->transform->velocity.y = -1;
-            sprite->play(WALK_BACK);
+            this->sprite->play(WALK_BACK);
             // printf("w\n");
             break;
           case SDLK_s:
             this->transform->velocity.y =  1;
-            sprite->play(WALK_FRONT);
+            this->sprite->play(WALK_FRONT);
             // printf("s\n");
             break;
           case SDLK_a:
             this->transform->velocity.x = -1;
-            sprite->play(WALK_RIGHT);
+            this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
+            this->sprite->play(WALK_RIGHT);
             // printf("a\n");
             break;
           case SDLK_d:
             this->transform->velocity.x = 1;
-            sprite->play(WALK_RIGHT);
+            this->sprite->play(WALK_RIGHT);
             // printf("d\n");
             break;
           default:
@@ -48,19 +49,20 @@ class KeyboardController : public Component{
         switch(Game::event.key.keysym.sym){
           case SDLK_w:
             this->transform->velocity.y = 0;
-            sprite->play(IDLE);
+            this->sprite->play(IDLE);
             break;
           case SDLK_s:
             this->transform->velocity.y =  0;
-            sprite->play(IDLE);
+            this->sprite->play(IDLE);
             break;
           case SDLK_a:
             this->transform->velocity.x = 0;
-            sprite->play(IDLE);
+            this->sprite->spriteFlip = SDL_FLIP_NONE;
+            this->sprite->play(IDLE);
             break;
           case SDLK_d:
             this->transform->velocity.x = 0;
-            sprite->play(IDLE);
+            this->sprite->play(IDLE);
             break;
           default:
             break;
