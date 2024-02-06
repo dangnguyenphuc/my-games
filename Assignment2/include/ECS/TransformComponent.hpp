@@ -7,6 +7,9 @@
 class TransformComponent : public Component {
   public:
     Vector2 position;
+    Vector2 velocity;
+
+    int speed = 3;
 
     TransformComponent(){
       this->position.x = 0.0f;
@@ -23,13 +26,14 @@ class TransformComponent : public Component {
     };
 
     void init() override{
-      this->position.x = 0.0f;
-      this->position.y = 0.0f;
+      this->velocity.x = 0.0f;
+      this->velocity.x = 0.0f;
       // printf("Position added completely\n");
     }
 
     void update() override{
-
+      this->position.x = this->position.x + this->velocity.x * this->speed;
+      this->position.y = this->position.y + this->velocity.y * this->speed;
       // printf("Position update() being called\n");
     }
 

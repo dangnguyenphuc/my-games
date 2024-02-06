@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "ECS.hpp"
+#include "Component.hpp"
 #include "../TextureManager.hpp"
 
 class SpriteComponent : public Component{
@@ -64,8 +65,8 @@ class SpriteComponent : public Component{
     }
 
     void update() override{
-      this->destRect.x = this->transform->position.x;
-      this->destRect.y = this->transform->position.y;
+      this->destRect.x = std::static_cast<int>(this->transform->position.x);
+      this->destRect.y = std::static_cast<int>(this->transform->position.y);
     }
 
     ~SpriteComponent(){
