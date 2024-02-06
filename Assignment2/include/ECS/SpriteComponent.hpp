@@ -29,6 +29,11 @@ class SpriteComponent : public Component{
       setRect(scale);
     }
 
+    // SpriteComponent(const char* spritePath, float scale = 1){
+    //   this->texture = TextureManager::loadTexture(spritePath);
+    //   setRect(scale);
+    // }
+
     void setTexture(const char* spritePath, float scale = 1){
       this->texture = TextureManager::loadTexture(spritePath);
       setRect(scale);
@@ -65,11 +70,12 @@ class SpriteComponent : public Component{
     }
 
     void update() override{
-      this->destRect.x = std::static_cast<int>(this->transform->position.x);
-      this->destRect.y = std::static_cast<int>(this->transform->position.y);
+      this->destRect.x = static_cast<int>(this->transform->position.x);
+      this->destRect.y = static_cast<int>(this->transform->position.y);
     }
 
     ~SpriteComponent(){
+      SDL_DestroyTexture(this->texture);
     }
 
 };
