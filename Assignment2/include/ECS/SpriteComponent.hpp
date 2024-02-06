@@ -24,7 +24,7 @@ class SpriteComponent : public Component{
   public:
     std::map<int, Animation> animations;
     int currentAction = 0;
-
+    SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
   public:
     SpriteComponent(){
       this->srcRect.push_back({0,0,0,0});
@@ -98,7 +98,7 @@ class SpriteComponent : public Component{
     }
 
     void draw() override{
-      TextureManager::draw(this->texture[currentAction], this->srcRect[currentAction], this->destRect);
+      TextureManager::draw(this->texture[currentAction], this->srcRect[currentAction], this->destRect, this->spriteFlip);
     }
 
     void update() override{
