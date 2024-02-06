@@ -7,6 +7,7 @@
 #include "ECS.hpp"
 #include "Component.hpp"
 #include "../TextureManager.hpp"
+#include "../config.hpp"
 
 class SpriteComponent : public Component{
   private:
@@ -14,7 +15,9 @@ class SpriteComponent : public Component{
     SDL_Texture* texture;
     SDL_Rect srcRect, destRect;
 
-    // bool animated = false;
+    bool animated = false;
+    int speed = SPEED;
+    int numberOfFrame = 1;
 
   public:
     SpriteComponent(){
@@ -29,18 +32,27 @@ class SpriteComponent : public Component{
       setRect(scale);
     }
 
-    // SpriteComponent(const char* spritePath, float scale = 1){
-    //   this->texture = TextureManager::loadTexture(spritePath);
-    //   setRect(scale);
-    // }
+    SpriteComponent(const char* spritePath, int numberOfFrame, int speed, float scale = 1){
+      this->animated = true;
+      this->speed = speed;
+      this->numberOfFrame = numberOfFrame;
+
+      this->texture = TextureManager::loadTexture(spritePath);
+      setRect(scale, numberOfFrame);
+    }
 
     void setTexture(const char* spritePath, float scale = 1){
       this->texture = TextureManager::loadTexture(spritePath);
       setRect(scale);
     }
 
-    void setRect(float scale = 1){
+    void setRect(float scale = 1, int col = 1, int row = 1){
       SDL_QueryTexture(this->texture, nullptr, nullptr, &this->srcRect.w, &this->srcRect.h);
+
+      this->srcRect.x = 0;
+      this->srcRect.y = 0;
+      this->srcRect.w /= col;
+      this->srcRect.h /= row;
 
       this->destRect.w =  this->srcRect.w * scale;
       this->destRect.h = this->srcRect.h * scale;
@@ -70,6 +82,11 @@ class SpriteComponent : public Component{
     }
 
     void update() override{
+      if(this->animated){
+        this->srcRect.x = this->srcRect.w * ((SDL_GetTicks()/this->speed) % this->numberOfFrame);
+      }
+
+
       this->destRect.x = static_cast<int>(this->transform->position.x);
       this->destRect.y = static_cast<int>(this->transform->position.y);
     }
