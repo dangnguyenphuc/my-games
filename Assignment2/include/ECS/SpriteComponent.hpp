@@ -12,13 +12,15 @@
 class SpriteComponent : public Component{
   private:
     TransformComponent* transform;
-    SDL_Texture* texture;
+    std::vector<SDL_Texture*> texture;
     SDL_Rect srcRect, destRect;
 
     bool animated = false;
     int speed = SPEED;
     int numberOfFrame = 1;
 
+  public:
+    int currentIndex = 0;
   public:
     SpriteComponent(){
       this->srcRect.h = 0;
@@ -28,26 +30,29 @@ class SpriteComponent : public Component{
     };
 
     SpriteComponent(const char* spritePath, float scale = 1){
-      this->texture = TextureManager::loadTexture(spritePath);
+      this->texture.emplace_back(std::move(TextureManager::loadTexture(spritePath)));
       setRect(scale);
     }
 
-    SpriteComponent(const char* spritePath, int numberOfFrame, int speed, float scale = 1){
+    SpriteComponent(const std::vector<std::string> spritePaths, int numberOfFrame, int speed, float scale = 1){
       this->animated = true;
       this->speed = speed;
       this->numberOfFrame = numberOfFrame;
 
-      this->texture = TextureManager::loadTexture(spritePath);
+      for(auto& item : spritePaths){
+        this->texture.emplace_back(std::move(TextureManager::loadTexture(item.c_str())));
+      }
+
       setRect(scale, numberOfFrame);
     }
 
     void setTexture(const char* spritePath, float scale = 1){
-      this->texture = TextureManager::loadTexture(spritePath);
+      this->texture.emplace_back(std::move(TextureManager::loadTexture(spritePath)));
       setRect(scale);
     }
 
-    void setRect(float scale = 1, int col = 1, int row = 1){
-      SDL_QueryTexture(this->texture, nullptr, nullptr, &this->srcRect.w, &this->srcRect.h);
+    void setRect(float scale = 1, int col = 1, int row = 1, int index = 0){
+      SDL_QueryTexture(this->texture[index], nullptr, nullptr, &this->srcRect.w, &this->srcRect.h);
 
       this->srcRect.x = 0;
       this->srcRect.y = 0;
@@ -78,7 +83,7 @@ class SpriteComponent : public Component{
     }
 
     void draw() override{
-      TextureManager::draw(this->texture, srcRect, destRect);
+      TextureManager::draw(this->texture[currentIndex], srcRect, destRect);
     }
 
     void update() override{
@@ -86,13 +91,18 @@ class SpriteComponent : public Component{
         this->srcRect.x = this->srcRect.w * ((SDL_GetTicks()/this->speed) % this->numberOfFrame);
       }
 
+      this->srcRect.y = this->currentIndex * this->srcRect.w;
+
 
       this->destRect.x = static_cast<int>(this->transform->position.x);
       this->destRect.y = static_cast<int>(this->transform->position.y);
     }
 
     ~SpriteComponent(){
-      SDL_DestroyTexture(this->texture);
+      for(auto& item : this->texture){
+        SDL_DestroyTexture(item);
+      }
+
     }
 
 };

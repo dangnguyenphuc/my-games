@@ -40,7 +40,11 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     this->isRunning = true;
 
     newPlayer.addComponent<TransformComponent>();
-    newPlayer.addComponent<SpriteComponent>(ARGENTINA_WALK, 4, 100,3);
+
+    std::vector<std::string> ArgentinaFootballer;
+    ArgentinaFootballer.push_back(ARGENTINA_WALK);
+
+    newPlayer.addComponent<SpriteComponent>(ArgentinaFootballer, 4, 100,3);
     newPlayer.addComponent<KeyboardController>();
 
 

@@ -9,10 +9,11 @@
 class KeyboardController : public Component{
   private:
     TransformComponent* transform;
-
+    SpriteComponent* sprite;
   public:
     void init() override{
       this->transform = &(this->entity)->getComponent<TransformComponent>();
+      this->sprite = &(this->entity)->getComponent<SpriteComponent>();
     }
 
     void update() override{
