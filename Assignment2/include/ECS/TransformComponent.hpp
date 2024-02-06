@@ -8,6 +8,7 @@ class TransformComponent : public Component {
   public:
     Vector2 position;
     Vector2 velocity;
+    float scale = 1;
 
     int speed = 3;
 

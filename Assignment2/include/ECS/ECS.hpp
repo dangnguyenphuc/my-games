@@ -7,6 +7,7 @@
 #include <array>
 #include <vector>
 #include <memory>
+#include <map>
 
 class Component;
 class Entity;
