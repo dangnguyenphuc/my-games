@@ -42,6 +42,9 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     newPlayer.addComponent<TransformComponent>();
     newPlayer.addComponent<SpriteComponent>(TEST_TEXTURE_FILE_PATH, 0.2);
     newPlayer.addComponent<KeyboardController>();
+
+    auto [width, height] = TextureManager::getSpriteWidthHeight("../assets/image/Free_Assets/Footballers/Argentina/walk.png", 1 , 4);
+    printf("\nw: %d, h: %d\n", width, height);
   }
   else
   {
