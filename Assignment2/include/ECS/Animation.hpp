@@ -4,7 +4,7 @@
 
 struct Animation{
   int index;
-  int frame;
+  int numberOfFrame;
   int speed;
 
   Animation(){
@@ -13,10 +13,10 @@ struct Animation{
 
   Animation(int i, int f, int s){
     index = i;
-    frame = f;
-    speed = s
+    numberOfFrame = f;
+    speed = s;
   }
 
-}
+};
 
 #endif

@@ -39,12 +39,15 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     this->isRunning = true;
 
+    std::vector<std::tuple<const char*, int, int, int, int>> ArgentinaFootballerSprite;
+    ArgentinaFootballerSprite.push_back(std::make_tuple(ARGENTINA_IDLE, IDLE, 0, 4, 100));
+    ArgentinaFootballerSprite.push_back(std::make_tuple(ARGENTINA_WALK, WALK_RIGHT, 1, 4, 100));
+    ArgentinaFootballerSprite.push_back(std::make_tuple(ARGENTINA_FRONT, WALK_FRONT, 2, 4, 100));
+    ArgentinaFootballerSprite.push_back(std::make_tuple(ARGENTINA_BACK, WALK_BACK, 3, 4, 100));
+
     newPlayer.addComponent<TransformComponent>();
-
-    std::vector<const char*> ArgentinaFootballer;
-    ArgentinaFootballer.push_back(ARGENTINA_WALK);
-
-    newPlayer.addComponent<SpriteComponent>(ArgentinaFootballer, 4, 100,3);
+    newPlayer.getComponent<TransformComponent>().scale = 2;
+    newPlayer.addComponent<SpriteComponent>(ArgentinaFootballerSprite, true);
     newPlayer.addComponent<KeyboardController>();
 
 

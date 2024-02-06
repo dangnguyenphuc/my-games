@@ -8,69 +8,80 @@
 #include "Component.hpp"
 #include "../TextureManager.hpp"
 #include "../config.hpp"
+#include "Animation.hpp"
 
 class SpriteComponent : public Component{
   private:
     TransformComponent* transform;
     std::vector<SDL_Texture*> texture;
-    SDL_Rect srcRect, destRect;
+    std::vector<SDL_Rect> srcRect;
+    SDL_Rect destRect;
 
     bool animated = false;
     int speed = SPEED;
     int numberOfFrame = 1;
 
   public:
-    int currentIndex = 0;
-    // std::map<
+    std::map<int, Animation> animations;
+    int currentAction = 0;
 
   public:
     SpriteComponent(){
-      this->srcRect.h = 0;
-      this->srcRect.w = 0;
+      this->srcRect.push_back({0,0,0,0});
       this->destRect.h = 0;
       this->destRect.w = 0;
-    };
-
-    SpriteComponent(const char* spritePath, float scale = 1){
-      this->texture.emplace_back(std::move(TextureManager::loadTexture(spritePath)));
-      setRect(scale);
     }
 
-    SpriteComponent(const std::vector<const char*> spritePaths, int numberOfFrame, int speed, float scale = 1){
-      this->animated = true;
-      this->speed = speed;
-      this->numberOfFrame = numberOfFrame;
+    SpriteComponent(const char* spritePath){
+      this->texture.emplace_back(std::move(TextureManager::loadTexture(spritePath)));
+    }
 
-      for(auto& item : spritePaths){
-        this->texture.emplace_back(std::move(TextureManager::loadTexture(item)));
+    SpriteComponent(const std::vector<std::tuple<const char*, int, int, int, int>>& sprites, bool isAnimated){
+      this->animated = isAnimated;
+
+      for(auto& item : sprites){
+
+        this->texture.emplace_back(
+          std::move(
+            TextureManager::loadTexture( std::get<0>(item))
+          )
+        );
+
+        animations.emplace(
+          std::get<1>(item),
+          Animation(
+            std::get<2>(item),
+            std::get<3>(item),
+            std::get<4>(item)
+          )
+        );
       }
 
-      setRect(scale, numberOfFrame);
+      // IDLE AS THE DEFAULT STATE
+      this->play(std::get<1>(sprites[this->currentAction]));
     }
 
-    void setTexture(const char* spritePath, float scale = 1){
+    void setTexture(const char* spritePath){
+      this->texture.clear();
       this->texture.emplace_back(std::move(TextureManager::loadTexture(spritePath)));
-      setRect(scale);
+      setRect();
     }
 
-    void setRect(float scale = 1, int col = 1, int row = 1, int index = 0){
-      SDL_QueryTexture(this->texture[index], nullptr, nullptr, &this->srcRect.w, &this->srcRect.h);
+    void setRect(){
+      SDL_Rect tempRect;
+      for(int i = 0; i < (int)this->texture.size(); i+=1){
 
-      this->srcRect.x = 0;
-      this->srcRect.y = 0;
-      this->srcRect.w /= col;
-      this->srcRect.h /= row;
+        SDL_QueryTexture(this->texture[i], nullptr, nullptr, &tempRect.w, &tempRect.h);
 
-      this->destRect.w =  this->srcRect.w * scale;
-      this->destRect.h = this->srcRect.h * scale;
-    }
+        tempRect.x = 0;
+        tempRect.y = 0;
+        tempRect.w /= this->animations[i].numberOfFrame;
 
-    void setSrcRect(int width, int height, int scale = 1){
-      this->srcRect.w = width;
-      this->srcRect.h = height;
+        this->srcRect.push_back(tempRect);
+      }
 
-      this->destRect.h = height*scale;
-      this->destRect.w = width*scale;
+      this->destRect.w =  this->srcRect[this->currentAction].w * this->transform->scale;
+      this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;
     }
 
     void setDestRect(int width, int height){
@@ -82,29 +93,35 @@ class SpriteComponent : public Component{
       this->transform = &(this->entity)->getComponent<TransformComponent>();
       this->destRect.x = this->transform->position.x;
       this->destRect.y = this->transform->position.y;
+
+      this->setRect();
     }
 
     void draw() override{
-      TextureManager::draw(this->texture[currentIndex], srcRect, destRect);
+      TextureManager::draw(this->texture[currentAction], this->srcRect[currentAction], this->destRect);
     }
 
     void update() override{
       if(this->animated){
-        this->srcRect.x = this->srcRect.w * ((SDL_GetTicks()/this->speed) % this->numberOfFrame);
+        this->srcRect[this->currentAction].x = this->srcRect[this->currentAction].w * ((SDL_GetTicks()/this->speed) % this->numberOfFrame);
       }
 
-      this->srcRect.y = this->currentIndex * this->srcRect.w;
-
-
+      this->destRect.w =  this->srcRect[this->currentAction].w * this->transform->scale;
+      this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;
       this->destRect.x = static_cast<int>(this->transform->position.x);
       this->destRect.y = static_cast<int>(this->transform->position.y);
+    }
+
+    void play(const int& animationName){
+      this->currentAction = animations[animationName].index;
+      this->speed = animations[animationName].speed;
+      this->numberOfFrame = animations[animationName].numberOfFrame;
     }
 
     ~SpriteComponent(){
       for(auto& item : this->texture){
         SDL_DestroyTexture(item);
       }
-
     }
 
 };
