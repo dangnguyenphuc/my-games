@@ -13,7 +13,7 @@ class SpriteComponent : public Component{
     SDL_Texture* texture;
     SDL_Rect srcRect, destRect;
 
-    bool animated = false;
+    // bool animated = false;
 
   public:
     SpriteComponent(){
@@ -55,8 +55,8 @@ class SpriteComponent : public Component{
 
     void init() override{
       this->position = &(this->entity)->getComponent<PositionComponent>();
-      this->destRect.x = this->position->getLeft();
-      this->destRect.y = this->position->getTop();
+      this->destRect.x = this->position->position.x;
+      this->destRect.y = this->position->position.y;
     }
 
     void draw() override{
@@ -64,8 +64,8 @@ class SpriteComponent : public Component{
     }
 
     void update() override{
-      this->destRect.x = this->position->getLeft();
-      this->destRect.y = this->position->getTop();
+      this->destRect.x = this->position->position.x;
+      this->destRect.y = this->position->position.y;
     }
 
     ~SpriteComponent(){
