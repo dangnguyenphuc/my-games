@@ -1,12 +1,12 @@
 #include "../include/Game.hpp"
 #include "../include/TextureManager.hpp"
+#include "../include/ECS/Component.hpp"
 
-#include "../include/ECS/ECS.hpp"
-#include "../include/ECS/TransformComponent.hpp"
-#include "../include/ECS/SpriteComponent.hpp"
-
+// static attributes
 SDL_Renderer* Game::renderer = nullptr;
+SDL_Event Game::event;
 
+// Game instances
 Manager manager;
 Entity& newPlayer = manager.addEntity();
 
@@ -41,7 +41,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     newPlayer.addComponent<TransformComponent>();
     newPlayer.addComponent<SpriteComponent>(TEST_TEXTURE_FILE_PATH, 0.2);
-
+    newPlayer.addComponent<KeyboardController>();
   }
   else
   {
@@ -50,7 +50,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 }
 
 void Game::handleEvent(){
-  SDL_Event event;
+
   SDL_PollEvent(&event);
 
   switch(event.type){
@@ -66,9 +66,8 @@ void Game::handleEvent(){
 }
 
 void Game::update(){
-
+  manager.refresh();
   manager.update();
-  newPlayer.getComponent<TransformComponent>().position.Add(Vector2(1,1));
 }
 
 void Game::render(){
