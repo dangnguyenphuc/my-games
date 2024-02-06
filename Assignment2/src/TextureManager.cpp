@@ -24,6 +24,7 @@ std::pair<int, int> TextureManager::getTextureWidthHeight(const char* filePath){
   return std::make_pair(width,height);
 }
 
+// auto [width, height] = TextureManager::getSpriteWidthHeight("../assets/image/Free_Assets/Footballers/Argentina/walk.png", 1 , 4);
 std::pair<int, int> TextureManager::getSpriteWidthHeight(const char* filePath, int row, int col){
   auto [width, height] = getTextureWidthHeight(filePath);
   return std::make_pair(width/col,height/row);
