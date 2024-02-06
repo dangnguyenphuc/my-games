@@ -2,31 +2,40 @@
 #define POSITION_COMPONENT_HPP
 #pragma once
 #include "ECS.hpp"
+#include "../Vector2.hpp"
 
 class PositionComponent : public Component {
-  private:
-    int top;
-    int left;
-
   public:
-    int getTop() { return this->top; }
-    int getLeft() { return this->left; }
+    Vector2 position;
+
+    PositionComponent(){
+      this->position.x = 0.0f;
+      this->position.y = 0.0f;
+    }
+
+    PositionComponent(float x, float y){
+      this->position.x = x;
+      this->position.y = y;
+    }
+
+    ~PositionComponent(){
+
+    };
 
     void init() override{
-      this->top = 0;
-      this->left = 0;
+      this->position.x = 0.0f;
+      this->position.y = 0.0f;
       printf("Position added completely\n");
     }
 
     void update() override{
-      this->top += 1;
-      this->left += 1;
-      // printf("Position update() being called\n");
+
+      printf("Position update() being called\n");
     }
 
     void setTopLeftPos(int top, int left){
-      this->top = top;
-      this->left = left;
+      this->position.x = left;
+      this->position.y = top;
     }
 };
 #endif

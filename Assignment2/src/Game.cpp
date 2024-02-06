@@ -42,8 +42,6 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     newPlayer.addComponent<PositionComponent>();
     newPlayer.addComponent<SpriteComponent>(TEST_TEXTURE_FILE_PATH, 0.2);
 
-    // newPlayer.getComponent<SpriteComponent>().setTexture();
-
   }
   else
   {
@@ -70,7 +68,7 @@ void Game::handleEvent(){
 void Game::update(){
 
   manager.update();
-  // std::cout << newPlayer.getComponent<PositionComponent>().getTop() << "," << newPlayer.getComponent<PositionComponent>().getLeft() << std::endl;
+  newPlayer.getComponent<PositionComponent>().position.Add(Vector2(1,1));
 }
 
 void Game::render(){
