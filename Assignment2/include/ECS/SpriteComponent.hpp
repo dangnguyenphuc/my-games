@@ -21,6 +21,8 @@ class SpriteComponent : public Component{
 
   public:
     int currentIndex = 0;
+    // std::map<
+
   public:
     SpriteComponent(){
       this->srcRect.h = 0;
@@ -34,13 +36,13 @@ class SpriteComponent : public Component{
       setRect(scale);
     }
 
-    SpriteComponent(const std::vector<std::string> spritePaths, int numberOfFrame, int speed, float scale = 1){
+    SpriteComponent(const std::vector<const char*> spritePaths, int numberOfFrame, int speed, float scale = 1){
       this->animated = true;
       this->speed = speed;
       this->numberOfFrame = numberOfFrame;
 
       for(auto& item : spritePaths){
-        this->texture.emplace_back(std::move(TextureManager::loadTexture(item.c_str())));
+        this->texture.emplace_back(std::move(TextureManager::loadTexture(item)));
       }
 
       setRect(scale, numberOfFrame);
