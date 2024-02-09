@@ -1,6 +1,7 @@
 #include "../include/Game.hpp"
 #include "../include/TextureManager.hpp"
 #include "../include/ECS/Component.hpp"
+#include "../include/Map.hpp"
 
 // static attributes
 SDL_Renderer* Game::renderer = nullptr;
@@ -9,6 +10,7 @@ SDL_Event Game::event;
 // Game instances
 Manager manager;
 Entity& newPlayer = manager.addEntity();
+Map* map;
 
 Game::Game(){}
 Game::~Game(){}
@@ -38,6 +40,8 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     }
 
     this->isRunning = true;
+
+    map = new Map();
 
     std::vector<std::tuple<const char*, int, int, int, int>> ArgentinaFootballerSprite;
     ArgentinaFootballerSprite.push_back(std::make_tuple(ARGENTINA_IDLE, IDLE, 0, 4, 100));
@@ -81,12 +85,13 @@ void Game::update(){
 
 void Game::render(){
   SDL_RenderClear(this->renderer);
+  map->drawMap();
   manager.draw();
   SDL_RenderPresent(this->renderer);
 }
 
 void Game::clean(){
-
+  delete map;
   SDL_DestroyWindow(this->window);
   SDL_DestroyRenderer(this->renderer);
   SDL_Quit();

@@ -1,14 +1,23 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#define SCREEN_WIDTH 1000
-#define SCREEN_HEIGHT 850
+#define SCREEN_WIDTH 1120
+#define SCREEN_HEIGHT 800
 
 #define FPS 60
 #define FRAME_DELAY 1000/FPS
 #define SPEED 100
 
 #define TEST_TEXTURE_FILE_PATH "../assets/image/temp.jpg"
+
+// Map
+#define MAP_WIDTH 35  //  1120/32
+#define MAP_HEIGHT 25 //  800/32
+
+// Grass Tile
+#define GRASS_TILE_FILE_PATH "../assets/image/Tiles/grass.png"
+#define GRASS_TILE_WIDTH_HEIGHT 16
+#define GRASS_TILE_WIDTH_HEIGHT_2_DRAW 32
 
 // ARGENTINA
 #define ARGENTINA_WALK "../assets/image/Free_Assets/Footballers/Argentina/walk.png"
