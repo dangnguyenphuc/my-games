@@ -29,6 +29,11 @@ Vector2& Vector2::Divide(const float& num){
   return *this;
 }
 
+Vector2& Vector2::Zero(){
+  this->x = 0.0f;
+  this->y = 0.0f;
+  return *this;
+}
 
 
 Vector2& operator+(Vector2& left, const Vector2& right){

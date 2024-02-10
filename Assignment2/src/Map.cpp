@@ -31,7 +31,6 @@ int defaultMap[25][35] = {
 
 Map::Map(){
   this->grass = TextureManager::loadTexture(GRASS_TILE_FILE_PATH);
-  this->flip = SDL_FLIP_NONE;
 
   this->loadMap(defaultMap);
 
@@ -67,7 +66,7 @@ void Map::drawMap(){
 
       switch(type){
         case 0:
-          TextureManager::draw(grass, this->srcRect, this->desRect, this->flip);
+          TextureManager::draw(grass, this->srcRect, this->desRect, SDL_FLIP_NONE);
           break;
 
         default:

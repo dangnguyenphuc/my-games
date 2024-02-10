@@ -7,7 +7,7 @@
 #include "Component.hpp"
 
 class KeyboardController : public Component{
-  private:
+  protected:
     TransformComponent* transform;
     SpriteComponent* sprite;
   public:
@@ -15,7 +15,10 @@ class KeyboardController : public Component{
       this->transform = &(this->entity)->getComponent<TransformComponent>();
       this->sprite = &(this->entity)->getComponent<SpriteComponent>();
     }
+};
 
+class FootballKeyboardController : public KeyboardController{
+  public:
     void update() override{
       if(Game::event.type == SDL_KEYDOWN){
         switch(Game::event.key.keysym.sym){
