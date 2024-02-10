@@ -11,7 +11,7 @@
 #include "Animation.hpp"
 
 class SpriteComponent : public Component{
-  private:
+  protected:
     TransformComponent* transform;
     std::vector<SDL_Texture*> texture;
     std::vector<SDL_Rect> srcRect;
@@ -33,7 +33,12 @@ class SpriteComponent : public Component{
     }
 
     SpriteComponent(const char* spritePath){
-      this->texture.emplace_back(std::move(TextureManager::loadTexture(spritePath)));
+      this->texture.emplace_back(
+        std::move(
+          TextureManager::loadTexture(spritePath)
+        )
+      );
+      this->animated = false;
     }
 
     SpriteComponent(const std::vector<std::tuple<const char*, int, int, int, int>>& sprites, bool isAnimated){
@@ -75,10 +80,13 @@ class SpriteComponent : public Component{
 
         tempRect.x = 0;
         tempRect.y = 0;
-        tempRect.w /= this->animations[i].numberOfFrame;
+        if(this->animated) tempRect.w /= this->animations[i].numberOfFrame;
 
         this->srcRect.push_back(tempRect);
       }
+
+      this->transform->height = this->srcRect[this->currentAction].h;
+      this->transform->width = this->srcRect[this->currentAction].w;
 
       this->destRect.w =  this->srcRect[this->currentAction].w * this->transform->scale;
       this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;
@@ -105,6 +113,9 @@ class SpriteComponent : public Component{
       if(this->animated){
         this->srcRect[this->currentAction].x = this->srcRect[this->currentAction].w * ((SDL_GetTicks()/this->speed) % this->numberOfFrame);
       }
+
+      this->transform->height = this->srcRect[this->currentAction].h;
+      this->transform->width = this->srcRect[this->currentAction].w;
 
       this->destRect.w =  this->srcRect[this->currentAction].w * this->transform->scale;
       this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;

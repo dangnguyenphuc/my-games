@@ -23,6 +23,7 @@ class Vector2{
     Vector2& Multiply(const Vector2& v);
     Vector2& Multiply(const float& num);
     Vector2& Divide(const float& num);
+    Vector2& Zero();
 
     friend Vector2& operator+(Vector2& left, const Vector2& right);
     friend Vector2& operator-(Vector2& left, const Vector2& right);

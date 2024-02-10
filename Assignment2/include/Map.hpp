@@ -15,7 +15,6 @@ class Map{
     SDL_Rect srcRect, desRect;
     SDL_Texture* grass;
     SDL_Texture* line;
-    SDL_RendererFlip flip;
 
     int map[MAP_HEIGHT][MAP_WIDTH];
 };
