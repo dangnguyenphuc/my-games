@@ -34,8 +34,7 @@ class TransformComponent : public Component {
     };
 
     void init() override{
-      this->velocity.x = 0.0f;
-      this->velocity.x = 0.0f;
+      this->velocity.Zero();
       // printf("Position added completely\n");
     }
 
