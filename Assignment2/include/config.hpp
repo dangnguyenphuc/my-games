@@ -33,7 +33,6 @@
 #define WALK_RIGHT 1
 #define WALK_FRONT 2
 #define WALK_BACK 3
-#define WALK_LEFT 4
 
 
 
