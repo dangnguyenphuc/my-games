@@ -85,8 +85,8 @@ class SpriteComponent : public Component{
         this->srcRect.push_back(tempRect);
       }
 
-      this->transform->height = this->srcRect[this->currentAction].h;
-      this->transform->width = this->srcRect[this->currentAction].w;
+      this->transform->height = this->srcRect[this->currentAction].h  * this->transform->scale;
+      this->transform->width = this->srcRect[this->currentAction].w  * this->transform->scale;
 
       this->destRect.w =  this->srcRect[this->currentAction].w * this->transform->scale;
       this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;
@@ -114,8 +114,8 @@ class SpriteComponent : public Component{
         this->srcRect[this->currentAction].x = this->srcRect[this->currentAction].w * ((SDL_GetTicks()/this->speed) % this->numberOfFrame);
       }
 
-      this->transform->height = this->srcRect[this->currentAction].h;
-      this->transform->width = this->srcRect[this->currentAction].w;
+      this->transform->height = this->srcRect[this->currentAction].h * this->transform->scale;
+      this->transform->width = this->srcRect[this->currentAction].w * this->transform->scale;
 
       this->destRect.w =  this->srcRect[this->currentAction].w * this->transform->scale;
       this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;

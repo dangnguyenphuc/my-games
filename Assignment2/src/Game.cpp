@@ -89,6 +89,7 @@ void Game::update(){
   manager.update();
 
   if(Collision::AABB(newPlayer.getComponent<CollisionComponent>().collider, wall.getComponent<CollisionComponent>().collider)){
+    newPlayer.getComponent<TransformComponent>().velocity *= -1;
     printf("PLAYER hits WALL\n");
   }
 
