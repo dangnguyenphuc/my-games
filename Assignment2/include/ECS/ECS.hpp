@@ -9,16 +9,20 @@
 #include <memory>
 #include <map>
 
+class Manager;
 class Component;
 class Entity;
 
+using Group = std::size_t;
 using ComponentID = std::size_t;
 constexpr std::size_t maxComponent = 32;
+constexpr std::size_t maxGroup = 32;
 using ComponentBitSet = std::bitset<maxComponent>;
+using GroupBitSet = std::bitset<maxGroup>;
 using ComponentArray = std::array<std::shared_ptr<Component>, maxComponent>;
 
 inline ComponentID getComponentTypeID() {
-    static ComponentID lastID = 0;
+    static ComponentID lastID = 0u;
     return lastID++;
 }
 
@@ -49,13 +53,19 @@ public:
 
 class Entity {
 private:
+    Manager& manager;
     bool isActive = true;
     std::vector<std::shared_ptr<Component>> components;
 
     ComponentArray componentArray;
     ComponentBitSet componentBitSet;
-
+    GroupBitSet groupBitSet;
 public:
+
+    Entity(Manager& manager):manager(manager){
+
+    }
+
     void update() {
         for (auto& c : this->components) {
             c->update();
@@ -70,6 +80,16 @@ public:
 
     bool getIsActive() const { return this->isActive; }
     void destroy() { this->isActive = false; }
+
+    bool hasGroup(Group group){
+        return this->groupBitSet[group];
+    }
+
+    void addGroup(Group group);
+
+    void removeGroup(Group group){
+        this->groupBitSet[group] = false;
+    }
 
     template <typename T>
     bool hasComponent() const {
@@ -100,6 +120,7 @@ public:
 class Manager {
 private:
     std::vector<std::shared_ptr<Entity>> entities;
+    std::array<std::vector<Entity*>, maxGroup> groupedEntities;
 
 public:
     void update() {
@@ -115,6 +136,19 @@ public:
     }
 
     void refresh() {
+        for(auto i(0u); i < maxGroup; i+=1)
+        {
+            auto& v = this->groupedEntities[i];
+            v.erase(
+                std::remove_if(v.begin(), v.end(),
+                [i](Entity* entity){
+                    return !entity->getIsActive() || !entity->hasGroup(i);
+                }),
+                v.end()
+            );
+        }
+
+
         this->entities.erase(std::remove_if(this->entities.begin(), this->entities.end(),
                                             [](const std::shared_ptr<Entity>& entity) {
                                                 return !entity->getIsActive();
@@ -123,10 +157,18 @@ public:
     }
 
     Entity& addEntity() {
-        std::shared_ptr<Entity> e = std::make_shared<Entity>();
+        std::shared_ptr<Entity> e = std::make_shared<Entity>(*this);
         this->entities.push_back(e);
 
         return *e;
+    }
+
+    void addToGroup(Entity* entity, Group group){
+        this->groupedEntities[group].emplace_back(entity);
+    }
+
+    std::vector<Entity*>& getGroup(Group group){
+        return this->groupedEntities[group];
     }
 };
 
