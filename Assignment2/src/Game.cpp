@@ -10,8 +10,14 @@ SDL_Event Game::event;
 std::vector<CollisionComponent*> Game::colliders;
 
 // Game instances
+enum groupLables : std::size_t {
+    GROUP_MAP,
+    GROUP_PLAYER,
+    GROUP_COLLIDER
+};
 Manager manager;
 Entity& newPlayer = manager.addEntity();
+
 
 // Map* map;
 int defaultMap[25][35] = {
@@ -84,6 +90,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     newPlayer.addComponent<SpriteComponent>(ArgentinaFootballerSprite, true);
     newPlayer.addComponent<FootballKeyboardController>();
     newPlayer.addComponent<CollisionComponent>("player");
+    newPlayer.addGroup(GROUP_PLAYER);
   }
   else
   {
@@ -117,10 +124,28 @@ void Game::update(){
 
 }
 
+std::vector<Entity*>& tiles = manager.getGroup(GROUP_MAP);
+std::vector<Entity*>& player = manager.getGroup(GROUP_PLAYER);
+// std::vector<Entity*>& collider = manager.getGroup(GROUP_COLLIDER);
+
 void Game::render(){
   SDL_RenderClear(this->renderer);
-  // map->drawMap();
-  manager.draw();
+
+  for(auto& i : tiles)
+  {
+    i->draw();
+  }
+
+  for(auto& i : player)
+  {
+    i->draw();
+  }
+
+  // for(auto& i : collider)
+  // {
+  //   i->draw();
+  // }
+
   SDL_RenderPresent(this->renderer);
 }
 
@@ -135,4 +160,5 @@ void Game::clean(){
 void Game::addTile(int x, int y, int id, float scale){
   Entity& tile = manager.addEntity();
   tile.addComponent<TileComponent>(x,y,id,scale);
+  tile.addGroup(GROUP_MAP);
 }
