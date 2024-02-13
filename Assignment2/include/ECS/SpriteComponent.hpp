@@ -119,8 +119,8 @@ class SpriteComponent : public Component{
 
       this->destRect.w =  this->srcRect[this->currentAction].w * this->transform->scale;
       this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;
-      this->destRect.x = static_cast<int>(this->transform->position.x);
-      this->destRect.y = static_cast<int>(this->transform->position.y);
+      this->destRect.x = static_cast<int>(this->transform->position.x) - Game::camera.x;
+      this->destRect.y = static_cast<int>(this->transform->position.y) - Game::camera.y;
     }
 
     void play(const int& animationName){

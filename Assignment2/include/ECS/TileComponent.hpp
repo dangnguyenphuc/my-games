@@ -5,6 +5,8 @@
 #include "Component.hpp"
 #include "ECS.hpp"
 #include "../config.hpp"
+#include "../Vector2.hpp"
+#include "../TextureManager.hpp"
 
 class TileComponent : public Component{
   public:
@@ -14,8 +16,7 @@ class TileComponent : public Component{
 
     const char* path;
     float scale;
-    int x;
-    int y;
+    Vector2 position;
 
 
 
@@ -27,8 +28,8 @@ class TileComponent : public Component{
     TileComponent(int x, int y, int id = 0 ,float scale = 1.0f){
       this->id = id;
       this->scale = scale;
-      this->x = x;
-      this->y = y;
+      this->position.x = float(x);
+      this->position.y = float(y);
 
       switch(id){
         case 0:
@@ -44,12 +45,18 @@ class TileComponent : public Component{
     }
 
     void init() override{
-      this->entity->addComponent<TransformComponent>(float(x), float(y), this->scale);
+      this->entity->addComponent<TransformComponent>(this->position.x, this->position.y, this->scale);
       this->transform = &(this->entity)->getComponent<TransformComponent>();
 
       this->entity->addComponent<SpriteComponent>(this->path);
       this->sprite = &(this->entity)->getComponent<SpriteComponent>();
     }
+
+    void update() override{
+      this->transform->position.x = this->position.x - Game::camera.x;
+      this->transform->position.y = this->position.y - Game::camera.y;
+    }
+
 };
 
 #endif
