@@ -15,7 +15,7 @@
 
 // Map
 #define MAP_WIDTH 35  //  1120/32
-#define MAP_HEIGHT 25 //  800/32
+#define MAP_HEIGHT 50 //  800/32
 
 // Grass Tile
 #define GRASS_TILE_FILE_PATH "../assets/image/Tiles/grass.png"
