@@ -48,5 +48,10 @@ class TransformComponent : public Component {
       this->position.x = left;
       this->position.y = top;
     }
+
+    void setTopLeftPos(Vector2 position){
+      this->position.x = position.x;
+      this->position.y = position.y;
+    }
 };
 #endif
