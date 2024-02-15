@@ -12,7 +12,7 @@ void Map::loadMap(int arr[MAP_HEIGHT][MAP_WIDTH]){
     for(int j = 0; j < MAP_WIDTH; j+=1){
       switch(arr[i][j]){
          case 0:
-          Game::addTile(GRASS_TILE_WIDTH_HEIGHT_2_DRAW*j, GRASS_TILE_WIDTH_HEIGHT_2_DRAW*i, 0, 2.0f);
+          Game::addTile(GRASS_TILE_WIDTH_HEIGHT_2_DRAW*j, GRASS_TILE_WIDTH_HEIGHT_2_DRAW*i, 0, 4.0f);
           break;
          default:
           break;

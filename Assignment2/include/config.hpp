@@ -11,16 +11,16 @@
 #define FRAME_DELAY 1000/FPS
 #define SPEED 100
 
-#define TEST_TEXTURE_FILE_PATH "../assets/image/temp.jpg"
+#define BALL_TEXTURE_FILE_PATH "../assets/image/ball.png"
 
 // Map
 #define MAP_WIDTH 35  //  1120/32
-#define MAP_HEIGHT 50 //  800/32
+#define MAP_HEIGHT 25 //  800/32
 
 // Grass Tile
 #define GRASS_TILE_FILE_PATH "../assets/image/Tiles/grass.png"
 #define GRASS_TILE_WIDTH_HEIGHT 16
-#define GRASS_TILE_WIDTH_HEIGHT_2_DRAW 32
+#define GRASS_TILE_WIDTH_HEIGHT_2_DRAW 64
 
 // ARGENTINA
 #define ARGENTINA_WALK "../assets/image/Free_Assets/Footballers/Argentina/walk.png"

@@ -3,6 +3,8 @@
 #include "../include/ECS/Component.hpp"
 #include "../include/Map.hpp"
 #include "../include/Collision.hpp"
+#include "../include/Logic.hpp"
+#include <string.h>
 
 // static attributes
 SDL_Renderer* Game::renderer = nullptr;
@@ -14,40 +16,17 @@ SDL_Rect Game::camera = {0,0,SCREEN_WIDTH, SCREEN_HEIGHT};
 enum groupLables : std::size_t {
     GROUP_MAP,
     GROUP_PLAYER,
-    GROUP_COLLIDER
+    GROUP_COLLIDER,
+    GROUP_BALL
 };
+
 Manager manager;
 Entity& newPlayer = manager.addEntity();
+Entity& ball = manager.addEntity();
 
 
 // Map* map;
 int defaultMap[MAP_HEIGHT][MAP_WIDTH] = {
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
@@ -117,6 +96,16 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     newPlayer.addComponent<FootballKeyboardController>();
     newPlayer.addComponent<CollisionComponent>("player");
     newPlayer.addGroup(GROUP_PLAYER);
+
+    ball.addComponent<TransformComponent>(0.0625f);
+    ball.addComponent<SpriteComponent>(BALL_TEXTURE_FILE_PATH);
+    ball.addComponent<CollisionComponent>("ball");
+    ball.getComponent<TransformComponent>().setTopLeftPos(
+      SCREEN_CENTER_WIDTH,
+      SCREEN_CENTER_HEIGHT
+    );
+    ball.addGroup(GROUP_BALL);
+
   }
   else
   {
@@ -154,14 +143,29 @@ void Game::update(){
 
   // printf("Camera x: %d, Camera y: %d\n", camera.x, camera.y);
 
-  // for(auto& i : this->colliders){
-  //   Collision::AABB(newPlayer.getComponent<CollisionComponent>(), *i);
-  // }
+  for(auto& i : this->colliders)
+  {
+    if(strcmp (i->tag,"ball") == 0)
+    {
+      if(Collision::AABB(newPlayer.getComponent<CollisionComponent>(), *i))
+      {
+        Logic::playerTouchBall = true;
+      }
+    }
+  }
+
+  if(Logic::playerTouchBall)
+  {
+    ball.getComponent<TransformComponent>().setTopLeftPos(
+      newPlayer.getComponent<TransformComponent>().position
+    );
+  }
 
 }
 
 std::vector<Entity*>& tiles = manager.getGroup(GROUP_MAP);
-std::vector<Entity*>& player = manager.getGroup(GROUP_PLAYER);
+std::vector<Entity*>& players = manager.getGroup(GROUP_PLAYER);
+std::vector<Entity*>& balls = manager.getGroup(GROUP_BALL);
 // std::vector<Entity*>& collider = manager.getGroup(GROUP_COLLIDER);
 
 void Game::render(){
@@ -172,7 +176,12 @@ void Game::render(){
     i->draw();
   }
 
-  for(auto& i : player)
+  for(auto& i : players)
+  {
+    i->draw();
+  }
+
+  for(auto& i : balls)
   {
     i->draw();
   }
