@@ -4,6 +4,7 @@
 class Logic{
   public:
     static bool playerTouchBall;
+    static bool playerPassBall;
 };
 
 #endif

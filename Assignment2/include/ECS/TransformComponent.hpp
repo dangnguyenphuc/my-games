@@ -7,7 +7,7 @@
 class TransformComponent : public Component {
   public:
     Vector2 position;
-    Vector2 velocity;
+    Vector2 a;
     float scale = 1;
 
     int height;
@@ -34,13 +34,13 @@ class TransformComponent : public Component {
     };
 
     void init() override{
-      this->velocity.Zero();
+      this->a.Zero();
       // printf("Position added completely\n");
     }
 
     void update() override{
-      this->position.x = this->position.x + this->velocity.x * this->speed;
-      this->position.y = this->position.y + this->velocity.y * this->speed;
+      this->position.x = this->position.x + this->a.x * this->speed;
+      this->position.y = this->position.y + this->a.y * this->speed;
       // printf("Position update() being called\n");
     }
 
@@ -53,5 +53,14 @@ class TransformComponent : public Component {
       this->position.x = position.x;
       this->position.y = position.y;
     }
+
+    void setA(Vector2 a){
+      this->a.x = a.x;
+      this->a.y = a.y;
+    }
 };
+
+// class BallTransformComponent : public TransformComponent{
+//   public:
+// };
 #endif
