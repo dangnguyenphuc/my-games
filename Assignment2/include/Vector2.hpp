@@ -36,6 +36,10 @@ class Vector2{
     Vector2& operator*=(const Vector2& vec);
     Vector2& operator*=(const float& num);
     Vector2& operator/=(const float& num);
+
+    float squareOfDistance(const Vector2& v1, const Vector2& v2){
+      return (v2.x-v1.x)*(v2.x-v1.x) + (v2.y-v1.y)*(v2.y-v1.y);
+    }
 };
 
 

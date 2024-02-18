@@ -15,13 +15,15 @@ SDL_Rect Game::camera = {0,0,SCREEN_WIDTH, SCREEN_HEIGHT};
 // Game instances
 enum groupLables : std::size_t {
     GROUP_MAP,
-    GROUP_PLAYER,
+    GROUP_PLAYER1,
     GROUP_COLLIDER,
     GROUP_BALL
 };
 
 Manager manager;
-Entity& newPlayer = manager.addEntity();
+Entity& Player1_1 = manager.addEntity();
+Entity& Player1_2 = manager.addEntity();
+// Entity& Player1_1 = manager.addEntity();
 Entity& ball = manager.addEntity();
 
 
@@ -91,19 +93,31 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     ArgentinaFootballerSprite.push_back(std::make_tuple(ARGENTINA_FRONT, WALK_FRONT, 2, 4, 100));
     ArgentinaFootballerSprite.push_back(std::make_tuple(ARGENTINA_BACK, WALK_BACK, 3, 4, 100));
 
-    newPlayer.addComponent<TransformComponent>(2.0f);
-    newPlayer.addComponent<SpriteComponent>(ArgentinaFootballerSprite, true);
-    newPlayer.addComponent<FootballKeyboardController>();
-    newPlayer.addComponent<CollisionComponent>("player");
-    newPlayer.addGroup(GROUP_PLAYER);
+    Player1_1.addComponent<TransformComponent>(2.0f);
+    Player1_1.addComponent<SpriteComponent>(ArgentinaFootballerSprite, true);
+    Player1_1.addComponent<FootballKeyboardController>();
+    Player1_1.addComponent<CollisionComponent>("player1.1");
+    Player1_1.addGroup(GROUP_PLAYER1);
+
+    Player1_2.addComponent<TransformComponent>(2.0f);
+    Player1_2.addComponent<SpriteComponent>(ArgentinaFootballerSprite, true);
+    Player1_2.addComponent<FootballKeyboardController>();
+    Player1_2.addComponent<CollisionComponent>("player1.2");
+    Player1_2.addGroup(GROUP_PLAYER1);
+    Player1_2.getComponent<TransformComponent>().setTopLeftPos(
+      0,
+      SCREEN_CENTER_WIDTH
+    );
 
     ball.addComponent<TransformComponent>(0.0625f);
     ball.addComponent<SpriteComponent>(BALL_TEXTURE_FILE_PATH);
     ball.addComponent<CollisionComponent>("ball");
     ball.getComponent<TransformComponent>().setTopLeftPos(
-      SCREEN_CENTER_WIDTH,
-      SCREEN_CENTER_HEIGHT
+      SCREEN_CENTER_HEIGHT,
+      SCREEN_CENTER_WIDTH
     );
+
+    ball.addComponent<BallKeyboardController>();
     ball.addGroup(GROUP_BALL);
 
   }
@@ -133,7 +147,7 @@ void Game::update(){
   manager.refresh();
   manager.update();
 
-  camera.y = newPlayer.getComponent<TransformComponent>().position.y - SCREEN_CENTER_HEIGHT;
+  camera.y = Player1_1.getComponent<TransformComponent>().position.y - SCREEN_CENTER_HEIGHT;
   if(camera.y <= 0){
     camera.y = 0;
   }
@@ -147,9 +161,13 @@ void Game::update(){
   {
     if(strcmp (i->tag,"ball") == 0)
     {
-      if(Collision::AABB(newPlayer.getComponent<CollisionComponent>(), *i))
+      if(Collision::AABB(Player1_1.getComponent<CollisionComponent>(), *i) && Logic::playerPassBall == false)
       {
         Logic::playerTouchBall = true;
+      }
+      else
+      {
+        Logic::playerTouchBall = false;
       }
     }
   }
@@ -157,14 +175,20 @@ void Game::update(){
   if(Logic::playerTouchBall)
   {
     ball.getComponent<TransformComponent>().setTopLeftPos(
-      newPlayer.getComponent<TransformComponent>().position
+      Player1_1.getComponent<TransformComponent>().position
+    );
+
+    ball.getComponent<TransformComponent>().setA(
+      Player1_1.getComponent<TransformComponent>().a
     );
   }
+
+
 
 }
 
 std::vector<Entity*>& tiles = manager.getGroup(GROUP_MAP);
-std::vector<Entity*>& players = manager.getGroup(GROUP_PLAYER);
+std::vector<Entity*>& players = manager.getGroup(GROUP_PLAYER1);
 std::vector<Entity*>& balls = manager.getGroup(GROUP_BALL);
 // std::vector<Entity*>& collider = manager.getGroup(GROUP_COLLIDER);
 
