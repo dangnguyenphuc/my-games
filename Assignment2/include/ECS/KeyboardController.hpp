@@ -6,6 +6,7 @@
 #include "../Game.hpp"
 #include "Component.hpp"
 #include "../Logic.hpp"
+#include "../config.hpp"
 
 class KeyboardController : public Component{
   protected:
@@ -20,10 +21,24 @@ class KeyboardController : public Component{
 
 class FootballKeyboardController : public KeyboardController{
   public:
-    bool enable = false;
+    bool enable;
+    int id;
+    static int currentId;
+  private:
+    int debounceButton = 2;
   public:
+    FootballKeyboardController(bool enable=false) : enable(enable){
+      this->id = currentId;
+      currentId += 1;
+    };
+
+
+    ~FootballKeyboardController(){
+
+    }
+
     void update() override{
-      if(enable)
+      if(this->enable)
       {
         if(Game::event.type == SDL_KEYDOWN)
         {
@@ -34,23 +49,44 @@ class FootballKeyboardController : public KeyboardController{
               this->sprite->play(WALK_BACK);
               // printf("w\n");
               break;
+
             case SDLK_s:
               this->transform->a.y =  1;
               this->sprite->play(WALK_FRONT);
               // printf("s\n");
               break;
+
             case SDLK_a:
               this->transform->a.x = -1;
               this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
               this->sprite->play(WALK_RIGHT);
               // printf("a\n");
               break;
+
             case SDLK_d:
               this->transform->a.x = 1;
               this->sprite->play(WALK_RIGHT);
               // printf("d\n");
               break;
+
+            case SDLK_e:
+              if(this->debounceButton <= 0){
+                this->debounceButton = 2;
+                this->transform->a.x = 0;
+                this->transform->a.y = 0;
+                this->sprite->play(IDLE);
+                printf("player %d e\n", this->id);
+                this->enable = false;
+                Game::manager.getGroup(GROUP_PLAYER1)[(this->id+1)%MAX_NUM_OF_PLAYERS]->getComponent<FootballKeyboardController>().enable = true;
+              }
+
+              this->debounceButton -= 1;
+
+              // printf("nextPlayer id: %d\n",  this->nextPlayer.getComponent<FootballKeyboardController>().id);
+              break;
+
             default:
+              this->debounceButton = 2;
               break;
           }
         }
@@ -73,6 +109,8 @@ class FootballKeyboardController : public KeyboardController{
             case SDLK_d:
               this->transform->a.x = 0;
               this->sprite->play(IDLE);
+              break;
+            case SDLK_e:
               break;
             default:
               break;

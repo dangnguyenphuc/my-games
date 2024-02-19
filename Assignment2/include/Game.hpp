@@ -7,6 +7,7 @@
 #include <vector>
 
 class CollisionComponent;
+class Manager;
 
 class Game{
   public:
@@ -35,6 +36,7 @@ class Game{
     static SDL_Event event;
     static std::vector<CollisionComponent*> colliders;
     static SDL_Rect camera;
+    static Manager manager;
 };
 
 #endif
