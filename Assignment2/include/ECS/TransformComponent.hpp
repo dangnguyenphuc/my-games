@@ -29,6 +29,14 @@ class TransformComponent : public Component {
       this->scale = scale;
     }
 
+    TransformComponent(float x, float y, int width, int height, float scale = 1){
+      this->position.x = x;
+      this->position.y = y;
+      this->scale = scale;
+      this->width = width;
+      this->height = height;
+    }
+
     ~TransformComponent(){
 
     };
@@ -58,6 +66,7 @@ class TransformComponent : public Component {
       this->a.x = a.x;
       this->a.y = a.y;
     }
+
 };
 
 // class BallTransformComponent : public TransformComponent{

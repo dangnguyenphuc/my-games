@@ -17,9 +17,13 @@ Manager Game::manager;
 Entity& Player1_1 = Game::manager.addEntity();
 Entity& Player1_2 = Game::manager.addEntity();
 Entity& Player1_3 = Game::manager.addEntity();
-// Entity& Player1_1 = manager.addEntity();
+
 Entity& ball = Game::manager.addEntity();
 
+Entity& wallLeft = Game::manager.addEntity();
+Entity& wallRight = Game::manager.addEntity();
+Entity& wallBot = Game::manager.addEntity();
+Entity& wallTop = Game::manager.addEntity();
 
 // Map* map;
 int defaultMap[MAP_HEIGHT][MAP_WIDTH] = {
@@ -78,8 +82,22 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     this->isRunning = true;
 
-    // map = new Map();
+    /*  Map   */
     Map::loadMap(defaultMap);
+    /*  Map   */
+
+    /*  Colliders  */
+    wallTop.addComponent<TransformComponent>(0,0,SCREEN_WIDTH,0);
+    wallTop.addComponent<CollisionComponent>("w1");
+
+    wallLeft.addComponent<TransformComponent>(0,0,0,SCREEN_HEIGHT*2);
+    wallLeft.addComponent<CollisionComponent>("w2");
+
+    wallRight.addComponent<TransformComponent>(SCREEN_WIDTH,0,0,SCREEN_HEIGHT*2);
+    wallRight.addComponent<CollisionComponent>("w3");
+
+    wallBot.addComponent<TransformComponent>(0,SCREEN_HEIGHT*2,SCREEN_WIDTH,0);
+    wallBot.addComponent<CollisionComponent>("w4");
 
     std::vector<std::tuple<const char*, int, int, int, int>> ArgentinaFootballerSprite;
     ArgentinaFootballerSprite.push_back(std::make_tuple(ARGENTINA_IDLE, IDLE, 0, 4, 100));
@@ -89,24 +107,28 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     Player1_1.addComponent<TransformComponent>(2.0f);
     Player1_1.addComponent<SpriteComponent>(ArgentinaFootballerSprite, true);
-    Player1_1.addComponent<CollisionComponent>("player1.1");
+    Player1_1.addComponent<CollisionComponent>("p1.1");
     Player1_1.addGroup(GROUP_PLAYER1);
+    Player1_1.getComponent<TransformComponent>().setTopLeftPos(
+      300,
+      SCREEN_CENTER_WIDTH
+    );
 
     Player1_2.addComponent<TransformComponent>(2.0f);
     Player1_2.addComponent<SpriteComponent>(ArgentinaFootballerSprite, true);
-    Player1_2.addComponent<CollisionComponent>("player1.2");
+    Player1_2.addComponent<CollisionComponent>("p1.2");
     Player1_2.addGroup(GROUP_PLAYER1);
     Player1_2.getComponent<TransformComponent>().setTopLeftPos(
-      0,
+      300,
       SCREEN_CENTER_WIDTH
     );
 
     Player1_3.addComponent<TransformComponent>(2.0f);
     Player1_3.addComponent<SpriteComponent>(ArgentinaFootballerSprite, true);
-    Player1_3.addComponent<CollisionComponent>("player1.3");
+    Player1_3.addComponent<CollisionComponent>("p1.3");
     Player1_3.addGroup(GROUP_PLAYER1);
     Player1_3.getComponent<TransformComponent>().setTopLeftPos(
-      0,
+      300,
       SCREEN_WIDTH - 32
     );
 
@@ -148,7 +170,17 @@ void Game::handleEvent(){
 
 }
 
+std::vector<Entity*>& tiles = Game::manager.getGroup(GROUP_MAP);
+std::vector<Entity*>& player1 = Game::manager.getGroup(GROUP_PLAYER1);
+
+std::vector<Vector2> player1Position;
 void Game::update(){
+
+  player1Position.clear();
+  for(auto& p : player1){
+    player1Position.push_back(p->getComponent<TransformComponent>().position);
+  }
+
   Game::manager.refresh();
   Game::manager.update();
 
@@ -156,12 +188,12 @@ void Game::update(){
   //  Player1_1.getComponent<FootballKeyboardController>().enable,
   //  Player1_2.getComponent<FootballKeyboardController>().enable);
 
-  camera.y = Player1_1.getComponent<TransformComponent>().position.y - SCREEN_CENTER_HEIGHT;
+  camera.y = ball.getComponent<TransformComponent>().position.y - SCREEN_CENTER_HEIGHT;
   if(camera.y <= 0){
     camera.y = 0;
   }
-  if(camera.y >= SCREEN_CENTER_HEIGHT){
-    camera.y = SCREEN_CENTER_HEIGHT;
+  if(camera.y >= 800){
+    camera.y = 800;
   }
 
   // printf("Camera x: %d, Camera y: %d\n", camera.x, camera.y);
@@ -182,8 +214,21 @@ void Game::update(){
       }
 
       else Logic::playerTouchBall = false;
+    }
 
+    if(i->tag[0] == 'w')
+    {
 
+      if(Collision::AABB(ball.getComponent<CollisionComponent>(), *i))
+      {
+        ball.getComponent<TransformComponent>().a *= -1;
+      }
+
+      for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1){
+        if(Collision::AABB(player1[p]->getComponent<CollisionComponent>(), *i)){
+          player1[p]->getComponent<TransformComponent>().position = player1Position[p];
+        }
+      }
     }
   }
 
@@ -202,9 +247,6 @@ void Game::update(){
 
 }
 
-std::vector<Entity*>& tiles = Game::manager.getGroup(GROUP_MAP);
-std::vector<Entity*>& players = Game::manager.getGroup(GROUP_PLAYER1);
-std::vector<Entity*>& balls = Game::manager.getGroup(GROUP_BALL);
 // std::vector<Entity*>& collider = manager.getGroup(GROUP_COLLIDER);
 
 void Game::render(){
@@ -215,15 +257,12 @@ void Game::render(){
     i->draw();
   }
 
-  for(auto& i : players)
+  for(auto& i : player1)
   {
     i->draw();
   }
 
-  for(auto& i : balls)
-  {
-    i->draw();
-  }
+  ball.draw();
 
   // for(auto& i : collider)
   // {
