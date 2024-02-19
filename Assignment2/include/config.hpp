@@ -11,6 +11,15 @@
 #define FRAME_DELAY 1000/FPS
 #define SPEED 100
 
+#define MAX_NUM_OF_PLAYERS 3
+
+#define GROUP_MAP 0
+#define GROUP_PLAYER1 1
+#define GROUP_COLLIDER 2
+#define GROUP_BALL 3
+
+
+
 #define BALL_TEXTURE_FILE_PATH "../assets/image/ball.png"
 
 // Map

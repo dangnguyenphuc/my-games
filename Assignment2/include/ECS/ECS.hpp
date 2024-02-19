@@ -52,69 +52,77 @@ public:
 };
 
 class Entity {
-private:
-    Manager& manager;
-    bool isActive = true;
-    std::vector<std::shared_ptr<Component>> components;
+    private:
+        Manager& manager;
+        bool isActive = true;
+        std::vector<std::shared_ptr<Component>> components;
 
-    ComponentArray componentArray;
-    ComponentBitSet componentBitSet;
-    GroupBitSet groupBitSet;
-public:
+        ComponentArray componentArray;
+        ComponentBitSet componentBitSet;
+        GroupBitSet groupBitSet;
 
-    Entity(Manager& manager):manager(manager){
+    public:
 
-    }
+        Entity(Manager& manager):manager(manager){
 
-    void update() {
-        for (auto& c : this->components) {
-            c->update();
         }
-    }
 
-    void draw() {
-        for (auto& c : this->components) {
-            c->draw();
+        void update() {
+            for (auto& c : this->components) {
+                c->update();
+            }
         }
-    }
 
-    bool getIsActive() const { return this->isActive; }
-    void destroy() { this->isActive = false; }
+        void draw() {
+            for (auto& c : this->components) {
+                c->draw();
+            }
+        }
 
-    bool hasGroup(Group group){
-        return this->groupBitSet[group];
-    }
+        bool getIsActive() const { return this->isActive; }
+        void destroy() { this->isActive = false; }
 
-    void addGroup(Group group);
+        bool hasGroup(Group group){
+            return this->groupBitSet[group];
+        }
 
-    void removeGroup(Group group){
-        this->groupBitSet[group] = false;
-    }
+        void addGroup(Group group);
 
-    template <typename T>
-    bool hasComponent() const {
-        return this->componentBitSet[getComponentTypeID<T>()];
-    }
+        void removeGroup(Group group){
+            this->groupBitSet[group] = false;
+        }
 
-    template <typename T, typename... TArgs>
-    T& addComponent(TArgs&&... mArgs) {
-        std::shared_ptr<T> c = std::make_shared<T>(std::forward<TArgs>(mArgs)...);
-        c->entity = this;
+        Manager& getManager() const {
+            return manager;
+        }
 
-        this->components.push_back(c);
 
-        this->componentArray[getComponentTypeID<T>()] = c;
-        this->componentBitSet[getComponentTypeID<T>()] = true;
 
-        c->init();
-        return *c;
-    }
 
-    template <typename T>
-    T& getComponent() const {
-        auto pointer = componentArray[getComponentTypeID<T>()];
-        return *std::static_pointer_cast<T>(pointer);
-    }
+        template <typename T>
+        bool hasComponent() const {
+            return this->componentBitSet[getComponentTypeID<T>()];
+        }
+
+        template <typename T, typename... TArgs>
+        T& addComponent(TArgs&&... mArgs) {
+            std::shared_ptr<T> c = std::make_shared<T>(std::forward<TArgs>(mArgs)...);
+            c->entity = this;
+
+            this->components.push_back(c);
+
+            this->componentArray[getComponentTypeID<T>()] = c;
+            this->componentBitSet[getComponentTypeID<T>()] = true;
+
+            c->init();
+            return *c;
+        }
+
+        template <typename T>
+        T& getComponent() const {
+            auto pointer = componentArray[getComponentTypeID<T>()];
+            return *std::static_pointer_cast<T>(pointer);
+        }
 };
 
 class Manager {
