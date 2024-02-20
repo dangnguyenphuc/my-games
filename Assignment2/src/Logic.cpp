@@ -2,3 +2,6 @@
 
 bool Logic::playerTouchBall = false;
 bool Logic::playerPassBall = false;
+
+std::vector<Vector2> Logic::player1Position;
+std::vector<Vector2> Logic::player2Position;

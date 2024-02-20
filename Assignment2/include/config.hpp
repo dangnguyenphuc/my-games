@@ -15,7 +15,7 @@
 
 #define GROUP_MAP 0
 #define GROUP_PLAYER1 1
-#define GROUP_COLLIDER 2
+#define GROUP_PLAYER2 2
 #define GROUP_BALL 3
 
 
