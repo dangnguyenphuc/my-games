@@ -74,9 +74,6 @@ class Player{
     }
 
     ~Player(){
-      for(int i = 0; i < MAX_NUM_OF_PLAYERS; i+=1){
-        delete this->footballers[i];
-      }
       footballers.clear();
     }
 };
