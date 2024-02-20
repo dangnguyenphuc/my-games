@@ -49,6 +49,19 @@ int defaultMap[MAP_HEIGHT][MAP_WIDTH] = {
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
 };
 
@@ -165,7 +178,27 @@ void Game::update(){
     camera.y = 800;
   }
 
-  // printf("Camera x: %d, Camera y: %d\n", camera.x, camera.y);
+  if(ball.getComponent<TransformComponent>().a.x > 0)
+  {
+    ball.getComponent<TransformComponent>().a.x -= 0.02;
+    if(ball.getComponent<TransformComponent>().a.x <= 0) ball.getComponent<TransformComponent>().a.x = 0;
+  }
+  else if(ball.getComponent<TransformComponent>().a.x < 0)
+  {
+    ball.getComponent<TransformComponent>().a.x += 0.02;
+    if(ball.getComponent<TransformComponent>().a.x >= 0) ball.getComponent<TransformComponent>().a.x = 0;
+  }
+
+  if(ball.getComponent<TransformComponent>().a.y > 0)
+  {
+    ball.getComponent<TransformComponent>().a.y -= 0.02;
+    if(ball.getComponent<TransformComponent>().a.y <= 0) ball.getComponent<TransformComponent>().a.y = 0;
+  }
+  else if(ball.getComponent<TransformComponent>().a.y < 0)
+  {
+    ball.getComponent<TransformComponent>().a.y += 0.02;
+    if(ball.getComponent<TransformComponent>().a.y >= 0) ball.getComponent<TransformComponent>().a.y = 0;
+  }
 
   for(auto& i : this->colliders)
   {
@@ -188,6 +221,7 @@ void Game::update(){
         else
         {
           Logic::playerTouchBall = false;
+          // Logic::playerPassBall = false;
         }
       }
     }
@@ -219,22 +253,7 @@ void Game::update(){
     }
   }
 
-  // if(Logic::playerTouchBall)
-  // {
-  //   // ball.getComponent<TransformComponent>().setTopLeftPos(
-  //   //   Player1_1.getComponent<TransformComponent>().position
-  //   // );
-
-  //   // ball.getComponent<TransformComponent>().setA(
-  //   //   Player1_1.getComponent<TransformComponent>().a
-  //   // );
-  // }
-
-
-
 }
-
-// std::vector<Entity*>& collider = manager.getGroup(GROUP_COLLIDER);
 
 void Game::render(){
   SDL_RenderClear(this->renderer);

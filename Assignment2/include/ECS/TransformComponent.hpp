@@ -13,6 +13,7 @@ class TransformComponent : public Component {
     int height;
     int width;
     int speed = 3;
+    float decelerator = 0.0f;
 
     TransformComponent(){
       this->position.Zero();
@@ -69,7 +70,4 @@ class TransformComponent : public Component {
 
 };
 
-// class BallTransformComponent : public TransformComponent{
-//   public:
-// };
 #endif

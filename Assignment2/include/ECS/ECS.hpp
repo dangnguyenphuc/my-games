@@ -67,6 +67,10 @@ class Entity {
 
         }
 
+        ~Entity(){
+
+        }
+
         void update() {
             for (auto& c : this->components) {
                 c->update();
