@@ -172,10 +172,22 @@ void Game::update(){
     if(i->tag[0] == 'b')
     {
       for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1){
-        if(Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(), *i)){
+        if(Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(), *i) && !Logic::playerPassBall)
+        {
           ball.getComponent<TransformComponent>().setTopLeftPos(
             Logic::player1Position[p]
           );
+
+          ball.getComponent<TransformComponent>().setA(
+            player1->footballers[p]->getComponent<TransformComponent>().a
+          );
+
+          Logic::playerTouchBall = true;
+          break;
+        }
+        else
+        {
+          Logic::playerTouchBall = false;
         }
       }
     }
@@ -186,11 +198,21 @@ void Game::update(){
       if(Collision::AABB(ball.getComponent<CollisionComponent>(), *i))
       {
         ball.getComponent<TransformComponent>().a *= -1;
+        if(i->tag[1] == '1' || i->tag[1] == '4')
+        {
+          ball.getComponent<TransformComponent>().a.x *= -1;
+        }
+        else
+        {
+          ball.getComponent<TransformComponent>().a.y *= -1;
+        }
+
       }
 
       // footballers collided with wall
       for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1){
-        if(Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(), *i)){
+        if(Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(), *i))
+        {
           player1->footballers[p]->getComponent<TransformComponent>().position = Logic::player1Position[p];
         }
       }
