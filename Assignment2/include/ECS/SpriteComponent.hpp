@@ -41,7 +41,7 @@ class SpriteComponent : public Component{
       this->animated = false;
     }
 
-    SpriteComponent(const std::vector<std::tuple<const char*, int, int, int, int>>& sprites, bool isAnimated){
+    SpriteComponent(const std::vector<std::tuple<const char*, int, int, int>>& sprites, bool isAnimated){
       this->animated = isAnimated;
 
       for(auto& item : sprites){
@@ -55,9 +55,9 @@ class SpriteComponent : public Component{
         animations.emplace(
           std::get<1>(item),
           Animation(
+            std::get<1>(item),
             std::get<2>(item),
-            std::get<3>(item),
-            std::get<4>(item)
+            std::get<3>(item)
           )
         );
       }
