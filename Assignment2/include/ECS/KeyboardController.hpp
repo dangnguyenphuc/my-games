@@ -127,7 +127,7 @@ class BallKeyboardController : public KeyboardController{
       if(Game::event.type == SDL_KEYDOWN){
         switch(Game::event.key.keysym.sym){
           case SDLK_SPACE:
-            if(Logic::playerTouchBall){
+            if(Logic::playerTouchBall && !Logic::playerPassBall){
               printf("Space\n");
               this->transform->a *= 2;
               Logic::playerPassBall = true;
@@ -135,17 +135,7 @@ class BallKeyboardController : public KeyboardController{
             }
             break;
           default:
-            break;
-        }
-      }
-
-      if(Game::event.type == SDL_KEYUP){
-        switch(Game::event.key.keysym.sym){
-          case SDLK_SPACE:
-            // Logic::playerTouchBall = false;
             Logic::playerPassBall = false;
-            break;
-          default:
             break;
         }
       }

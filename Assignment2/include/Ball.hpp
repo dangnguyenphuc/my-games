@@ -27,7 +27,7 @@ class Ball{
       this->entity->addComponent<SpriteComponent>(spriteSheet);
       this->entity->addComponent<CollisionComponent>("b");
       this->entity->getComponent<TransformComponent>().setTopLeftPos(
-        SCREEN_CENTER_HEIGHT - 32,
+        SCREEN_HEIGHT - 32,
         SCREEN_CENTER_WIDTH - 32
       );
       this->entity->addComponent<BallKeyboardController>();

@@ -21,6 +21,8 @@ class Game{
     void render();
     void clean();
 
+    void updateCamera();
+
     bool running(){
       return this->isRunning;
     };

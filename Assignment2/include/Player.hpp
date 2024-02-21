@@ -6,7 +6,7 @@
 #include "ECS/Component.hpp"
 #include "Game.hpp"
 
-#define GET_PLAYER_GROUP ((teamId)?GROUP_PLAYER1:GROUP_PLAYER2)
+#define GET_PLAYER_GROUP ((!teamId)?GROUP_PLAYER1:GROUP_PLAYER2)
 
 
 class Player{
@@ -42,36 +42,65 @@ class Player{
         this->footballers[i]->addComponent<SpriteComponent>(spriteSheet, true);
 
         footballerTag = "p";                                    // "p"
-        footballerTag += std::to_string(this->teamId);  // "pX"
+        footballerTag += std::to_string(this->teamId);          // "pX"
         footballerTag += '.';                                   // "pX."
-        footballerTag += static_cast<char>(i);                   // "pX.i"
+        footballerTag += static_cast<char>(i);                  // "pX.i"
 
         this->footballers[i]->addComponent<CollisionComponent>(footballerTag.c_str());
         this->footballers[i]->addGroup(GET_PLAYER_GROUP);
       }
 
-      this->footballers[0]->getComponent<TransformComponent>().setTopLeftPos(
-        300,
-        0
-      );
+      if(GET_PLAYER_GROUP == GROUP_PLAYER1)
+      {
+        this->footballers[0]->getComponent<TransformComponent>().setTopLeftPos(
+          SCREEN_HEIGHT - 200,
+          100
+        );
 
-      this->footballers[1]->getComponent<TransformComponent>().setTopLeftPos(
-        300,
-        SCREEN_CENTER_WIDTH - 32
-      );
+        this->footballers[1]->getComponent<TransformComponent>().setTopLeftPos(
+          SCREEN_HEIGHT - 200,
+          SCREEN_CENTER_WIDTH - 32
+        );
 
-      this->footballers[2]->getComponent<TransformComponent>().setTopLeftPos(
-        300,
-        SCREEN_WIDTH - 32
-      );
+        this->footballers[2]->getComponent<TransformComponent>().setTopLeftPos(
+          SCREEN_HEIGHT - 200,
+          SCREEN_WIDTH - 32 - 100
+        );
 
-      this->footballers[0]->addComponent<FootballKeyboardController>(true);
+        this->footballers[0]->addComponent<FootballKeyboardController>(true);
 
-      for(int i = 1; i < MAX_NUM_OF_PLAYERS; i+=1){
-        this->footballers[i]->addComponent<FootballKeyboardController>();
+        for(int i = 1; i < MAX_NUM_OF_PLAYERS; i+=1){
+          this->footballers[i]->addComponent<FootballKeyboardController>();
+        }
+      }
+      else
+      {
+        this->footballers[0]->getComponent<TransformComponent>().setTopLeftPos(
+          SCREEN_HEIGHT + 200,
+          100
+        );
+
+        this->footballers[1]->getComponent<TransformComponent>().setTopLeftPos(
+          SCREEN_HEIGHT + 200,
+          SCREEN_CENTER_WIDTH - 32
+        );
+
+        this->footballers[2]->getComponent<TransformComponent>().setTopLeftPos(
+          SCREEN_HEIGHT + 200,
+          SCREEN_WIDTH - 32 - 100
+        );
+
+        // this->footballers[0]->addComponent<FootballKeyboardController>(true);
+
+        // for(int i = 1; i < MAX_NUM_OF_PLAYERS; i+=1){
+        //   this->footballers[i]->addComponent<FootballKeyboardController>();
+        // }
       }
 
+
     }
+
+
 
     ~Player(){
       footballers.clear();
