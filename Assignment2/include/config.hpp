@@ -43,5 +43,7 @@
 #define WALK_FRONT 2
 #define WALK_BACK 3
 
+extern int defaultMap[MAP_HEIGHT][MAP_WIDTH];
+
 
 #endif
