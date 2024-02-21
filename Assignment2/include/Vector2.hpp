@@ -25,15 +25,14 @@ class Vector2{
     Vector2& Divide(const float& num);
     Vector2& Zero();
 
-    friend Vector2& operator+(Vector2& left, const Vector2& right);
-    friend Vector2& operator-(Vector2& left, const Vector2& right);
-    friend Vector2& operator*(Vector2& left, const Vector2& right);
-    friend Vector2& operator*(Vector2& left, const float& right);
-    friend Vector2& operator/(Vector2& left, const float& right);
+    friend Vector2 operator+(Vector2& left, const Vector2& right);
+    friend Vector2 operator-(Vector2& left, const Vector2& right);
+    friend float operator*(Vector2& left, const Vector2& right);
+    friend Vector2 operator*(Vector2& left, const float& right);
+    friend Vector2 operator/(Vector2& left, const float& right);
 
     Vector2& operator+=(const Vector2& vec);
     Vector2& operator-=(const Vector2& vec);
-    Vector2& operator*=(const Vector2& vec);
     Vector2& operator*=(const float& num);
     Vector2& operator/=(const float& num);
 

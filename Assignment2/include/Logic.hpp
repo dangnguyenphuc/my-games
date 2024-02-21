@@ -12,6 +12,7 @@ class Logic{
 
     static std::vector<Vector2> player1Position;
     static std::vector<Vector2> player2Position;
+    static Vector2 ballPosition;
 };
 
 #endif

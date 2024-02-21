@@ -8,7 +8,6 @@
 class Ball{
   public:
     Entity* entity;
-
   public:
     Ball(){
       Entity& ball = Game::manager.addEntity();

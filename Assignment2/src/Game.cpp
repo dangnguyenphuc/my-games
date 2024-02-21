@@ -120,6 +120,8 @@ void Game::update(){
   Game::manager.refresh();
   Game::manager.update();
 
+  Logic::ballPosition = ball->entity->getComponent<TransformComponent>().position;
+
   // update camera
   this->updateCamera();
 
@@ -133,6 +135,7 @@ void Game::update(){
         {
           if(!Logic::playerPassBall)
           {
+
             ball->entity->getComponent<TransformComponent>().setTopLeftPos(
               Logic::player1Position[p]
             );
