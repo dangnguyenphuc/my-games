@@ -36,24 +36,38 @@ Vector2& Vector2::Zero(){
 }
 
 
-Vector2& operator+(Vector2& left, const Vector2& right){
-  return left.Add(right);
+Vector2 operator+(Vector2& left, const Vector2& right){
+  Vector2 res;
+  res.x = left.x + right.x;
+  res.y = left.y + right.y;
+  return res;
 }
 
-Vector2& operator-(Vector2& left, const Vector2& right){
-  return left.Subtract(right);
+Vector2 operator-(Vector2& left, const Vector2& right){
+  Vector2 res;
+  res.x = left.x - right.x;
+  res.y = left.y - right.y;
+  return res;
 }
 
-Vector2& operator*(Vector2& left, const Vector2& right){
-  return left.Multiply(right);
+float operator*(Vector2& left, const Vector2& right){
+  float x = left.x * right.x;
+  float y = left.y * right.y;
+  return x+y;
 }
 
-Vector2& operator*(Vector2& left, const float& right){
-  return left.Multiply(right);
+Vector2 operator*(Vector2& left, const float& right){
+  Vector2 res;
+  res.x = left.x * right;
+  res.y = left.y * right;
+  return res;
 }
 
-Vector2& operator/(Vector2& left, const float& right){
-  return left.Divide(right);
+Vector2 operator/(Vector2& left, const float& right){
+  Vector2 res;
+  res.x = left.x / right;
+  res.y = left.y / right;
+  return res;
 }
 
 Vector2& Vector2::operator+=(const Vector2& vec){
@@ -62,10 +76,6 @@ Vector2& Vector2::operator+=(const Vector2& vec){
 
 Vector2& Vector2::operator-=(const Vector2& vec){
   return this->Subtract(vec);
-}
-
-Vector2& Vector2::operator*=(const Vector2& vec){
-  return this->Multiply(vec);
 }
 
 Vector2& Vector2::operator*=(const float& num){

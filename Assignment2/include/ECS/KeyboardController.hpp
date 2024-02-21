@@ -117,6 +117,42 @@ class FootballKeyboardController : public KeyboardController{
           }
         }
       }
+      else
+      {
+        if(!Logic::playerTouchBall)
+        {
+          Vector2 howToMove = Logic::ballPosition - this->transform->position;
+          if(howToMove.x > 0.0f)
+          {
+            this->transform->a.x =  1;
+            this->sprite->play(WALK_RIGHT);
+          }
+          else if(howToMove.x < 0.0f)
+          {
+            this->transform->a.x =  -1;
+            this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
+            this->sprite->play(WALK_RIGHT);
+          }
+
+          if(howToMove.y > 0.0f)
+          {
+            this->transform->a.y =  1;
+            this->sprite->play(WALK_FRONT);
+          }
+          else if(howToMove.y < 0.0f)
+          {
+            this->transform->a.y =  -1;
+            this->sprite->play(WALK_BACK);
+          }
+        }
+        else{
+          this->transform->a.x =  0;
+          this->transform->a.y =  0;
+          this->sprite->play(IDLE);
+        }
+
+
+      }
     }
 };
 
