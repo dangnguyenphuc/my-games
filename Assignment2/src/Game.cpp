@@ -5,6 +5,7 @@
 #include "../include/Collision.hpp"
 #include "../include/Logic.hpp"
 #include "../include/Player.hpp"
+#include "../include/Ball.hpp"
 #include <string.h>
 
 // static attributes
@@ -16,54 +17,12 @@ SDL_Rect Game::camera = {0,0,SCREEN_WIDTH, SCREEN_HEIGHT};
 // Game instances
 Manager Game::manager;
 Player* player1 = new Player(true, 1);
-
-Entity& ball = Game::manager.addEntity();
+Ball* ball = new Ball();
 
 Entity& wallLeft = Game::manager.addEntity();
 Entity& wallRight = Game::manager.addEntity();
 Entity& wallBot = Game::manager.addEntity();
 Entity& wallTop = Game::manager.addEntity();
-
-// Map* map;
-int defaultMap[MAP_HEIGHT][MAP_WIDTH] = {
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
-};
 
 Game::Game(){}
 Game::~Game(){}
@@ -123,17 +82,9 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     player1->init(ArgentinaFootballerSprite);
     /*PLAYERS*/
 
-    ball.addComponent<TransformComponent>(0.0625f);
-    ball.addComponent<SpriteComponent>(BALL_TEXTURE_FILE_PATH);
-    ball.addComponent<CollisionComponent>("b");
-    ball.getComponent<TransformComponent>().setTopLeftPos(
-      SCREEN_CENTER_HEIGHT,
-      SCREEN_CENTER_WIDTH
-    );
-
-    ball.addComponent<BallKeyboardController>();
-    ball.addGroup(GROUP_BALL);
-
+    /*BALL*/
+    ball->init(BALL_TEXTURE_FILE_PATH);
+    /*BALL*/
   }
   else
   {
@@ -170,7 +121,7 @@ void Game::update(){
   Game::manager.refresh();
   Game::manager.update();
 
-  camera.y = ball.getComponent<TransformComponent>().position.y - SCREEN_CENTER_HEIGHT;
+  camera.y = ball->entity->getComponent<TransformComponent>().position.y - SCREEN_CENTER_HEIGHT;
   if(camera.y <= 0){
     camera.y = 0;
   }
@@ -178,27 +129,7 @@ void Game::update(){
     camera.y = 800;
   }
 
-  if(ball.getComponent<TransformComponent>().a.x > 0)
-  {
-    ball.getComponent<TransformComponent>().a.x -= 0.02;
-    if(ball.getComponent<TransformComponent>().a.x <= 0) ball.getComponent<TransformComponent>().a.x = 0;
-  }
-  else if(ball.getComponent<TransformComponent>().a.x < 0)
-  {
-    ball.getComponent<TransformComponent>().a.x += 0.02;
-    if(ball.getComponent<TransformComponent>().a.x >= 0) ball.getComponent<TransformComponent>().a.x = 0;
-  }
-
-  if(ball.getComponent<TransformComponent>().a.y > 0)
-  {
-    ball.getComponent<TransformComponent>().a.y -= 0.02;
-    if(ball.getComponent<TransformComponent>().a.y <= 0) ball.getComponent<TransformComponent>().a.y = 0;
-  }
-  else if(ball.getComponent<TransformComponent>().a.y < 0)
-  {
-    ball.getComponent<TransformComponent>().a.y += 0.02;
-    if(ball.getComponent<TransformComponent>().a.y >= 0) ball.getComponent<TransformComponent>().a.y = 0;
-  }
+  ball->defaultDecelerator();
 
   for(auto& i : this->colliders)
   {
@@ -207,11 +138,11 @@ void Game::update(){
       for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1){
         if(Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(), *i) && !Logic::playerPassBall)
         {
-          ball.getComponent<TransformComponent>().setTopLeftPos(
+          ball->entity->getComponent<TransformComponent>().setTopLeftPos(
             Logic::player1Position[p]
           );
 
-          ball.getComponent<TransformComponent>().setA(
+          ball->entity->getComponent<TransformComponent>().setA(
             player1->footballers[p]->getComponent<TransformComponent>().a
           );
 
@@ -229,16 +160,16 @@ void Game::update(){
     if(i->tag[0] == 'w')
     {
       // ball collided with wall
-      if(Collision::AABB(ball.getComponent<CollisionComponent>(), *i))
+      if(Collision::AABB(ball->entity->getComponent<CollisionComponent>(), *i))
       {
-        ball.getComponent<TransformComponent>().a *= -1;
+        ball->entity->getComponent<TransformComponent>().a *= -1;
         if(i->tag[1] == '1' || i->tag[1] == '4')
         {
-          ball.getComponent<TransformComponent>().a.x *= -1;
+          ball->entity->getComponent<TransformComponent>().a.x *= -1;
         }
         else
         {
-          ball.getComponent<TransformComponent>().a.y *= -1;
+          ball->entity->getComponent<TransformComponent>().a.y *= -1;
         }
 
       }
@@ -268,13 +199,14 @@ void Game::render(){
     i->draw();
   }
 
-  ball.draw();
+  ball->entity->draw();
 
   SDL_RenderPresent(this->renderer);
 }
 
 void Game::clean(){
   delete player1;
+  delete ball;
   SDL_DestroyWindow(this->window);
   SDL_DestroyRenderer(this->renderer);
   SDL_Quit();
