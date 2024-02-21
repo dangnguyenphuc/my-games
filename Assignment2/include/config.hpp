@@ -1,6 +1,9 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+#pragma once
+#include <vector>
+
 #define SCREEN_WIDTH 1120
 #define SCREEN_HEIGHT 800
 
@@ -37,6 +40,31 @@
 #define ARGENTINA_FRONT "../assets/image/Free_Assets/Footballers/Argentina/front.png"
 #define ARGENTINA_BACK "../assets/image/Free_Assets/Footballers/Argentina/back.png"
 
+// BOCAJUNIORS
+#define BOCAJUNIORS_WALK "../assets/image/Free_Assets/Footballers/BocaJuniors/walk.png"
+#define BOCAJUNIORS_IDLE "../assets/image/Free_Assets/Footballers/BocaJuniors/idle.png"
+#define BOCAJUNIORS_FRONT "../assets/image/Free_Assets/Footballers/BocaJuniors/front.png"
+#define BOCAJUNIORS_BACK "../assets/image/Free_Assets/Footballers/BocaJuniors/back.png"
+
+// INDEPENDIENTE
+#define INDEPENDIENTE_WALK "../assets/image/Free_Assets/Footballers/Independiente/walk.png"
+#define INDEPENDIENTE_IDLE "../assets/image/Free_Assets/Footballers/Independiente/idle.png"
+#define INDEPENDIENTE_FRONT "../assets/image/Free_Assets/Footballers/Independiente/front.png"
+#define INDEPENDIENTE_BACK "../assets/image/Free_Assets/Footballers/Independiente/back.png"
+
+// RIVERPLATE
+#define RIVERPLATE_WALK "../assets/image/Free_Assets/Footballers/RiverPlate/walk.png"
+#define RIVERPLATE_IDLE "../assets/image/Free_Assets/Footballers/RiverPlate/idle.png"
+#define RIVERPLATE_FRONT "../assets/image/Free_Assets/Footballers/RiverPlate/front.png"
+#define RIVERPLATE_BACK "../assets/image/Free_Assets/Footballers/RiverPlate/back.png"
+
+
+// SANLORENZO
+#define SANLORENZO_WALK "../assets/image/Free_Assets/Footballers/SanLorenzo/walk.png"
+#define SANLORENZO_IDLE "../assets/image/Free_Assets/Footballers/SanLorenzo/idle.png"
+#define SANLORENZO_FRONT "../assets/image/Free_Assets/Footballers/SanLorenzo/front.png"
+#define SANLORENZO_BACK "../assets/image/Free_Assets/Footballers/SanLorenzo/back.png"
+
 // FOOTBALLER STATES
 #define IDLE 0
 #define WALK_RIGHT 1
@@ -45,5 +73,10 @@
 
 extern int defaultMap[MAP_HEIGHT][MAP_WIDTH];
 
+extern std::vector<std::tuple<const char*, int, int, int>> ArgentinaFootballerSprite;
+extern std::vector<std::tuple<const char*, int, int, int>> BocaFootballerSprite;
+extern std::vector<std::tuple<const char*, int, int, int>> IndependienteFootballerSprite;
+extern std::vector<std::tuple<const char*, int, int, int>> RiverPlateFootballerSprite;
+extern std::vector<std::tuple<const char*, int, int, int>> SanLorenzoFootballerSprite;
 
 #endif

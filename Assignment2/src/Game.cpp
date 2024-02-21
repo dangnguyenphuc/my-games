@@ -16,7 +16,8 @@ SDL_Rect Game::camera = {0,0,SCREEN_WIDTH, SCREEN_HEIGHT};
 
 // Game instances
 Manager Game::manager;
-Player* player1 = new Player(true, 1);
+Player* player1 = new Player(true, 0);
+Player* player2 = new Player(true, 1);
 Ball* ball = new Ball();
 
 Entity& wallLeft = Game::manager.addEntity();
@@ -50,7 +51,6 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
       SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, 255);
       printf("Renderer created\n");
     }
-
     this->isRunning = true;
 
     /*  Map   */
@@ -71,15 +71,9 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     wallBot.addComponent<CollisionComponent>("w4");
     /*  Colliders  */
 
-    std::vector<std::tuple<const char*, int, int, int>> ArgentinaFootballerSprite {
-      std::make_tuple(ARGENTINA_IDLE, IDLE, 4, 100),
-      std::make_tuple(ARGENTINA_WALK, WALK_RIGHT, 4, 100),
-      std::make_tuple(ARGENTINA_FRONT, WALK_FRONT, 4, 100),
-      std::make_tuple(ARGENTINA_BACK, WALK_BACK, 4, 100)
-    };
-
     /*PLAYERS*/
-    player1->init(ArgentinaFootballerSprite);
+    player1->init(RiverPlateFootballerSprite);
+    player2->init(BocaFootballerSprite);
     /*PLAYERS*/
 
     /*BALL*/
@@ -118,33 +112,45 @@ void Game::update(){
     Logic::player1Position.push_back(p->getComponent<TransformComponent>().position);
   }
 
+  Logic::player2Position.clear();
+  for(auto& p : player2->footballers){
+    Logic::player2Position.push_back(p->getComponent<TransformComponent>().position);
+  }
+
   Game::manager.refresh();
   Game::manager.update();
 
-  camera.y = ball->entity->getComponent<TransformComponent>().position.y - SCREEN_CENTER_HEIGHT;
-  if(camera.y <= 0){
-    camera.y = 0;
-  }
-  if(camera.y >= 800){
-    camera.y = 800;
-  }
+  // update camera
+  this->updateCamera();
 
   ball->defaultDecelerator();
-
   for(auto& i : this->colliders)
   {
     if(i->tag[0] == 'b')
     {
       for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1){
-        if(Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(), *i) && !Logic::playerPassBall)
+        if(Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(), *i))
         {
-          ball->entity->getComponent<TransformComponent>().setTopLeftPos(
-            Logic::player1Position[p]
-          );
+          if(!Logic::playerPassBall)
+          {
+            ball->entity->getComponent<TransformComponent>().setTopLeftPos(
+              Logic::player1Position[p]
+            );
 
-          ball->entity->getComponent<TransformComponent>().setA(
-            player1->footballers[p]->getComponent<TransformComponent>().a
-          );
+            if(player1->footballers[p]->getComponent<TransformComponent>().a == Vector2(0.0f,0.0f))
+            {
+              ball->entity->getComponent<TransformComponent>().setA(
+                Vector2(0.0f, 0.7f)
+              );
+            }
+            else
+            {
+              ball->entity->getComponent<TransformComponent>().setA(
+                player1->footballers[p]->getComponent<TransformComponent>().a
+              );
+            }
+
+          }
 
           Logic::playerTouchBall = true;
           break;
@@ -152,7 +158,6 @@ void Game::update(){
         else
         {
           Logic::playerTouchBall = false;
-          // Logic::playerPassBall = false;
         }
       }
     }
@@ -199,6 +204,11 @@ void Game::render(){
     i->draw();
   }
 
+  for(auto& i : player2->footballers)
+  {
+    i->draw();
+  }
+
   ball->entity->draw();
 
   SDL_RenderPresent(this->renderer);
@@ -211,6 +221,16 @@ void Game::clean(){
   SDL_DestroyRenderer(this->renderer);
   SDL_Quit();
   printf("Game cleaned !\n");
+}
+
+void Game::updateCamera(){
+  camera.y = ball->entity->getComponent<TransformComponent>().position.y - SCREEN_CENTER_HEIGHT;
+  if(camera.y <= 0){
+    camera.y = 0;
+  }
+  if(camera.y >= SCREEN_HEIGHT){
+    camera.y = SCREEN_HEIGHT;
+  }
 }
 
 void Game::addTile(int x, int y, int id, float scale){

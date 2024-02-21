@@ -37,6 +37,13 @@ class Vector2{
     Vector2& operator*=(const float& num);
     Vector2& operator/=(const float& num);
 
+    bool operator==(const Vector2& vec){
+      return (this->x == vec.x) && (this->y == vec.y);
+    }
+    bool operator!=(const Vector2& vec){
+      return this->x != vec.x || this->y != vec.y;
+    }
+
     float squareOfDistance(const Vector2& v1, const Vector2& v2){
       return (v2.x-v1.x)*(v2.x-v1.x) + (v2.y-v1.y)*(v2.y-v1.y);
     }
