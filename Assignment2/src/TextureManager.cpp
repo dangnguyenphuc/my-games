@@ -8,9 +8,11 @@ SDL_Texture* TextureManager::loadTexture(const char* filePath){
   return texture;
 }
 
-void TextureManager::draw(SDL_Texture* texture, SDL_Rect srcRect, SDL_Rect destRect, SDL_RendererFlip flip){
-  SDL_RenderCopyEx(Game::renderer, texture, &srcRect, &destRect, NULL, NULL, flip);
+void TextureManager::draw(SDL_Texture* texture, SDL_Rect srcRect, SDL_Rect destRect, SDL_RendererFlip flip, const float& rotateDegree){
+  SDL_RenderCopyEx(Game::renderer, texture, &srcRect, &destRect, rotateDegree, NULL, flip);
 }
+
+
 
 
 // auto [width, height] = TextureManager::getTextureWidthHeight(TEST_TEXTURE_FILE_PATH);
