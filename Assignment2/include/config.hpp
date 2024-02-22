@@ -17,9 +17,10 @@
 #define MAX_NUM_OF_PLAYERS 3
 
 #define GROUP_MAP 0
-#define GROUP_PLAYER1 1
-#define GROUP_PLAYER2 2
-#define GROUP_BALL 3
+#define GROUP_LINE 1
+#define GROUP_PLAYER1 2
+#define GROUP_PLAYER2 3
+#define GROUP_BALL 4
 
 
 
@@ -33,6 +34,12 @@
 #define GRASS_TILE_FILE_PATH "../assets/image/Tiles/grass.png"
 #define GRASS_TILE_WIDTH_HEIGHT 16
 #define GRASS_TILE_WIDTH_HEIGHT_2_DRAW 64
+
+// Line
+#define LINE_TEXTURE_FILE_PATH "../assets/image/Tiles/line.png"
+#define LINE_H_TEXTURE_FILE_PATH "../assets/image/Tiles/line-horizontal.png"
+#define LINE1_TEXTURE_FILE_PATH "../assets/image/Tiles/line1.png"
+#define LINE2_TEXTURE_FILE_PATH "../assets/image/Tiles/line2.png"
 
 // ARGENTINA
 #define ARGENTINA_WALK "../assets/image/Free_Assets/Footballers/Argentina/walk.png"

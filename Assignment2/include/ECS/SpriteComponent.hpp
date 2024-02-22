@@ -25,6 +25,7 @@ class SpriteComponent : public Component{
     std::map<int, Animation> animations;
     int currentAction = 0;
     SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
+    float rotateDegree = 0.0f;
   public:
     SpriteComponent(){
       this->srcRect.push_back({0,0,0,0});
@@ -92,10 +93,38 @@ class SpriteComponent : public Component{
       this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;
     }
 
-    void setDestRect(int width, int height){
-      this->destRect.h = height;
+    void setSrcRect(const int& width, const int& height, const int& x=0, const int& y=0, const int& index = 0){
+      this->srcRect[index].x = x;
+      this->srcRect[index].y = y;
+      setSrcRectWidth(width, index);
+      setSrcRectHeight(height, index);
+    }
+
+    void setRotateDegree(const float& rotateDegree){
+      this->rotateDegree = rotateDegree;
+    }
+
+    void setSrcRectWidth(const int& width, const int& index = 0){
+      this->srcRect[index].w = width;
+    }
+
+    void setSrcRectHeight(const int& height, const int& index = 0){
+      this->srcRect[index].h = height;
+    }
+
+    void setDestRect(const int& width, const int& height){
+      setDestRectHeight(height);
+      setDestRectWidth(width);
+    }
+
+    void setDestRectWidth(const int& width){
       this->destRect.w = width;
     }
+
+    void setDestRectHeight(const int& height){
+      this->destRect.h = height;
+    }
+
 
     void init() override{
       this->transform = &(this->entity)->getComponent<TransformComponent>();
@@ -106,7 +135,7 @@ class SpriteComponent : public Component{
     }
 
     void draw() override{
-      TextureManager::draw(this->texture[currentAction], this->srcRect[currentAction], this->destRect, this->spriteFlip);
+      TextureManager::draw(this->texture[currentAction], this->srcRect[currentAction], this->destRect, this->spriteFlip, this->rotateDegree);
     }
 
     void update() override{

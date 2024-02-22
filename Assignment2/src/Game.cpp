@@ -20,6 +20,8 @@ Player* player1 = new Player(true, 0);
 Player* player2 = new Player(true, 1);
 Ball* ball = new Ball();
 
+Entity& line = Game::manager.addEntity();
+
 Entity& wallLeft = Game::manager.addEntity();
 Entity& wallRight = Game::manager.addEntity();
 Entity& wallBot = Game::manager.addEntity();
@@ -55,6 +57,16 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     /*  Map   */
     Map::loadMap(defaultMap);
+    line.addComponent<TransformComponent>(-20,0, 0.65f);
+    line.addComponent<SpriteComponent>(LINE1_TEXTURE_FILE_PATH);
+    line.addComponent<TransformComponent>(-20,1383, 0.65f);
+    line.addComponent<SpriteComponent>(LINE2_TEXTURE_FILE_PATH);
+    line.addComponent<TransformComponent>(0,0);
+    line.addComponent<SpriteComponent>(LINE_TEXTURE_FILE_PATH);
+    line.addComponent<TransformComponent>(SCREEN_WIDTH - 20,0);
+    line.addComponent<SpriteComponent>(LINE_TEXTURE_FILE_PATH);
+    line.addComponent<TransformComponent>(-20, SCREEN_HEIGHT - 20);
+    line.addComponent<SpriteComponent>(LINE_H_TEXTURE_FILE_PATH);
     /*  Map   */
 
     /*  Colliders  */
@@ -201,6 +213,8 @@ void Game::render(){
   {
     i->draw();
   }
+
+  line.draw();
 
   for(auto& i : player1->footballers)
   {
