@@ -5,6 +5,7 @@
 #include "ECS/ECS.hpp"
 #include "ECS/Component.hpp"
 #include "Game.hpp"
+#include "Logic.hpp"
 
 #define GET_PLAYER_GROUP ((!teamId)?GROUP_PLAYER1:GROUP_PLAYER2)
 
@@ -68,6 +69,7 @@ class Player{
         );
 
         this->footballers[0]->addComponent<FootballKeyboardController>(true);
+        Logic::currentFootballer1 = this->footballers[0];
 
         for(int i = 1; i < MAX_NUM_OF_PLAYERS; i+=1){
           this->footballers[i]->addComponent<FootballKeyboardController>();
@@ -96,8 +98,21 @@ class Player{
         //   this->footballers[i]->addComponent<FootballKeyboardController>();
         // }
       }
+    }
 
+    void setCurrentFootballer(){
+      for(int i = 0; i < MAX_NUM_OF_PLAYERS; i+=1)
+      {
+        this->footballers[i]->getComponent<FootballKeyboardController>().enable = false;
+      }
+      if(!this->teamId)
+      {
+        Logic::currentFootballer1->getComponent<FootballKeyboardController>().enable = true;
+      }
+      // else
+      // {
 
+      // }
     }
 
 

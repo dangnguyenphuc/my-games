@@ -138,6 +138,7 @@ void Game::update(){
   this->updateCamera();
 
   ball->defaultDecelerator();
+  player1->setCurrentFootballer();
   for(auto& i : this->colliders)
   {
     if(i->tag[0] == 'b')
@@ -166,7 +167,7 @@ void Game::update(){
             }
 
           }
-
+          Logic::currentFootballer1 = player1->footballers[p];
           Logic::playerTouchBall = true;
           break;
         }
