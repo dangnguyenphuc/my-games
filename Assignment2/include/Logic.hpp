@@ -5,8 +5,11 @@
 #include <vector>
 #include "Vector2.hpp"
 
+class Entity;
+
 class Logic{
   public:
+    static Entity* currentFootballer1;
     static bool playerTouchBall;
     static bool playerPassBall;
 

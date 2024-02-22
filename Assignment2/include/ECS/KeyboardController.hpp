@@ -76,8 +76,10 @@ class FootballKeyboardController : public KeyboardController{
                 this->transform->a.y = 0;
                 this->sprite->play(IDLE);
                 printf("footballer %d is choosing\n", this->id);
+
                 this->enable = false;
-                Game::manager.getGroup(GROUP_PLAYER1)[(this->id+1)%MAX_NUM_OF_PLAYERS]->getComponent<FootballKeyboardController>().enable = true;
+                Logic::currentFootballer1 =  Game::manager.getGroup(GROUP_PLAYER1)[(this->id+1)%MAX_NUM_OF_PLAYERS];
+                Logic::currentFootballer1->getComponent<FootballKeyboardController>().enable = true;
               }
 
               this->debounceButton -= 1;
