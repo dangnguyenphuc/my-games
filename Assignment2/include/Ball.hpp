@@ -25,12 +25,17 @@ class Ball{
 
       this->entity->addComponent<SpriteComponent>(spriteSheet);
       this->entity->addComponent<CollisionComponent>("b");
+      this->entity->addComponent<BallKeyboardController>();
+      this->setBallDefaultPosition();
+      this->entity->addGroup(GROUP_BALL);
+    }
+
+    void setBallDefaultPosition(){
+      this->entity->getComponent<TransformComponent>().a.Zero();
       this->entity->getComponent<TransformComponent>().setTopLeftPos(
         SCREEN_HEIGHT - 32,
         SCREEN_CENTER_WIDTH - 32
       );
-      this->entity->addComponent<BallKeyboardController>();
-      this->entity->addGroup(GROUP_BALL);
     }
 
     void defaultDecelerator(const float& decelerator=0.015){

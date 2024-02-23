@@ -51,47 +51,18 @@ class Player{
         this->footballers[i]->addGroup(GET_PLAYER_GROUP);
       }
 
-      if(GET_PLAYER_GROUP == GROUP_PLAYER1)
+      if(!this->teamId)
       {
-        this->footballers[0]->getComponent<TransformComponent>().setTopLeftPos(
-          SCREEN_HEIGHT - 200,
-          100
-        );
-
-        this->footballers[1]->getComponent<TransformComponent>().setTopLeftPos(
-          SCREEN_HEIGHT - 200,
-          SCREEN_CENTER_WIDTH - 32
-        );
-
-        this->footballers[2]->getComponent<TransformComponent>().setTopLeftPos(
-          SCREEN_HEIGHT - 200,
-          SCREEN_WIDTH - 32 - 100
-        );
-
-        this->footballers[0]->addComponent<FootballKeyboardController>(true);
-        Logic::currentFootballer1 = this->footballers[0];
-
-        for(int i = 1; i < MAX_NUM_OF_PLAYERS; i+=1){
+        for(int i = 0; i < MAX_NUM_OF_PLAYERS - 1; i+=1){
           this->footballers[i]->addComponent<FootballKeyboardController>();
         }
+
+        this->footballers[MAX_NUM_OF_PLAYERS - 1]->addComponent<FootballKeyboardController>(true);
+        Logic::currentFootballer1 = this->footballers[MAX_NUM_OF_PLAYERS - 1];
+
       }
       else
       {
-        this->footballers[0]->getComponent<TransformComponent>().setTopLeftPos(
-          SCREEN_HEIGHT + 200,
-          100
-        );
-
-        this->footballers[1]->getComponent<TransformComponent>().setTopLeftPos(
-          SCREEN_HEIGHT + 200,
-          SCREEN_CENTER_WIDTH - 32
-        );
-
-        this->footballers[2]->getComponent<TransformComponent>().setTopLeftPos(
-          SCREEN_HEIGHT + 200,
-          SCREEN_WIDTH - 32 - 100
-        );
-
         // this->footballers[0]->addComponent<FootballKeyboardController>(true);
 
         // for(int i = 1; i < MAX_NUM_OF_PLAYERS; i+=1){
@@ -113,6 +84,60 @@ class Player{
       // {
 
       // }
+    }
+
+    void resetPlayerPosition(){
+      if(!this->teamId)
+      {
+        this->footballers[0]->getComponent<TransformComponent>().setTopLeftPos(
+          Logic::zone1.h/2 - 32,
+          Logic::zone1.w/2 - 32
+        );
+
+        this->footballers[1]->getComponent<TransformComponent>().setTopLeftPos(
+          Logic::zone2.h/2 - 32,
+          Logic::zone1.w + Logic::zone2.h/2 - 32
+        );
+      }
+      else
+      {
+        this->footballers[0]->getComponent<TransformComponent>().setTopLeftPos(
+          Logic::zone1.h + Logic::zone3.h + Logic::zone5.h/2 - 32,
+          Logic::zone1.w/2 - 32
+        );
+
+        this->footballers[1]->getComponent<TransformComponent>().setTopLeftPos(
+          Logic::zone1.h + Logic::zone3.h + Logic::zone5.h/2 - 32,
+          Logic::zone1.w + Logic::zone2.h/2 - 32
+        );
+      }
+
+      for(auto& i : this->footballers){
+        i->getComponent<TransformComponent>().a.Zero();
+      }
+
+    }
+
+    void resetPlayer1CFPosition(){
+        this->footballers[2]->getComponent<TransformComponent>().setTopLeftPos(
+          Logic::zone1.h + 100 - 32,
+          SCREEN_CENTER_WIDTH - 32
+        );
+
+    }
+
+    void setPlayerCFWithBall(){
+      this->footballers[2]->getComponent<TransformComponent>().setTopLeftPos(
+          SCREEN_HEIGHT - 32,
+          SCREEN_CENTER_WIDTH - 32
+      );
+    }
+
+    void resetPlayer2CFPosition(){
+        this->footballers[2]->getComponent<TransformComponent>().setTopLeftPos(
+          SCREEN_HEIGHT*2 - Logic::zone1.h - 100 - 32,
+          SCREEN_CENTER_WIDTH - 32
+        );
     }
 
 
