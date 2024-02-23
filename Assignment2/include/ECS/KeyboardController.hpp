@@ -166,10 +166,7 @@ class BallKeyboardController : public KeyboardController{
         switch(Game::event.key.keysym.sym){
           case SDLK_SPACE:
             if(Logic::playerTouchBall && !Logic::playerPassBall){
-              printf("Space\n");
-              this->transform->a *= 2;
-              Logic::playerPassBall = true;
-              Logic::playerTouchBall = false;
+              this->kickTheBall();
             }
             break;
           default:
@@ -177,6 +174,13 @@ class BallKeyboardController : public KeyboardController{
             break;
         }
       }
+    }
+
+    void kickTheBall(){
+      printf("Kick\n");
+      this->transform->a *= 2;
+      Logic::playerPassBall = true;
+      Logic::playerTouchBall = false;
     }
 };
 

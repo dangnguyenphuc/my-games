@@ -7,6 +7,8 @@
 #include "../include/Player.hpp"
 #include "../include/Ball.hpp"
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 
 // static attributes
 SDL_Renderer* Game::renderer = nullptr;
@@ -21,11 +23,22 @@ Player* player2 = new Player(true, 1);
 Ball* ball = new Ball();
 
 Entity& line = Game::manager.addEntity();
+Entity& wall = Game::manager.addEntity();
 
-Entity& wallLeft = Game::manager.addEntity();
-Entity& wallRight = Game::manager.addEntity();
-Entity& wallBot = Game::manager.addEntity();
-Entity& wallTop = Game::manager.addEntity();
+void resetPlayerFootballerPositions(){
+  player1->resetPlayerPosition();
+  player2->resetPlayerPosition();
+  if(Logic::scoreState == PLAYER1_SCORED)
+  {
+    player2->setPlayerCFWithBall();
+    player1->resetPlayer1CFPosition();
+  }
+  else
+  {
+    player1->setPlayerCFWithBall();
+    player2->resetPlayer2CFPosition();
+  }
+}
 
 Game::Game(){}
 Game::~Game(){}
@@ -57,9 +70,9 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
     /*  Map   */
     Map::loadMap(defaultMap);
-    line.addComponent<TransformComponent>(-20,0, 0.65f);
+    line.addComponent<TransformComponent>(-10,0, 0.65f);
     line.addComponent<SpriteComponent>(LINE1_TEXTURE_FILE_PATH);
-    line.addComponent<TransformComponent>(-20,1383, 0.65f);
+    line.addComponent<TransformComponent>(-10,1383, 0.65f);
     line.addComponent<SpriteComponent>(LINE2_TEXTURE_FILE_PATH);
     line.addComponent<TransformComponent>(0,0);
     line.addComponent<SpriteComponent>(LINE_TEXTURE_FILE_PATH);
@@ -70,22 +83,43 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     /*  Map   */
 
     /*  Colliders  */
-    wallTop.addComponent<TransformComponent>(0,0,SCREEN_WIDTH,0);
-    wallTop.addComponent<CollisionComponent>("w1");
 
-    wallLeft.addComponent<TransformComponent>(0,0,0,SCREEN_HEIGHT*2);
-    wallLeft.addComponent<CollisionComponent>("w2");
+    //wall
+      // TOP
+    wall.addComponent<TransformComponent>(0,0,390,0);
+    wall.addComponent<CollisionComponent>("w1.1");
+    wall.addComponent<TransformComponent>(390,0,SCREEN_WIDTH-390*2,0);
+    wall.addComponent<CollisionComponent>("g2");
+    wall.addComponent<TransformComponent>(SCREEN_WIDTH-390,0,SCREEN_WIDTH-390,0);
+    wall.addComponent<CollisionComponent>("w1.2");
 
-    wallRight.addComponent<TransformComponent>(SCREEN_WIDTH,0,0,SCREEN_HEIGHT*2);
-    wallRight.addComponent<CollisionComponent>("w3");
+      // RIGHT
+    wall.addComponent<TransformComponent>(0,0,0,SCREEN_HEIGHT*2);
+    wall.addComponent<CollisionComponent>("w2");
 
-    wallBot.addComponent<TransformComponent>(0,SCREEN_HEIGHT*2,SCREEN_WIDTH,0);
-    wallBot.addComponent<CollisionComponent>("w4");
+      // LEFT
+    wall.addComponent<TransformComponent>(SCREEN_WIDTH,0,0,SCREEN_HEIGHT*2);
+    wall.addComponent<CollisionComponent>("w3");
+
+      // BOT
+    wall.addComponent<TransformComponent>(0,SCREEN_HEIGHT*2,390,0);
+    wall.addComponent<CollisionComponent>("w4.1");
+    wall.addComponent<TransformComponent>(390,SCREEN_HEIGHT*2,SCREEN_WIDTH-390*2,0);
+    wall.addComponent<CollisionComponent>("g1");
+    wall.addComponent<TransformComponent>(SCREEN_WIDTH-390,SCREEN_HEIGHT*2,SCREEN_WIDTH-390,0);
+    wall.addComponent<CollisionComponent>("w4.2");
     /*  Colliders  */
 
     /*PLAYERS*/
     player1->init(RiverPlateFootballerSprite);
     player2->init(BocaFootballerSprite);
+
+    srand(time(NULL));
+
+    int randomNumber = rand();
+    Logic::scoreState = randomNumber % 2 + 1;
+
+    resetPlayerFootballerPositions();
     /*PLAYERS*/
 
     /*BALL*/
@@ -139,44 +173,49 @@ void Game::update(){
 
   ball->defaultDecelerator();
   player1->setCurrentFootballer();
-  for(auto& i : this->colliders)
+
+  // check player1 collide with ball
+  for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1)
   {
-    if(i->tag[0] == 'b')
+    if(
+      Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(),
+      ball->entity->getComponent<CollisionComponent>()
+    ))
     {
-      for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1){
-        if(Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(), *i))
+      if(!Logic::playerPassBall)
+      {
+        ball->entity->getComponent<TransformComponent>().setTopLeftPos(
+          Logic::player1Position[p]
+        );
+
+        if(player1->footballers[p]->getComponent<TransformComponent>().a == Vector2(0.0f,0.0f))
         {
-          if(!Logic::playerPassBall)
-          {
-
-            ball->entity->getComponent<TransformComponent>().setTopLeftPos(
-              Logic::player1Position[p]
-            );
-
-            if(player1->footballers[p]->getComponent<TransformComponent>().a == Vector2(0.0f,0.0f))
-            {
-              ball->entity->getComponent<TransformComponent>().setA(
-                Vector2(0.0f, 0.7f)
-              );
-            }
-            else
-            {
-              ball->entity->getComponent<TransformComponent>().setA(
-                player1->footballers[p]->getComponent<TransformComponent>().a
-              );
-            }
-
-          }
-          Logic::currentFootballer1 = player1->footballers[p];
-          Logic::playerTouchBall = true;
-          break;
+          ball->entity->getComponent<TransformComponent>().setA(
+            Vector2(0.0f, 0.7f)
+          );
         }
         else
         {
-          Logic::playerTouchBall = false;
+          ball->entity->getComponent<TransformComponent>().setA(
+            player1->footballers[p]->getComponent<TransformComponent>().a
+          );
         }
+
       }
+      Logic::currentFootballer1 = player1->footballers[p];
+      Logic::playerTouchBall = true;
+      break;
     }
+    else
+    {
+      Logic::playerTouchBall = false;
+    }
+  }
+
+
+  // other colliders
+  for(auto& i : this->colliders)
+  {
 
     if(i->tag[0] == 'w')
     {
@@ -201,6 +240,26 @@ void Game::update(){
         {
           player1->footballers[p]->getComponent<TransformComponent>().position = Logic::player1Position[p];
         }
+      }
+    }
+
+    if(i->tag[0] == 'g')
+    {
+      // ball collided with goal
+      if(Collision::AABB(ball->entity->getComponent<CollisionComponent>(), *i))
+      {
+        ball->setBallDefaultPosition();
+        if(i->tag[1] == '1')
+        {
+          Logic::player1Score += 1;
+          Logic::scoreState = PLAYER1_SCORED;
+        }
+        else
+        {
+          Logic::player2Score += 1;
+          Logic::scoreState = PLAYER2_SCORED;
+        }
+        resetPlayerFootballerPositions();
       }
     }
   }
