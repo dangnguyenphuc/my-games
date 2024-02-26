@@ -25,11 +25,11 @@ class Vector2{
     Vector2& Divide(const float& num);
     Vector2& Zero();
 
-    friend Vector2 operator+(Vector2& left, const Vector2& right);
-    friend Vector2 operator-(Vector2& left, const Vector2& right);
-    friend float operator*(Vector2& left, const Vector2& right);
-    friend Vector2 operator*(Vector2& left, const float& right);
-    friend Vector2 operator/(Vector2& left, const float& right);
+    friend Vector2 operator+(const Vector2& left, const Vector2& right);
+    friend Vector2 operator-(const Vector2& left, const Vector2& right);
+    friend float operator*(const Vector2& left, const Vector2& right);
+    friend Vector2 operator*(const Vector2& left, const float& right);
+    friend Vector2 operator/(const Vector2& left, const float& right);
 
     Vector2& operator+=(const Vector2& vec);
     Vector2& operator-=(const Vector2& vec);
@@ -42,6 +42,7 @@ class Vector2{
     bool operator!=(const Vector2& vec){
       return this->x != vec.x || this->y != vec.y;
     }
+
 
     float squareOfDistance(const Vector2& v1, const Vector2& v2){
       return (v2.x-v1.x)*(v2.x-v1.x) + (v2.y-v1.y)*(v2.y-v1.y);

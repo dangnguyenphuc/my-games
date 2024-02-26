@@ -8,6 +8,7 @@
 
 class CollisionComponent;
 class Manager;
+class Ball;
 
 class Game{
   public:
@@ -39,6 +40,8 @@ class Game{
     static std::vector<CollisionComponent*> colliders;
     static SDL_Rect camera;
     static Manager manager;
+    static Ball* ball;
+
 };
 
 #endif

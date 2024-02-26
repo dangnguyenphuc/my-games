@@ -7,20 +7,22 @@ std::vector<Vector2> Logic::player1Position;
 std::vector<Vector2> Logic::player2Position;
 
 Entity* Logic::currentFootballer1 = nullptr;
+Entity* Logic::currentFootballer2 = nullptr;
 
 Vector2 Logic::ballPosition;
 
 int Logic::player1Score = 0;
 int Logic::player2Score = 0;
-int Logic::scoreState = NONE;
+int Logic::ballState = NONE;
 
-SDL_Rect Logic::zone1 = {0          , 0               , ZONE_WIDTH  , ZONE_HEIGHT+1};
-SDL_Rect Logic::zone2 = {ZONE_WIDTH , 0               , ZONE_WIDTH  , ZONE_HEIGHT+1};
-SDL_Rect Logic::zone3 = {0          , ZONE_HEIGHT+1   , ZONE_WIDTH  , ZONE_HEIGHT-1};
-SDL_Rect Logic::zone4 = {ZONE_WIDTH , ZONE_HEIGHT+1   , ZONE_WIDTH  , ZONE_HEIGHT-1};
-SDL_Rect Logic::zone5 = {0          , 2*ZONE_HEIGHT+1 , ZONE_WIDTH  , ZONE_HEIGHT+1};
-SDL_Rect Logic::zone6 = {ZONE_WIDTH , 2*ZONE_HEIGHT+1 , ZONE_WIDTH  , ZONE_HEIGHT+1};
-
+std::vector<SDL_Rect> Logic::zones{
+  {0          , 0               , ZONE_WIDTH  , ZONE_HEIGHT+1},
+  {ZONE_WIDTH , 0               , ZONE_WIDTH  , ZONE_HEIGHT+1},
+  {0          , ZONE_HEIGHT+1   , ZONE_WIDTH  , ZONE_HEIGHT-1},
+  {ZONE_WIDTH , ZONE_HEIGHT+1   , ZONE_WIDTH  , ZONE_HEIGHT-1},
+  {0          , 2*ZONE_HEIGHT+1 , ZONE_WIDTH  , ZONE_HEIGHT+1},
+  {ZONE_WIDTH , 2*ZONE_HEIGHT+1 , ZONE_WIDTH  , ZONE_HEIGHT+1}
+};
 /* Zone
 ------ ------
 |  1  |  2  |
@@ -30,3 +32,14 @@ SDL_Rect Logic::zone6 = {ZONE_WIDTH , 2*ZONE_HEIGHT+1 , ZONE_WIDTH  , ZONE_HEIGH
 |  5  |  6  |
 ------ ------
 */
+
+bool Logic::checkBallInZone(const int& index){
+  if( ballPosition.x >= zones[index].x &&
+      ballPosition.y >= zones[index].y &&
+      ballPosition.x < zones[index].x + zones[index].w &&
+      ballPosition.y < zones[index].y + zones[index].h)
+  {
+    return true;
+  }
+  return false;
+}

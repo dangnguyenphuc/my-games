@@ -25,9 +25,11 @@ class FootballKeyboardController : public KeyboardController{
     int id;
     static int currentId;
   private:
+    bool teamId;
+  private:
     int debounceButton = 2;
   public:
-    FootballKeyboardController(bool enable=false) : enable(enable){
+    FootballKeyboardController(const bool& enable=false, const bool& teamId=false) : enable(enable), teamId(teamId){
       this->id = currentId;
       currentId += 1;
     };
@@ -38,124 +40,242 @@ class FootballKeyboardController : public KeyboardController{
     }
 
     void update() override{
-      if(this->enable)
+      if(!this->teamId)
       {
-        if(Game::event.type == SDL_KEYDOWN)
+        if(this->enable)
         {
-          switch(Game::event.key.keysym.sym)
+          if(Game::event.type == SDL_KEYDOWN)
           {
-            case SDLK_w:
-              this->transform->a.y = -1;
-              this->sprite->play(WALK_BACK);
-              // printf("w\n");
-              break;
+            switch(Game::event.key.keysym.sym)
+            {
+              case SDLK_w:
+                this->transform->a.y = -1;
+                this->sprite->play(WALK_BACK);
+                // printf("w\n");
+                break;
 
-            case SDLK_s:
-              this->transform->a.y =  1;
-              this->sprite->play(WALK_FRONT);
-              // printf("s\n");
-              break;
+              case SDLK_s:
+                this->transform->a.y =  1;
+                this->sprite->play(WALK_FRONT);
+                // printf("s\n");
+                break;
 
-            case SDLK_a:
-              this->transform->a.x = -1;
-              this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
-              this->sprite->play(WALK_RIGHT);
-              // printf("a\n");
-              break;
+              case SDLK_a:
+                this->transform->a.x = -1;
+                this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
+                this->sprite->play(WALK_RIGHT);
+                // printf("a\n");
+                break;
 
-            case SDLK_d:
-              this->transform->a.x = 1;
-              this->sprite->play(WALK_RIGHT);
-              // printf("d\n");
-              break;
+              case SDLK_d:
+                this->transform->a.x = 1;
+                this->sprite->play(WALK_RIGHT);
+                // printf("d\n");
+                break;
 
-            case SDLK_e:
-              if(this->debounceButton <= 0){
+              case SDLK_e:
+                if(this->debounceButton <= 0){
+                  this->debounceButton = 2;
+                  this->transform->a.x = 0;
+                  this->transform->a.y = 0;
+                  this->sprite->play(IDLE);
+                  printf("footballer %d is choosing\n", this->id);
+
+                  this->enable = false;
+                  Logic::currentFootballer1 =  Game::manager.getGroup(GROUP_PLAYER1)[(this->id+1)%MAX_NUM_OF_PLAYERS];
+                  Logic::currentFootballer1->getComponent<FootballKeyboardController>().enable = true;
+                }
+
+                this->debounceButton -= 1;
+
+                // printf("nextPlayer id: %d\n",  this->nextPlayer.getComponent<FootballKeyboardController>().id);
+                break;
+
+              default:
                 this->debounceButton = 2;
-                this->transform->a.x = 0;
+                break;
+            }
+          }
+
+          if(Game::event.type == SDL_KEYUP)
+          {
+            switch(Game::event.key.keysym.sym)
+            {
+              case SDLK_w:
                 this->transform->a.y = 0;
                 this->sprite->play(IDLE);
-                printf("footballer %d is choosing\n", this->id);
-
-                this->enable = false;
-                Logic::currentFootballer1 =  Game::manager.getGroup(GROUP_PLAYER1)[(this->id+1)%MAX_NUM_OF_PLAYERS];
-                Logic::currentFootballer1->getComponent<FootballKeyboardController>().enable = true;
-              }
-
-              this->debounceButton -= 1;
-
-              // printf("nextPlayer id: %d\n",  this->nextPlayer.getComponent<FootballKeyboardController>().id);
-              break;
-
-            default:
-              this->debounceButton = 2;
-              break;
-          }
-        }
-
-        if(Game::event.type == SDL_KEYUP){
-          switch(Game::event.key.keysym.sym){
-            case SDLK_w:
-              this->transform->a.y = 0;
-              this->sprite->play(IDLE);
-              break;
-            case SDLK_s:
-              this->transform->a.y =  0;
-              this->sprite->play(IDLE);
-              break;
-            case SDLK_a:
-              this->transform->a.x = 0;
-              this->sprite->spriteFlip = SDL_FLIP_NONE;
-              this->sprite->play(IDLE);
-              break;
-            case SDLK_d:
-              this->transform->a.x = 0;
-              this->sprite->play(IDLE);
-              break;
-            case SDLK_e:
-              break;
-            default:
-              break;
+                break;
+              case SDLK_s:
+                this->transform->a.y =  0;
+                this->sprite->play(IDLE);
+                break;
+              case SDLK_a:
+                this->transform->a.x = 0;
+                this->sprite->spriteFlip = SDL_FLIP_NONE;
+                this->sprite->play(IDLE);
+                break;
+              case SDLK_d:
+                this->transform->a.x = 0;
+                this->sprite->play(IDLE);
+                break;
+              case SDLK_e:
+                break;
+              default:
+                break;
+            }
           }
         }
       }
       else
       {
-        if(!Logic::playerTouchBall)
+        if(this->enable)
         {
-          Vector2 howToMove = Logic::ballPosition - this->transform->position;
-          if(howToMove.x > 0.0f)
+          if(Game::event.type == SDL_KEYDOWN)
           {
-            this->transform->a.x =  1;
-            this->sprite->play(WALK_RIGHT);
-          }
-          else if(howToMove.x < 0.0f)
-          {
-            this->transform->a.x =  -1;
-            this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
-            this->sprite->play(WALK_RIGHT);
+            switch(Game::event.key.keysym.sym)
+            {
+              case SDLK_UP:
+                this->transform->a.y = -1;
+                this->sprite->play(WALK_BACK);
+                // printf("w\n");
+                break;
+
+              case SDLK_DOWN:
+                this->transform->a.y =  1;
+                this->sprite->play(WALK_FRONT);
+                // printf("s\n");
+                break;
+
+              case SDLK_LEFT:
+                this->transform->a.x = -1;
+                this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
+                this->sprite->play(WALK_RIGHT);
+                // printf("a\n");
+                break;
+
+              case SDLK_RIGHT:
+                this->transform->a.x = 1;
+                this->sprite->play(WALK_RIGHT);
+                // printf("d\n");
+                break;
+
+              case SDLK_RSHIFT:
+                if(this->debounceButton <= 0){
+                  this->debounceButton = 2;
+                  this->transform->a.x = 0;
+                  this->transform->a.y = 0;
+                  this->sprite->play(IDLE);
+                  printf("footballer %d is choosing\n", this->id);
+
+                  this->enable = false;
+                  Logic::currentFootballer2 =  Game::manager.getGroup(GROUP_PLAYER2)[(this->id+1)%MAX_NUM_OF_PLAYERS];
+                  Logic::currentFootballer2->getComponent<FootballKeyboardController>().enable = true;
+                }
+
+                this->debounceButton -= 1;
+
+                // printf("nextPlayer id: %d\n",  this->nextPlayer.getComponent<FootballKeyboardController>().id);
+                break;
+
+              default:
+                this->debounceButton = 2;
+                break;
+            }
           }
 
-          if(howToMove.y > 0.0f)
+          if(Game::event.type == SDL_KEYUP)
           {
-            this->transform->a.y =  1;
-            this->sprite->play(WALK_FRONT);
-          }
-          else if(howToMove.y < 0.0f)
-          {
-            this->transform->a.y =  -1;
-            this->sprite->play(WALK_BACK);
+            switch(Game::event.key.keysym.sym)
+            {
+              case SDLK_UP:
+                this->transform->a.y = 0;
+                this->sprite->play(IDLE);
+                break;
+              case SDLK_DOWN:
+                this->transform->a.y =  0;
+                this->sprite->play(IDLE);
+                break;
+              case SDLK_LEFT:
+                this->transform->a.x = 0;
+                this->sprite->spriteFlip = SDL_FLIP_NONE;
+                this->sprite->play(IDLE);
+                break;
+              case SDLK_RIGHT:
+                this->transform->a.x = 0;
+                this->sprite->play(IDLE);
+                break;
+              default:
+                break;
+            }
           }
         }
-        else{
-          this->transform->a.x =  0;
-          this->transform->a.y =  0;
-          this->sprite->play(IDLE);
-        }
-
-
       }
     }
+
+  void autoGetBall(){
+    if(!Logic::playerTouchBall)
+    {
+      Vector2 howToMove = Logic::ballPosition - this->transform->position;
+      if(howToMove.x > 0.0f)
+      {
+        this->transform->a.x =  1;
+        this->sprite->play(WALK_RIGHT);
+      }
+      else if(howToMove.x < 0.0f)
+      {
+        this->transform->a.x =  -1;
+        this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
+        this->sprite->play(WALK_RIGHT);
+      }
+
+      if(howToMove.y > 0.0f)
+      {
+        this->transform->a.y =  1;
+        this->sprite->play(WALK_FRONT);
+      }
+      else if(howToMove.y < 0.0f)
+      {
+        this->transform->a.y =  -1;
+        this->sprite->play(WALK_BACK);
+      }
+    }
+    else
+    {
+      this->transform->a.Zero();
+      this->sprite->play(IDLE);
+    }
+  }
+
+  void stop(){
+    this->transform->a.Zero();
+    this->sprite->play(IDLE);
+  }
+
+  void returnZone(const int& zone){
+    Vector2 howToMove = Vector2(Logic::zones[zone].x + Logic::zones[zone].w/2, Logic::zones[zone].y + Logic::zones[zone].h/2) - this->transform->position;
+    if(howToMove.x > 0.0f)
+      {
+        this->transform->a.x =  1;
+        this->sprite->play(WALK_RIGHT);
+      }
+      else if(howToMove.x < 0.0f)
+      {
+        this->transform->a.x =  -1;
+        this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
+        this->sprite->play(WALK_RIGHT);
+      }
+
+      if(howToMove.y > 0.0f)
+      {
+        this->transform->a.y =  1;
+        this->sprite->play(WALK_FRONT);
+      }
+      else if(howToMove.y < 0.0f)
+      {
+        this->transform->a.y =  -1;
+        this->sprite->play(WALK_BACK);
+      }
+  }
 };
 
 
@@ -177,7 +297,7 @@ class BallKeyboardController : public KeyboardController{
     }
 
     void kickTheBall(){
-      printf("Kick\n");
+      // printf("Kick\n");
       this->transform->a *= 2;
       Logic::playerPassBall = true;
       Logic::playerTouchBall = false;

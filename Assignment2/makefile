@@ -1,6 +1,6 @@
 CC := g++
 CFLAGS := -std=c++17 -Wall -Wextra
-SFMLFLAGS := -lSDL2 -lSDL2_image
+SDLFLAGS := -lSDL2 -lSDL2_image
 
 SRC_DIR := src
 OBJ_DIR := obj

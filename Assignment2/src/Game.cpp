@@ -20,7 +20,7 @@ SDL_Rect Game::camera = {0,0,SCREEN_WIDTH, SCREEN_HEIGHT};
 Manager Game::manager;
 Player* player1 = new Player(true, 0);
 Player* player2 = new Player(true, 1);
-Ball* ball = new Ball();
+Ball* Game::ball = new Ball();
 
 Entity& line = Game::manager.addEntity();
 Entity& wall = Game::manager.addEntity();
@@ -28,12 +28,12 @@ Entity& wall = Game::manager.addEntity();
 void resetPlayerFootballerPositions(){
   player1->resetPlayerPosition();
   player2->resetPlayerPosition();
-  if(Logic::scoreState == PLAYER1_SCORED)
+  if(Logic::ballState == PLAYER1_SCORED)
   {
     player2->setPlayerCFWithBall();
     player1->resetPlayer1CFPosition();
   }
-  else
+  else if(Logic::ballState == PLAYER2_SCORED)
   {
     player1->setPlayerCFWithBall();
     player2->resetPlayer2CFPosition();
@@ -117,9 +117,11 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     srand(time(NULL));
 
     int randomNumber = rand();
-    Logic::scoreState = randomNumber % 2 + 1;
+    Logic::ballState = randomNumber % 2 + 1;
 
     resetPlayerFootballerPositions();
+
+    Logic::ballState = NONE;
     /*PLAYERS*/
 
     /*BALL*/
@@ -200,15 +202,17 @@ void Game::update(){
             player1->footballers[p]->getComponent<TransformComponent>().a
           );
         }
-
+        Logic::ballState = PLAYER1_GETBALL;
+        Logic::currentFootballer1 = player1->footballers[p];
+        Logic::playerTouchBall = true;
       }
-      Logic::currentFootballer1 = player1->footballers[p];
-      Logic::playerTouchBall = true;
+      // else if ()
       break;
     }
     else
     {
       Logic::playerTouchBall = false;
+      Logic::ballState = NONE;
     }
   }
 
@@ -252,17 +256,19 @@ void Game::update(){
         if(i->tag[1] == '1')
         {
           Logic::player1Score += 1;
-          Logic::scoreState = PLAYER1_SCORED;
+          Logic::ballState = PLAYER1_SCORED;
         }
         else
         {
           Logic::player2Score += 1;
-          Logic::scoreState = PLAYER2_SCORED;
+          Logic::ballState = PLAYER2_SCORED;
         }
         resetPlayerFootballerPositions();
       }
     }
   }
+
+  player1->controlFootballers();
 
 }
 
@@ -276,17 +282,28 @@ void Game::render(){
 
   line.draw();
 
-  for(auto& i : player1->footballers)
+  std::vector<Entity*> allEntities(player1->footballers.begin(), player1->footballers.end());
+  allEntities.insert(allEntities.end(), player2->footballers.begin(), player2->footballers.end());
+  allEntities.push_back(ball->entity);
+
+  std::sort(allEntities.begin(), allEntities.end(), [](Entity* a, Entity* b){
+    return a->getComponent<TransformComponent>().position.y < b->getComponent<TransformComponent>().position.y;
+  });
+  // for(auto& i : player1->footballers)
+  // {
+  //   i->draw();
+  // }
+
+  // for(auto& i : player2->footballers)
+  // {
+  //   i->draw();
+  // }
+
+  // ball->entity->draw();
+  for(auto& i : allEntities)
   {
     i->draw();
   }
-
-  for(auto& i : player2->footballers)
-  {
-    i->draw();
-  }
-
-  ball->entity->draw();
 
   SDL_RenderPresent(this->renderer);
 }
