@@ -16,7 +16,7 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJ_FILES)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) $^ -o $@ $(SFMLFLAGS)
+	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) $^ -o $@ $(SDLFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)

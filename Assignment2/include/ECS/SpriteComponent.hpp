@@ -11,11 +11,13 @@
 #include "Animation.hpp"
 
 class SpriteComponent : public Component{
+  public:
+    SDL_Rect destRect;
   protected:
     TransformComponent* transform;
     std::vector<SDL_Texture*> texture;
     std::vector<SDL_Rect> srcRect;
-    SDL_Rect destRect;
+
 
     bool animated = false;
     int speed = SPEED;

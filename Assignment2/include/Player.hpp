@@ -59,7 +59,6 @@ class Player{
 
         this->footballers[MAX_NUM_OF_PLAYERS - 1]->addComponent<FootballKeyboardController>(true, this->teamId);
         Logic::currentFootballer1 = this->footballers[MAX_NUM_OF_PLAYERS - 1];
-
       }
       else
       {

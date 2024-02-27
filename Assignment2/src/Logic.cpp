@@ -1,4 +1,6 @@
 #include "../include/Logic.hpp"
+#include "../include/ECS/ECS.hpp"
+#include "../include/ECS/Component.hpp"
 
 bool Logic::playerTouchBall = false;
 bool Logic::playerPassBall = false;
@@ -42,4 +44,28 @@ bool Logic::checkBallInZone(const int& index){
     return true;
   }
   return false;
+}
+
+void Logic::deceleratorEntities(const float& decelerator, Entity* entity){
+  if(entity->getComponent<TransformComponent>().a.x > 0)
+  {
+    entity->getComponent<TransformComponent>().a.x -= decelerator;
+    if(entity->getComponent<TransformComponent>().a.x <= 0) entity->getComponent<TransformComponent>().a.x = 0;
+  }
+  else if(entity->getComponent<TransformComponent>().a.x < 0)
+  {
+    entity->getComponent<TransformComponent>().a.x += decelerator;
+    if(entity->getComponent<TransformComponent>().a.x >= 0) entity->getComponent<TransformComponent>().a.x = 0;
+  }
+
+  if(entity->getComponent<TransformComponent>().a.y > 0)
+  {
+    entity->getComponent<TransformComponent>().a.y -= decelerator;
+    if(entity->getComponent<TransformComponent>().a.y <= 0) entity->getComponent<TransformComponent>().a.y = 0;
+  }
+  else if(entity->getComponent<TransformComponent>().a.y < 0)
+  {
+    entity->getComponent<TransformComponent>().a.y += decelerator;
+    if(entity->getComponent<TransformComponent>().a.y >= 0) entity->getComponent<TransformComponent>().a.y = 0;
+  }
 }

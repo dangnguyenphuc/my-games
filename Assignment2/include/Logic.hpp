@@ -32,11 +32,13 @@ class Logic{
 
     static std::vector<Vector2> player1Position;
     static std::vector<Vector2> player2Position;
+
     static Vector2 ballPosition;
 
     static std::vector<SDL_Rect> zones;
 
     static bool checkBallInZone(const int& index);
+    static void deceleratorEntities(const float& num, Entity* entity);
 };
 
 #endif
