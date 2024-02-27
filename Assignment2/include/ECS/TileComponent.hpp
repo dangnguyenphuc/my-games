@@ -18,7 +18,8 @@ class TileComponent : public Component{
     float scale;
     Vector2 position;
 
-
+  private:
+    bool isCollider = false;
 
   public:
     TileComponent(){
@@ -35,6 +36,12 @@ class TileComponent : public Component{
         case 0:
           this->path = GRASS_TILE_FILE_PATH;
           break;
+
+        case 1:
+          this->path = MUD_TILE_FILE_PATH;
+          this->isCollider = true;
+          break;
+
         default:
           break;
       }
@@ -50,11 +57,17 @@ class TileComponent : public Component{
 
       this->entity->addComponent<SpriteComponent>(this->path);
       this->sprite = &(this->entity)->getComponent<SpriteComponent>();
+
+
+      if(this->isCollider)
+      {
+        this->entity->addComponent<CollisionComponent>("m");
+      }
     }
 
     void update() override{
-      this->transform->position.x = this->position.x - Game::camera.x;
-      this->transform->position.y = this->position.y - Game::camera.y;
+      this->sprite->destRect.x = this->position.x - Game::camera.x;
+      this->sprite->destRect.y = this->position.y - Game::camera.y;
     }
 
 };

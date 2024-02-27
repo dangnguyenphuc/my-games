@@ -21,21 +21,22 @@
 #define GROUP_PLAYER1 2
 #define GROUP_PLAYER2 3
 #define GROUP_BALL 4
-
+#define GROUP_MUD 5
 
 
 #define BALL_TEXTURE_FILE_PATH "../assets/image/ball.png"
 
 // Map
-#define MAP_WIDTH 35  //  1120/32
-#define MAP_HEIGHT 37 //  800/32
+#define MAP_WIDTH 18  //  1120/32
+#define MAP_HEIGHT 38 //  800/32
 
 #define ZONE_HEIGHT 533
 #define ZONE_WIDTH  560
 
 // Grass Tile
 #define GRASS_TILE_FILE_PATH "../assets/image/Tiles/grass.png"
-#define GRASS_TILE_WIDTH_HEIGHT 16
+#define MUD_TILE_FILE_PATH "../assets/image/Tiles/Mud.png"
+#define GRASS_TILE_WIDTH_HEIGHT 32
 #define GRASS_TILE_WIDTH_HEIGHT_2_DRAW 64
 
 // Line
@@ -81,12 +82,18 @@
 #define WALK_FRONT 2
 #define WALK_BACK 3
 
-extern int defaultMap[MAP_HEIGHT][MAP_WIDTH];
-
+// footballers sprite sheet
 extern std::vector<std::tuple<const char*, int, int, int>> ArgentinaFootballerSprite;
 extern std::vector<std::tuple<const char*, int, int, int>> BocaFootballerSprite;
 extern std::vector<std::tuple<const char*, int, int, int>> IndependienteFootballerSprite;
 extern std::vector<std::tuple<const char*, int, int, int>> RiverPlateFootballerSprite;
 extern std::vector<std::tuple<const char*, int, int, int>> SanLorenzoFootballerSprite;
+
+// map
+extern int defaultMap[MAP_HEIGHT][MAP_WIDTH];
+
+// star for current choosing footballer
+#define PLAYER1_STAR "../assets/image/Free_Assets/Star/Active.png"
+#define PLAYER2_STAR "../assets/image/Free_Assets/Obstacles/SnowFlake.png"
 
 #endif

@@ -38,28 +38,8 @@ class Ball{
       );
     }
 
-    void defaultDecelerator(const float& decelerator=0.015){
-      if(this->entity->getComponent<TransformComponent>().a.x > 0)
-      {
-        this->entity->getComponent<TransformComponent>().a.x -= decelerator;
-        if(this->entity->getComponent<TransformComponent>().a.x <= 0) this->entity->getComponent<TransformComponent>().a.x = 0;
-      }
-      else if(this->entity->getComponent<TransformComponent>().a.x < 0)
-      {
-        this->entity->getComponent<TransformComponent>().a.x += decelerator;
-        if(this->entity->getComponent<TransformComponent>().a.x >= 0) this->entity->getComponent<TransformComponent>().a.x = 0;
-      }
-
-      if(this->entity->getComponent<TransformComponent>().a.y > 0)
-      {
-        this->entity->getComponent<TransformComponent>().a.y -= decelerator;
-        if(this->entity->getComponent<TransformComponent>().a.y <= 0) this->entity->getComponent<TransformComponent>().a.y = 0;
-      }
-      else if(this->entity->getComponent<TransformComponent>().a.y < 0)
-      {
-        this->entity->getComponent<TransformComponent>().a.y += decelerator;
-        if(this->entity->getComponent<TransformComponent>().a.y >= 0) this->entity->getComponent<TransformComponent>().a.y = 0;
-      }
+    void defaultDecelerator(const float& decelerator=0.02){
+      Logic::deceleratorEntities(decelerator, this->entity);
     }
 
 };

@@ -24,6 +24,8 @@ Ball* Game::ball = new Ball();
 
 Entity& line = Game::manager.addEntity();
 Entity& wall = Game::manager.addEntity();
+Entity& activeStar = Game::manager.addEntity();
+Entity& unactiveStar = Game::manager.addEntity();
 
 void resetPlayerFootballerPositions(){
   player1->resetPlayerPosition();
@@ -114,6 +116,20 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     player1->init(RiverPlateFootballerSprite);
     player2->init(BocaFootballerSprite);
 
+    activeStar.addComponent<TransformComponent>(
+      Logic::currentFootballer1->getComponent<TransformComponent>().position.x - 5,
+      Logic::currentFootballer1->getComponent<TransformComponent>().position.y - 25,
+      0.25f
+    );
+    activeStar.addComponent<SpriteComponent>(PLAYER1_STAR);
+
+    unactiveStar.addComponent<TransformComponent>(
+      Logic::currentFootballer2->getComponent<TransformComponent>().position.x + 5,
+      Logic::currentFootballer2->getComponent<TransformComponent>().position.y - 25,
+      1.0f
+    );
+    unactiveStar.addComponent<SpriteComponent>(PLAYER2_STAR);
+
     srand(time(NULL));
 
     int randomNumber = rand();
@@ -175,6 +191,7 @@ void Game::update(){
 
   ball->defaultDecelerator();
   player1->setCurrentFootballer();
+  // player2->setCurrentFootballer();
 
   // check player1 collide with ball
   for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1)
@@ -220,7 +237,7 @@ void Game::update(){
   // other colliders
   for(auto& i : this->colliders)
   {
-
+    // printf("%s\n", i->tag);
     if(i->tag[0] == 'w')
     {
       // ball collided with wall
@@ -266,9 +283,27 @@ void Game::update(){
         resetPlayerFootballerPositions();
       }
     }
+
+    // if ball hits mud
+    if(i->tag[0] == 'm')
+    {
+      if(Collision::AABB(ball->entity->getComponent<CollisionComponent>(), *i)){
+        Logic::deceleratorEntities(0.05f, ball->entity);
+      }
+    }
   }
 
   player1->controlFootballers();
+
+  activeStar.getComponent<TransformComponent>().setTopLeftPos(
+    Logic::currentFootballer1->getComponent<TransformComponent>().position.y - 25,
+    Logic::currentFootballer1->getComponent<TransformComponent>().position.x - 5
+  );
+
+  unactiveStar.getComponent<TransformComponent>().setTopLeftPos(
+    Logic::currentFootballer2->getComponent<TransformComponent>().position.y - 25,
+    Logic::currentFootballer2->getComponent<TransformComponent>().position.x + 5
+  );
 
 }
 
@@ -289,21 +324,14 @@ void Game::render(){
   std::sort(allEntities.begin(), allEntities.end(), [](Entity* a, Entity* b){
     return a->getComponent<TransformComponent>().position.y < b->getComponent<TransformComponent>().position.y;
   });
-  // for(auto& i : player1->footballers)
-  // {
-  //   i->draw();
-  // }
 
-  // for(auto& i : player2->footballers)
-  // {
-  //   i->draw();
-  // }
-
-  // ball->entity->draw();
   for(auto& i : allEntities)
   {
     i->draw();
   }
+
+  activeStar.draw();
+  unactiveStar.draw();
 
   SDL_RenderPresent(this->renderer);
 }

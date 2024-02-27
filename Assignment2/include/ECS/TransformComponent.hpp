@@ -8,7 +8,7 @@ class TransformComponent : public Component {
   public:
     Vector2 position;
     Vector2 a;
-    float scale = 1;
+    float scale = 1.0f;
 
     int height;
     int width;
@@ -24,13 +24,13 @@ class TransformComponent : public Component {
       this->scale = scale;
     }
 
-    TransformComponent(float x, float y, float scale = 1){
+    TransformComponent(float x, float y, float scale = 1.0f){
       this->position.x = x;
       this->position.y = y;
       this->scale = scale;
     }
 
-    TransformComponent(float x, float y, int width, int height, float scale = 1){
+    TransformComponent(float x, float y, int width, int height, float scale = 1.0f){
       this->position.x = x;
       this->position.y = y;
       this->scale = scale;
@@ -61,6 +61,10 @@ class TransformComponent : public Component {
     void setTopLeftPos(Vector2 position){
       this->position.x = position.x;
       this->position.y = position.y;
+    }
+
+    void setScale(float scale){
+      this->scale = scale;
     }
 
     void setA(Vector2 a){
