@@ -38,7 +38,7 @@ class Ball{
       );
     }
 
-    void defaultDecelerator(const float& decelerator=0.02){
+    void defaultDecelerator(const float& decelerator=0.015){
       Logic::deceleratorEntities(decelerator, this->entity);
     }
 
