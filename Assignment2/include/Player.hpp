@@ -25,11 +25,7 @@ class Player{
     > footballerSprite;
     std::vector<Entity*> footballers;
   public:
-    Player(bool isControlled, bool teamId=false){
-
-      this->isControlled = isControlled;
-      this->teamId = teamId;
-
+    Player(bool isControlled, bool teamId=false) : isControlled(isControlled), teamId(teamId){
       for(int i = 0; i < MAX_NUM_OF_PLAYERS; i+=1){
         Entity& footballer = Game::manager.addEntity();
         this->footballers.emplace_back(std::move(&footballer));
@@ -80,10 +76,10 @@ class Player{
       {
         Logic::currentFootballer1->getComponent<FootballKeyboardController>().enable = true;
       }
-      // else
-      // {
-
-      // }
+      else
+      {
+        Logic::currentFootballer2->getComponent<FootballKeyboardController>().enable = true;
+      }
     }
 
     void resetPlayerPosition(){

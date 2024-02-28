@@ -44,8 +44,12 @@ class Vector2{
     }
 
 
-    float squareOfDistance(const Vector2& v1, const Vector2& v2){
+    static float squareOfDistance(const Vector2& v1, const Vector2& v2){
       return (v2.x-v1.x)*(v2.x-v1.x) + (v2.y-v1.y)*(v2.y-v1.y);
+    }
+
+    float square(){
+      return this->x*this->x + this->y*this->y;
     }
 };
 

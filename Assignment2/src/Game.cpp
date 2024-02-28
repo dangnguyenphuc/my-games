@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+void drawActiveStar();
+void drawUnactiveStar();
+
 // static attributes
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
@@ -24,6 +27,8 @@ Ball* Game::ball = new Ball();
 
 Entity& line = Game::manager.addEntity();
 Entity& wall = Game::manager.addEntity();
+Entity& goal1 = Game::manager.addEntity();
+Entity& goal2 = Game::manager.addEntity();
 Entity& activeStar = Game::manager.addEntity();
 Entity& unactiveStar = Game::manager.addEntity();
 
@@ -90,8 +95,8 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
       // TOP
     wall.addComponent<TransformComponent>(0,0,390,0);
     wall.addComponent<CollisionComponent>("w1.1");
-    wall.addComponent<TransformComponent>(390,0,SCREEN_WIDTH-390*2,0);
-    wall.addComponent<CollisionComponent>("g2");
+    goal2.addComponent<TransformComponent>(390,0,SCREEN_WIDTH-390*2,0);
+    goal2.addComponent<CollisionComponent>("g2");
     wall.addComponent<TransformComponent>(SCREEN_WIDTH-390,0,SCREEN_WIDTH-390,0);
     wall.addComponent<CollisionComponent>("w1.2");
 
@@ -106,8 +111,8 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
       // BOT
     wall.addComponent<TransformComponent>(0,SCREEN_HEIGHT*2,390,0);
     wall.addComponent<CollisionComponent>("w4.1");
-    wall.addComponent<TransformComponent>(390,SCREEN_HEIGHT*2,SCREEN_WIDTH-390*2,0);
-    wall.addComponent<CollisionComponent>("g1");
+    goal1.addComponent<TransformComponent>(390,SCREEN_HEIGHT*2,SCREEN_WIDTH-390*2,0);
+    goal1.addComponent<CollisionComponent>("g1");
     wall.addComponent<TransformComponent>(SCREEN_WIDTH-390,SCREEN_HEIGHT*2,SCREEN_WIDTH-390,0);
     wall.addComponent<CollisionComponent>("w4.2");
     /*  Colliders  */
@@ -191,21 +196,29 @@ void Game::update(){
 
   ball->defaultDecelerator();
   player1->setCurrentFootballer();
-  // player2->setCurrentFootballer();
+  player2->setCurrentFootballer();
 
   // check player1 collide with ball
   for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1)
   {
     if(
       Collision::AABB(player1->footballers[p]->getComponent<CollisionComponent>(),
-      ball->entity->getComponent<CollisionComponent>()
-    ))
+      ball->entity->getComponent<CollisionComponent>())
+    )
     {
       if(!Logic::playerPassBall)
       {
-        ball->entity->getComponent<TransformComponent>().setTopLeftPos(
-          Logic::player1Position[p]
-        );
+        if(player1->footballers[p]->getComponent<TransformComponent>().a.y>=0)
+        {
+          ball->entity->getComponent<TransformComponent>().setTopLeftPos(
+            Logic::player1Position[p].y + 10, Logic::player1Position[p].x
+          );
+        }
+        else{
+          ball->entity->getComponent<TransformComponent>().setTopLeftPos(
+            Logic::player1Position[p].y - 10, Logic::player1Position[p].x
+          );
+        }
 
         if(player1->footballers[p]->getComponent<TransformComponent>().a == Vector2(0.0f,0.0f))
         {
@@ -222,9 +235,8 @@ void Game::update(){
         Logic::ballState = PLAYER1_GETBALL;
         Logic::currentFootballer1 = player1->footballers[p];
         Logic::playerTouchBall = true;
+        break;
       }
-      // else if ()
-      break;
     }
     else
     {
@@ -233,6 +245,47 @@ void Game::update(){
     }
   }
 
+  // check player2 collide with ball
+  for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1)
+  {
+    if(
+      Collision::AABB(player2->footballers[p]->getComponent<CollisionComponent>(),
+      ball->entity->getComponent<CollisionComponent>())
+    )
+    {
+      if(!Logic::playerPassBall)
+      {
+        if(player2->footballers[p]->getComponent<TransformComponent>().a.y>=0)
+        {
+          ball->entity->getComponent<TransformComponent>().setTopLeftPos(
+            Logic::player2Position[p].y + 10, Logic::player2Position[p].x
+          );
+        }
+        else{
+          ball->entity->getComponent<TransformComponent>().setTopLeftPos(
+            Logic::player2Position[p].y - 10, Logic::player2Position[p].x
+          );
+        }
+
+        if(player2->footballers[p]->getComponent<TransformComponent>().a == Vector2(0.0f,0.0f))
+        {
+          ball->entity->getComponent<TransformComponent>().setA(
+            Vector2(0.0f, -0.7f)
+          );
+        }
+        else
+        {
+          ball->entity->getComponent<TransformComponent>().setA(
+            player2->footballers[p]->getComponent<TransformComponent>().a
+          );
+        }
+        Logic::ballState = PLAYER2_GETBALL;
+        Logic::currentFootballer2 = player2->footballers[p];
+        Logic::playerTouchBall = true;
+        break;
+      }
+    }
+  }
 
   // other colliders
   for(auto& i : this->colliders)
@@ -262,9 +315,17 @@ void Game::update(){
           player1->footballers[p]->getComponent<TransformComponent>().position = Logic::player1Position[p];
         }
       }
+
+      // footballers collided with wall
+      for(int p = 0; p < MAX_NUM_OF_PLAYERS; p+=1){
+        if(Collision::AABB(player2->footballers[p]->getComponent<CollisionComponent>(), *i))
+        {
+          player2->footballers[p]->getComponent<TransformComponent>().position = Logic::player2Position[p];
+        }
+      }
     }
 
-    if(i->tag[0] == 'g')
+    if((i->tag[0] == 'g' && i->tag[1] == '1') || (i->tag[0] == 'g' && i->tag[1] == '2') )
     {
       // ball collided with goal
       if(Collision::AABB(ball->entity->getComponent<CollisionComponent>(), *i))
@@ -281,7 +342,7 @@ void Game::update(){
           Logic::ballState = PLAYER2_SCORED;
         }
         resetPlayerFootballerPositions();
-      }
+    }
     }
 
     // if ball hits mud
@@ -330,8 +391,8 @@ void Game::render(){
     i->draw();
   }
 
-  activeStar.draw();
-  unactiveStar.draw();
+  drawActiveStar();
+  drawUnactiveStar();
 
   SDL_RenderPresent(this->renderer);
 }
@@ -359,4 +420,26 @@ void Game::addTile(int x, int y, int id, float scale){
   Entity& tile = Game::manager.addEntity();
   tile.addComponent<TileComponent>(x,y,id,scale);
   tile.addGroup(GROUP_MAP);
+}
+
+void drawActiveStar(){
+  if(activeStar.getComponent<TransformComponent>().position.y < Game::camera.y)
+  {
+    activeStar.getComponent<TransformComponent>().position.y =  Game::camera.y;
+  }
+  else if(activeStar.getComponent<TransformComponent>().position.y > Game::camera.y + Game::camera.h){
+    activeStar.getComponent<TransformComponent>().position.y = Game::camera.y + Game::camera.h - 20;
+  }
+  activeStar.draw();
+}
+
+void drawUnactiveStar(){
+  if(unactiveStar.getComponent<TransformComponent>().position.y< Game::camera.y)
+  {
+    unactiveStar.getComponent<TransformComponent>().position.y =  Game::camera.y;
+  }
+  else if(unactiveStar.getComponent<TransformComponent>().position.y > Game::camera.y + Game::camera.h){
+    unactiveStar.getComponent<TransformComponent>().position.y = Game::camera.y + Game::camera.h - 20;
+  }
+  unactiveStar.draw();
 }

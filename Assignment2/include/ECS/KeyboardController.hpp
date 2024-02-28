@@ -280,24 +280,72 @@ class FootballKeyboardController : public KeyboardController{
 
 
 class BallKeyboardController : public KeyboardController{
+
   public:
     void update() override{
-      if(Game::event.type == SDL_KEYDOWN){
-        switch(Game::event.key.keysym.sym){
-          case SDLK_SPACE:
-            if(Logic::playerTouchBall && !Logic::playerPassBall){
-              this->kickTheBall();
-            }
-            break;
-          default:
-            Logic::playerPassBall = false;
-            break;
+      if(Logic::ballState==PLAYER1_GETBALL)
+      {
+        if(Game::event.type == SDL_KEYDOWN)
+        {
+          switch(Game::event.key.keysym.sym)
+          {
+            case SDLK_f:
+              if(Logic::playerTouchBall && !Logic::playerPassBall)
+              {
+                this->kickTheBall();
+              }
+              break;
+            default:
+              Logic::playerPassBall = false;
+              break;
+          }
         }
+      }
+      else if(Logic::ballState==PLAYER2_GETBALL)
+      {
+        if(Game::event.type == SDL_KEYDOWN)
+        {
+          switch(Game::event.key.keysym.sym)
+          {
+            case SDLK_RETURN:
+              if(Logic::playerTouchBall && !Logic::playerPassBall)
+              {
+                this->kickTheBall();
+              }
+              break;
+            default:
+              Logic::playerPassBall = false;
+              break;
+          }
+        }
+      }
+
+      else
+      {
+        Logic::playerPassBall = false;
       }
     }
 
     void kickTheBall(){
       // printf("Kick\n");
+      if(this->transform->a.y > 0)
+      {
+        this->transform->position.y += 23;
+      }
+      else if(this->transform->a.y < 0)
+      {
+        this->transform->position.y -= 23;
+      }
+
+      if(this->transform->a.x > 0)
+      {
+        this->transform->position.x += 33;
+      }
+      else if(this->transform->a.x < 0)
+      {
+        this->transform->position.x -= 33;
+      }
+
       this->transform->a *= 2;
       Logic::playerPassBall = true;
       Logic::playerTouchBall = false;
