@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include "config.hpp"
 #include <vector>
 
@@ -25,13 +26,12 @@ class Game{
     void updateCamera();
 
     bool running(){
-      return this->isRunning;
+      return isRunning;
     };
 
     static void addTile(int x, int y, int id = 0, float scale = 1.0f);
 
   private:
-    bool isRunning;
     SDL_Window* window;
 
   public:
@@ -41,6 +41,8 @@ class Game{
     static SDL_Rect camera;
     static Manager manager;
     static Ball* ball;
+    static TTF_Font* font;
+    static bool isRunning;
 
 };
 

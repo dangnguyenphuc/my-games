@@ -75,6 +75,37 @@ class SpriteComponent : public Component{
       setRect();
     }
 
+    void setDefaultTextTexture(const char* text, const int& defaultIndex = 0){
+      if( this->texture.size() > 0)
+      {
+        this->texture[defaultIndex] = TextureManager::renderText(text);
+        setRectforIndex(defaultIndex);
+      }
+      else
+      {
+        this->texture.emplace_back( std::move(TextureManager::renderText(text)));
+        setRect();
+      }
+
+    }
+
+    void setRectforIndex(const int& index = 0){
+      SDL_Rect tempRect;
+      SDL_QueryTexture(this->texture[index], nullptr, nullptr, &tempRect.w, &tempRect.h);
+
+      tempRect.x = 0;
+      tempRect.y = 0;
+      if(this->animated) tempRect.w /= this->animations[index].numberOfFrame;
+
+      this->srcRect[index] = tempRect;
+
+      this->transform->height = this->srcRect[this->currentAction].h  * this->transform->scale;
+      this->transform->width = this->srcRect[this->currentAction].w  * this->transform->scale;
+
+      this->destRect.w =  this->srcRect[this->currentAction].w * this->transform->scale;
+      this->destRect.h = this->srcRect[this->currentAction].h * this->transform->scale;
+    }
+
     void setRect(){
       SDL_Rect tempRect;
       for(int i = 0; i < (int)this->texture.size(); i+=1){

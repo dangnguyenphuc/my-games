@@ -84,6 +84,7 @@ class FootballKeyboardController : public KeyboardController{
                   this->enable = false;
                   Logic::currentFootballer1 =  Game::manager.getGroup(GROUP_PLAYER1)[(this->id+1)%MAX_NUM_OF_PLAYERS];
                   Logic::currentFootballer1->getComponent<FootballKeyboardController>().enable = true;
+                  Logic::currentFootballer1->getComponent<TransformComponent>().a.Zero();
                 }
 
                 this->debounceButton -= 1;
@@ -170,6 +171,7 @@ class FootballKeyboardController : public KeyboardController{
                   this->enable = false;
                   Logic::currentFootballer2 =  Game::manager.getGroup(GROUP_PLAYER2)[(this->id+1)%MAX_NUM_OF_PLAYERS];
                   Logic::currentFootballer2->getComponent<FootballKeyboardController>().enable = true;
+                  Logic::currentFootballer2->getComponent<TransformComponent>().a.Zero();
                 }
 
                 this->debounceButton -= 1;
@@ -212,28 +214,63 @@ class FootballKeyboardController : public KeyboardController{
       }
     }
 
+  void goStraight(const int& zone){
+    this->transform->a.Zero();
+    Vector2 howToMove = Vector2(Logic::zones[zone].x + Logic::zones[zone].w/2, Logic::zones[zone].y + Logic::zones[zone].h/2) - this->transform->position;
+    if(howToMove.y > 0.2f)
+    {
+      this->transform->a.y =  1;
+      this->sprite->play(WALK_FRONT);
+    }
+    else if(howToMove.y < -0.2f)
+    {
+      this->transform->a.y =  -1;
+      this->sprite->play(WALK_BACK);
+    }
+    else{
+      this->transform->a.Zero();
+      this->sprite->play(IDLE);
+    }
+  }
+
+  void goCross(const int& zone){
+    Vector2 howToMove = Vector2(Logic::zones[zone].x + Logic::zones[zone].w/2, Logic::zones[zone].y + Logic::zones[zone].h/2) - this->transform->position;
+    if(howToMove.x > 0.2f)
+    {
+      this->transform->a.x =  1;
+      this->sprite->play(WALK_RIGHT);
+    }
+    else if(howToMove.x < -0.2f)
+    {
+      this->transform->a.x =  -1;
+      this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
+      this->sprite->play(WALK_RIGHT);
+    }
+  }
+
   void autoGetBall(){
+
     if(!Logic::playerTouchBall)
     {
       Vector2 howToMove = Logic::ballPosition - this->transform->position;
-      if(howToMove.x > 0.0f)
+      if(howToMove.x > 0.2f)
       {
         this->transform->a.x =  1;
         this->sprite->play(WALK_RIGHT);
       }
-      else if(howToMove.x < 0.0f)
+      else if(howToMove.x < -0.2f)
       {
         this->transform->a.x =  -1;
         this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
         this->sprite->play(WALK_RIGHT);
       }
 
-      if(howToMove.y > 0.0f)
+      if(howToMove.y > 0.2f)
       {
         this->transform->a.y =  1;
         this->sprite->play(WALK_FRONT);
       }
-      else if(howToMove.y < 0.0f)
+      else if(howToMove.y < -0.2f)
       {
         this->transform->a.y =  -1;
         this->sprite->play(WALK_BACK);
@@ -253,24 +290,24 @@ class FootballKeyboardController : public KeyboardController{
 
   void returnZone(const int& zone){
     Vector2 howToMove = Vector2(Logic::zones[zone].x + Logic::zones[zone].w/2, Logic::zones[zone].y + Logic::zones[zone].h/2) - this->transform->position;
-    if(howToMove.x > 0.0f)
+    if(howToMove.x > 0.2f)
       {
         this->transform->a.x =  1;
         this->sprite->play(WALK_RIGHT);
       }
-      else if(howToMove.x < 0.0f)
+      else if(howToMove.x < -0.2f)
       {
         this->transform->a.x =  -1;
         this->sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
         this->sprite->play(WALK_RIGHT);
       }
 
-      if(howToMove.y > 0.0f)
+      if(howToMove.y > 0.2f)
       {
         this->transform->a.y =  1;
         this->sprite->play(WALK_FRONT);
       }
-      else if(howToMove.y < 0.0f)
+      else if(howToMove.y < -0.2f)
       {
         this->transform->a.y =  -1;
         this->sprite->play(WALK_BACK);
@@ -293,6 +330,8 @@ class BallKeyboardController : public KeyboardController{
               if(Logic::playerTouchBall && !Logic::playerPassBall)
               {
                 this->kickTheBall();
+                Logic::playerPassBall = true;
+                Logic::playerTouchBall = false;
               }
               break;
             default:
@@ -301,6 +340,7 @@ class BallKeyboardController : public KeyboardController{
           }
         }
       }
+
       else if(Logic::ballState==PLAYER2_GETBALL)
       {
         if(Game::event.type == SDL_KEYDOWN)
@@ -311,6 +351,8 @@ class BallKeyboardController : public KeyboardController{
               if(Logic::playerTouchBall && !Logic::playerPassBall)
               {
                 this->kickTheBall();
+                Logic::playerPassBall = true;
+                Logic::playerTouchBall = false;
               }
               break;
             default:
@@ -322,6 +364,7 @@ class BallKeyboardController : public KeyboardController{
 
       else
       {
+        Logic::playerPassBall = false;
         Logic::playerPassBall = false;
       }
     }
@@ -346,9 +389,7 @@ class BallKeyboardController : public KeyboardController{
         this->transform->position.x -= 33;
       }
 
-      this->transform->a *= 2;
-      Logic::playerPassBall = true;
-      Logic::playerTouchBall = false;
+      this->transform->a *= 2.2f;
     }
 };
 

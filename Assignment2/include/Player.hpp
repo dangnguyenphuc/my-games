@@ -162,25 +162,25 @@ class Player{
               this->footballers[1]->getComponent<FootballKeyboardController>().autoGetBall();
             }
             if(!getFootballerEnable(2)){
-              this->footballers[2]->getComponent<FootballKeyboardController>().returnZone(2);
+              this->footballers[2]->getComponent<FootballKeyboardController>().returnZone(3);
             }
           }
           else if(Logic::checkBallInZone(2))
           {
             if(!getFootballerEnable(0)){
-              this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(1);
+              this->footballers[0]->getComponent<FootballKeyboardController>().autoGetBall();
             }
             if(!getFootballerEnable(1)){
-              this->footballers[1]->getComponent<FootballKeyboardController>().returnZone(2);
+              this->footballers[1]->getComponent<FootballKeyboardController>().returnZone(3);
             }
             if(!getFootballerEnable(2)){
-              this->footballers[2]->getComponent<FootballKeyboardController>().autoGetBall();
+              this->footballers[2]->getComponent<FootballKeyboardController>().returnZone(4);
             }
           }
           else if(Logic::checkBallInZone(3))
           {
             if(!getFootballerEnable(0)){
-              this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(0);
+              this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(1);
             }
             if(!getFootballerEnable(1)){
               this->footballers[1]->getComponent<FootballKeyboardController>().autoGetBall();
@@ -195,7 +195,7 @@ class Player{
               this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(2);
             }
             if(!getFootballerEnable(1)){
-              this->footballers[1]->getComponent<FootballKeyboardController>().returnZone(3);
+              this->footballers[1]->getComponent<FootballKeyboardController>().returnZone(5);
             }
             if(!getFootballerEnable(2)){
               this->footballers[2]->getComponent<FootballKeyboardController>().autoGetBall();
@@ -207,35 +207,250 @@ class Player{
               this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(3);
             }
             if(!getFootballerEnable(1)){
-              this->footballers[1]->getComponent<FootballKeyboardController>().returnZone(4);
+              this->footballers[1]->getComponent<FootballKeyboardController>().autoGetBall();
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().returnZone(4);
+            }
+          }
+        }
+        else if(Logic::ballState == PLAYER1_GETBALL) //PLAYER1 GET BALl
+        {
+          if(Logic::checkBallInZone(0))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(4);
+            }
+          }
+
+          else if(Logic::checkBallInZone(1))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(4);
+            }
+          }
+
+          else if(Logic::checkBallInZone(2))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(4);
+            }
+          }
+
+          else if(Logic::checkBallInZone(3))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(5);
+            }
+          }
+
+          else if(Logic::checkBallInZone(4))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(5);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(4);
+            }
+          }
+
+          else
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(5);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(4);
+            }
+          }
+        }
+      }
+      else
+      {
+        if(Logic::ballState != PLAYER2_GETBALL)
+        {
+          if(Logic::checkBallInZone(0))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().returnZone(1);
             }
             if(!getFootballerEnable(2)){
               this->footballers[2]->getComponent<FootballKeyboardController>().autoGetBall();
             }
           }
+          else if(Logic::checkBallInZone(1))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(3);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().autoGetBall();
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().returnZone(0);
+            }
+          }
+          else if(Logic::checkBallInZone(2))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(4);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().returnZone(3);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().autoGetBall();
+            }
+          }
+          else if(Logic::checkBallInZone(3))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(5);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().autoGetBall();
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().returnZone(2);
+            }
+          }
+          else if(Logic::checkBallInZone(4))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().autoGetBall();
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().returnZone(5);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().returnZone(2);
+            }
+          }
+          else
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(4);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().autoGetBall();
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().returnZone(3);
+            }
+          }
         }
         else
         {
-          if(!getFootballerEnable(0)){
-              this->footballers[0]->getComponent<FootballKeyboardController>().stop();
+          if(Logic::checkBallInZone(0))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(0);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(1);
+            }
           }
-          if(!getFootballerEnable(1)){
-              this->footballers[1]->getComponent<FootballKeyboardController>().stop();
-          }
-          if(!getFootballerEnable(2)){
-              this->footballers[2]->getComponent<FootballKeyboardController>().stop();
-          }
-          // if(Logic::ballPosition.x < Logic::zones[0].x + Logic::zones[0].w && Logic::ballPosition.y < Logic::zones[0].y + Logic::zones[0].h){
-          //   if(!){
-          //     this->footballers[0]->getComponent<FootballKeyboardController>().autoGetBall();
-          //     Logic::ballState = PLAYER1_GETBALL;
-          //   }
-          // }
 
-          // if(!this->footballers[0]->getComponent<FootballKeyboardController>().enable){
-          //   this->footballers[0]->getComponent<FootballKeyboardController>().returnZone(3);
-          // }
+          else if(Logic::checkBallInZone(1))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(0);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(1);
+            }
+          }
 
+          else if(Logic::checkBallInZone(2))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(0);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(1);
+            }
+          }
+
+          else if(Logic::checkBallInZone(3))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(1);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+          }
+
+          else if(Logic::checkBallInZone(4))
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(3);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(1);
+            }
+          }
+
+          else
+          {
+            if(!getFootballerEnable(0)){
+              this->footballers[0]->getComponent<FootballKeyboardController>().goStraight(2);
+            }
+            if(!getFootballerEnable(1)){
+              this->footballers[1]->getComponent<FootballKeyboardController>().goStraight(1);
+            }
+            if(!getFootballerEnable(2)){
+              this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(0);
+            }
+          }
         }
       }
     }
@@ -243,7 +458,6 @@ class Player{
     bool getFootballerEnable(const int& index){
       return this->footballers[index]->getComponent<FootballKeyboardController>().enable;
     }
-
 
     ~Player(){
       footballers.clear();

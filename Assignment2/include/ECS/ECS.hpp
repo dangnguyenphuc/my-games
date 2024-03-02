@@ -68,7 +68,7 @@ class Entity {
         }
 
         ~Entity(){
-
+            this->components.clear();
         }
 
         void update() {
