@@ -12,8 +12,6 @@
 #define PLAYER2_SCORED    2
 #define PLAYER1_GETBALL   3
 #define PLAYER2_GETBALL   4
-#define PLAYER1_PASSING   5
-#define PLAYER2_PASSING   6
 
 class Entity;
 

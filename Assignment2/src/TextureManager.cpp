@@ -1,10 +1,31 @@
 #include "../include/TextureManager.hpp"
 
+
 SDL_Texture* TextureManager::loadTexture(const char* filePath){
   SDL_Surface* tempSurface = IMG_Load(filePath);
   SDL_Texture* texture = SDL_CreateTextureFromSurface(Game::renderer, tempSurface);
   SDL_FreeSurface(tempSurface);
 
+  return texture;
+}
+
+SDL_Texture* TextureManager::renderText(const char* s, const SDL_Color& color, const int& fontStyle){
+  TTF_SetFontStyle(Game::font, fontStyle);
+  SDL_Surface* tempSurface = TTF_RenderText_Solid(Game::font, s, color);
+  if(!tempSurface)
+  {
+    printf("Failed to create text surface\n");
+    Game::isRunning = false;
+    return nullptr;
+  }
+  SDL_Texture* texture = SDL_CreateTextureFromSurface(Game::renderer, tempSurface);
+  if(!texture)
+  {
+    printf("Failed to create text texture\n");
+    Game::isRunning = false;
+    return nullptr;
+  }
+  SDL_FreeSurface(tempSurface);
   return texture;
 }
 
