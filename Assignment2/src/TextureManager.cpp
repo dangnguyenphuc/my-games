@@ -25,6 +25,7 @@ SDL_Texture* TextureManager::renderText(const char* s, const SDL_Color& color, c
     Game::isRunning = false;
     return nullptr;
   }
+  // printf("%s being rendered\n", s);
   SDL_FreeSurface(tempSurface);
   return texture;
 }

@@ -38,6 +38,8 @@ Entity& activeStar = Game::manager.addEntity();
 Entity& unactiveStar = Game::manager.addEntity();
 Entity& timer = Game::manager.addEntity();
 Entity& timerValue = Game::manager.addEntity();
+Entity& scoreBorder = Game::manager.addEntity();
+Entity& score = Game::manager.addEntity();
 
 Game::Game(){}
 Game::~Game(){}
@@ -85,6 +87,15 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     timerValue.addComponent<SpriteComponent>();
     timerValue.getComponent<SpriteComponent>().setDefaultTextTexture(timeToPlay.timeToString().c_str());
     timerValue.getComponent<TransformComponent>().position.x = SCREEN_WIDTH - 65;
+
+    scoreBorder.addComponent<TransformComponent>();
+    scoreBorder.addComponent<SpriteComponent>(SCORE_BORDER_TEXTURE_FILE_PATH);
+    scoreBorder.getComponent<TransformComponent>().position.x = 0;
+
+    score.addComponent<TransformComponent>();
+    score.addComponent<SpriteComponent>();
+    score.getComponent<SpriteComponent>().setDefaultTextTexture((std::to_string(Logic::player1Score) + ":" + std::to_string(Logic::player2Score)).c_str());
+    score.getComponent<TransformComponent>().position.x = 25;
     /*  Map   */
     Map::loadMap(defaultMap);
     line.addComponent<TransformComponent>(-10,0, 0.65f);
@@ -150,7 +161,8 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     int randomNumber = rand();
     Logic::ballState = randomNumber % 2 + 1;
     resetPlayerFootballerPositions();
-
+    Logic::player1Score = 0;
+    Logic::player2Score = 0;
     Logic::ballState = NONE;
     /*PLAYERS*/
 
@@ -187,6 +199,7 @@ void Game::update(){
 
   //update time
   timerValue.getComponent<SpriteComponent>().setDefaultTextTexture(timeToPlay.timeToString().c_str());
+  score.getComponent<SpriteComponent>().setDefaultTextTexture((std::to_string(Logic::player1Score) + ":" + std::to_string(Logic::player2Score)).c_str());
 
   Logic::player1Position.clear();
   for(auto& p : player1->footballers){
@@ -275,12 +288,10 @@ void Game::update(){
         ball->setBallDefaultPosition();
         if(i->tag[1] == '1')
         {
-          Logic::player1Score += 1;
           Logic::ballState = PLAYER1_SCORED;
         }
         else
         {
-          Logic::player2Score += 1;
           Logic::ballState = PLAYER2_SCORED;
         }
         resetPlayerFootballerPositions();
@@ -337,6 +348,9 @@ void Game::render(){
   timer.draw();
   timerValue.draw();
 
+  scoreBorder.draw();
+  score.draw();
+
   SDL_RenderPresent(this->renderer);
 }
 
@@ -362,6 +376,9 @@ void Game::updateCamera(){
   }
   timer.getComponent<TransformComponent>().position.y = camera.y;
   timerValue.getComponent<TransformComponent>().position.y = camera.y + 10;
+
+  scoreBorder.getComponent<TransformComponent>().position.y = camera.y;
+  score.getComponent<TransformComponent>().position.y = camera.y + 10;
 }
 
 void Game::addTile(int x, int y, int id, float scale){
@@ -397,11 +414,13 @@ void resetPlayerFootballerPositions(){
   player2->resetPlayerPosition();
   if(Logic::ballState == PLAYER1_SCORED)
   {
+    Logic::player1Score += 1;
     player2->setPlayerCFWithBall();
     player1->resetPlayer1CFPosition();
   }
   else if(Logic::ballState == PLAYER2_SCORED)
   {
+    Logic::player2Score += 1;
     player1->setPlayerCFWithBall();
     player2->resetPlayer2CFPosition();
   }
