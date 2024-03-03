@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+// #include <SDL2/SDL_ttf.h>
 #include "config.hpp"
 #include <vector>
 
@@ -41,7 +41,7 @@ class Game{
     static SDL_Rect camera;
     static Manager manager;
     static Ball* ball;
-    static TTF_Font* font;
+    // static TTF_Font* font;
     static bool isRunning;
 
 };

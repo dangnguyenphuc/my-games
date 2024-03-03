@@ -22,7 +22,7 @@ SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 std::vector<CollisionComponent*> Game::colliders;
 SDL_Rect Game::camera = {0,0,SCREEN_WIDTH, SCREEN_HEIGHT};
-TTF_Font* Game::font = nullptr;
+// TTF_Font* Game::font = nullptr;
 bool Game::isRunning = false;
 
 // Game instances
@@ -37,7 +37,7 @@ Entity& wall = Game::manager.addEntity();
 Entity& activeStar = Game::manager.addEntity();
 Entity& unactiveStar = Game::manager.addEntity();
 Entity& timer = Game::manager.addEntity();
-Entity& timerValue = Game::manager.addEntity();
+// Entity& timerValue = Game::manager.addEntity();
 
 Game::Game(){}
 Game::~Game(){}
@@ -68,23 +68,23 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     this->isRunning = true;
 
     // font
-    TTF_Init();
-    Game::font = TTF_OpenFont(JETBRAINSMONO_FONT_FILE_PATH, 25);
-    if (Game::font == nullptr) {
-      printf("Cannot load font\n");
-      this->isRunning = false;
-    }
+    // TTF_Init();
+    // Game::font = TTF_OpenFont(JETBRAINSMONO_FONT_FILE_PATH, 25);
+    // if (Game::font == nullptr) {
+    //   printf("Cannot load font\n");
+    //   this->isRunning = false;
+    // }
     /*
     timer
     */
     timer.addComponent<TransformComponent>();
-    timer.addComponent<SpriteComponent>(TIMER_BORDER_TEXTURE_FILE_PATH);
-    timer.getComponent<TransformComponent>().position.x = SCREEN_WIDTH - 142;
+    // timer.addComponent<SpriteComponent>(TIMER_BORDER_TEXTURE_FILE_PATH);
+    // timer.getComponent<TransformComponent>().position.x = SCREEN_WIDTH - 142;
 
-    timerValue.addComponent<TransformComponent>();
-    timerValue.addComponent<SpriteComponent>();
-    timerValue.getComponent<SpriteComponent>().setDefaultTextTexture(timeToPlay.timeToString().c_str());
-    timerValue.getComponent<TransformComponent>().position.x = SCREEN_WIDTH - 65;
+    // timerValue.addComponent<TransformComponent>();
+    // timerValue.addComponent<SpriteComponent>();
+    // timerValue.getComponent<SpriteComponent>().setDefaultTextTexture(timeToPlay.timeToString().c_str());
+    // timerValue.getComponent<TransformComponent>().position.x = SCREEN_WIDTH - 65;
     /*  Map   */
     Map::loadMap(defaultMap);
     line.addComponent<TransformComponent>(-10,0, 0.65f);
@@ -186,7 +186,7 @@ std::vector<Entity*>& tiles = Game::manager.getGroup(GROUP_MAP);
 void Game::update(){
 
   //update time
-  timerValue.getComponent<SpriteComponent>().setDefaultTextTexture(timeToPlay.timeToString().c_str());
+  // timerValue.getComponent<SpriteComponent>().setDefaultTextTexture(timeToPlay.timeToString().c_str());
 
   Logic::player1Position.clear();
   for(auto& p : player1->footballers){
@@ -334,8 +334,8 @@ void Game::render(){
 
   drawActiveStar();
   drawUnactiveStar();
-  timer.draw();
-  timerValue.draw();
+  // timer.draw();
+  // timerValue.draw();
 
   SDL_RenderPresent(this->renderer);
 }
@@ -346,9 +346,9 @@ void Game::clean(){
   delete ball;
   SDL_DestroyWindow(this->window);
   SDL_DestroyRenderer(this->renderer);
-  TTF_CloseFont(Game::font);
+  // TTF_CloseFont(Game::font);
   SDL_Quit();
-  TTF_Quit();
+  // TTF_Quit();
   printf("Game cleaned !\n");
 }
 
@@ -360,8 +360,8 @@ void Game::updateCamera(){
   if(camera.y >= SCREEN_HEIGHT){
     camera.y = SCREEN_HEIGHT;
   }
-  timer.getComponent<TransformComponent>().position.y = camera.y;
-  timerValue.getComponent<TransformComponent>().position.y = camera.y + 10;
+  // timer.getComponent<TransformComponent>().position.y = camera.y;
+  // timerValue.getComponent<TransformComponent>().position.y = camera.y + 10;
 }
 
 void Game::addTile(int x, int y, int id, float scale){
