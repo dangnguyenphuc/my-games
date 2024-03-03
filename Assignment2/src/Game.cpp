@@ -360,9 +360,9 @@ void Game::clean(){
   delete ball;
   SDL_DestroyWindow(this->window);
   SDL_DestroyRenderer(this->renderer);
-  TTF_CloseFont(Game::font);
+  // TTF_CloseFont(Game::font);
   SDL_Quit();
-  TTF_Quit();
+  // TTF_Quit();
   printf("Game cleaned !\n");
 }
 
