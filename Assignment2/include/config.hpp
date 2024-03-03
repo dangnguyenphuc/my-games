@@ -27,6 +27,7 @@
 
 #define JETBRAINSMONO_FONT_FILE_PATH "../assets/font/JetBrainsMonoNerdFontMono-Regular.ttf"
 #define TIMER_BORDER_TEXTURE_FILE_PATH "../assets/image/Free_Assets/Counter/Border.png"
+#define SCORE_BORDER_TEXTURE_FILE_PATH "../assets/image/Free_Assets/Counter/ScoreBorder.png"
 
 #define BALL_TEXTURE_FILE_PATH "../assets/image/ball.png"
 

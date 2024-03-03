@@ -25,6 +25,7 @@ class Logic{
 
     static int player1Score;
     static int player2Score;
+    static std::string scoreString;
 
     static int ballState;
 

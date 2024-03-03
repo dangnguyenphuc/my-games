@@ -160,7 +160,7 @@ class FootballKeyboardController : public KeyboardController{
                 // printf("d\n");
                 break;
 
-              case SDLK_RSHIFT:
+              case SDLK_m:
                 if(this->debounceButton <= 0){
                   this->debounceButton = 2;
                   this->transform->a.x = 0;
@@ -347,7 +347,7 @@ class BallKeyboardController : public KeyboardController{
         {
           switch(Game::event.key.keysym.sym)
           {
-            case SDLK_RETURN:
+            case SDLK_n:
               if(Logic::playerTouchBall && !Logic::playerPassBall)
               {
                 this->kickTheBall();
