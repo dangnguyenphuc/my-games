@@ -4,11 +4,10 @@
 
 bool Logic::playerTouchBall = false;
 bool Logic::playerPassBall = false;
+bool Logic::playWithComputer = false;
 
 std::vector<Vector2> Logic::player1Position;
 std::vector<Vector2> Logic::player2Position;
-
-std::string Logic::scoreString = "0:0";
 
 Entity* Logic::currentFootballer1 = nullptr;
 Entity* Logic::currentFootballer2 = nullptr;

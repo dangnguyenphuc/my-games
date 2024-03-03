@@ -100,9 +100,6 @@ class Entity {
             return manager;
         }
 
-
-
-
         template <typename T>
         bool hasComponent() const {
             return this->componentBitSet[getComponentTypeID<T>()];

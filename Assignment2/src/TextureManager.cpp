@@ -1,5 +1,4 @@
 #include "../include/TextureManager.hpp"
-#include <cstdio>
 
 SDL_Texture* TextureManager::loadTexture(const char* filePath){
   SDL_Surface* tempSurface = IMG_Load(filePath);
@@ -15,14 +14,14 @@ SDL_Texture* TextureManager::renderText(const char* s, const SDL_Color& color, c
   if(!tempSurface)
   {
     printf("Failed to create text surface\n");
-    Game::isRunning = false;
+    Game::gameState = EXIT;
     return nullptr;
   }
   SDL_Texture* texture = SDL_CreateTextureFromSurface(Game::renderer, tempSurface);
   if(!texture)
   {
     printf("Failed to create text texture\n");
-    Game::isRunning = false;
+    Game::gameState = EXIT;
     return nullptr;
   }
   // printf("%s being rendered\n", s);
