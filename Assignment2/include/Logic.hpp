@@ -7,6 +7,7 @@
 #include <SDL2/SDL.h>
 #include "config.hpp"
 
+// ball states
 #define NONE              0
 #define PLAYER1_SCORED    1
 #define PLAYER2_SCORED    2
@@ -22,10 +23,10 @@ class Logic{
 
     static bool playerTouchBall;
     static bool playerPassBall;
+    static bool playWithComputer;
 
     static int player1Score;
     static int player2Score;
-    static std::string scoreString;
 
     static int ballState;
 

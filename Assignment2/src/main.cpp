@@ -11,7 +11,7 @@ int main(){
   game = new Game();
   game->init("Assignment2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, false);
 
-  while(game->running()){
+  while(game->getGameState()){
 
     frameStart = SDL_GetTicks();
 

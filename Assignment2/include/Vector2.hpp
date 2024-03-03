@@ -51,6 +51,10 @@ class Vector2{
     float square(){
       return this->x*this->x + this->y*this->y;
     }
+
+    float squareOfDistanceTo(const Vector2& v2){
+      return (v2.x-this->x)*(v2.x-this->x) + (v2.y-this->y)*(v2.y-this->y);
+    }
 };
 
 

@@ -12,7 +12,6 @@
 
 class Player{
   private:
-    bool isControlled;
     bool teamId;
   public:
     std::vector<std::tuple
@@ -25,7 +24,7 @@ class Player{
     > footballerSprite;
     std::vector<Entity*> footballers;
   public:
-    Player(bool isControlled, bool teamId=false) : isControlled(isControlled), teamId(teamId){
+    Player(bool teamId=false) : teamId(teamId){
       for(int i = 0; i < MAX_NUM_OF_PLAYERS; i+=1){
         Entity& footballer = Game::manager.addEntity();
         this->footballers.emplace_back(std::move(&footballer));
@@ -64,6 +63,13 @@ class Player{
 
         this->footballers[MAX_NUM_OF_PLAYERS - 1]->addComponent<FootballKeyboardController>(true, this->teamId);
         Logic::currentFootballer2 = this->footballers[MAX_NUM_OF_PLAYERS - 1];
+      }
+    }
+
+    void disableAllFootballer(){
+      for(int i = 0; i < MAX_NUM_OF_PLAYERS; i+=1)
+      {
+        this->footballers[i]->getComponent<FootballKeyboardController>().enable = false;
       }
     }
 
@@ -139,7 +145,7 @@ class Player{
     void controlFootballers(){
       if(!this->teamId)
       {
-        if(Logic::ballState != PLAYER1_GETBALL)
+        if(Logic::ballState == PLAYER2_GETBALL)
         {
           if(Logic::checkBallInZone(0))
           {
@@ -294,10 +300,26 @@ class Player{
             }
           }
         }
+        else
+        {
+          std::vector<Entity*> temp_f = this->footballers;
+          std::sort(temp_f.begin(), temp_f.end(), [](Entity* a, Entity* b){
+            return a->getComponent<TransformComponent>().position.squareOfDistanceTo(Logic::ballPosition) < b->getComponent<TransformComponent>().position.squareOfDistanceTo(Logic::ballPosition);
+          });
+
+          for(int i = MAX_NUM_OF_PLAYERS - 1; i >= 0; i -=1)
+          {
+            if(!temp_f[i]->getComponent<FootballKeyboardController>().enable)
+            {
+              temp_f[i]->getComponent<FootballKeyboardController>().autoGetBall();
+              break;
+            }
+          }
+        }
       }
       else
       {
-        if(Logic::ballState != PLAYER2_GETBALL)
+        if(Logic::ballState == PLAYER1_GETBALL)
         {
           if(Logic::checkBallInZone(0))
           {
@@ -372,7 +394,7 @@ class Player{
             }
           }
         }
-        else
+        else if(Logic::ballState == PLAYER2_GETBALL)
         {
           if(Logic::checkBallInZone(0))
           {
@@ -451,6 +473,23 @@ class Player{
               this->footballers[2]->getComponent<FootballKeyboardController>().goStraight(0);
             }
           }
+        }
+        else
+        {
+          std::vector<Entity*> temp_f = this->footballers;
+          std::sort(temp_f.begin(), temp_f.end(), [](Entity* a, Entity* b){
+            return a->getComponent<TransformComponent>().position.squareOfDistanceTo(Logic::ballPosition) < b->getComponent<TransformComponent>().position.squareOfDistanceTo(Logic::ballPosition);
+          });
+
+          for(int i = MAX_NUM_OF_PLAYERS - 1; i >= 0; i -=1)
+          {
+            if(!temp_f[i]->getComponent<FootballKeyboardController>().enable)
+            {
+              temp_f[i]->getComponent<FootballKeyboardController>().autoGetBall();
+              break;
+            }
+          }
+
         }
       }
     }

@@ -42,6 +42,10 @@ class Ball{
       Logic::deceleratorEntities(decelerator, this->entity);
     }
 
+    void kick(){
+      this->entity->getComponent<BallKeyboardController>().kickTheBall();
+    }
+
 };
 
 #endif

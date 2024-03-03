@@ -29,6 +29,17 @@
 #define TIMER_BORDER_TEXTURE_FILE_PATH "../assets/image/Free_Assets/Counter/Border.png"
 #define SCORE_BORDER_TEXTURE_FILE_PATH "../assets/image/Free_Assets/Counter/ScoreBorder.png"
 
+// start menu
+#define START_MENU_P1_BUTTON "../assets/image/Menu/pwp_btn.png"
+#define START_MENU_P2_BUTTON "../assets/image/Menu/pwc_btn.png"
+#define START_MENU_BACKGROUND "../assets/image/Menu/start_bg.png"
+
+// end menu
+#define END_MENU_BACKGROUND "../assets/image/Menu/end_bg.png"
+#define END_MENU_REPLAY_BUTTON "../assets/image/Menu/replay_btn.png"
+#define END_MENU_RETURN_BUTTON "../assets/image/Menu/return_btn.png"
+
+// ball
 #define BALL_TEXTURE_FILE_PATH "../assets/image/ball.png"
 
 // Map

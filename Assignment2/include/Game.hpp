@@ -7,6 +7,13 @@
 #include "config.hpp"
 #include <vector>
 
+// game states
+#define EXIT                          0
+#define IS_RUNNING                    1
+#define IS_RUNNING_VS_COMPUTER        2
+#define ACTIVE_START                  3
+#define ACTIVE_END                    4
+
 class CollisionComponent;
 class Manager;
 class Ball;
@@ -22,11 +29,12 @@ class Game{
     void update();
     void render();
     void clean();
-
+    void runGame();
+    void drawGameWhileRunning();
     void updateCamera();
 
-    bool running(){
-      return isRunning;
+    int getGameState(){
+      return (this->gameState);
     };
 
     static void addTile(int x, int y, int id = 0, float scale = 1.0f);
@@ -42,8 +50,7 @@ class Game{
     static Manager manager;
     static Ball* ball;
     static TTF_Font* font;
-    static bool isRunning;
-
+    static int gameState;
 };
 
 #endif

@@ -370,7 +370,6 @@ class BallKeyboardController : public KeyboardController{
     }
 
     void kickTheBall(){
-      // printf("Kick\n");
       if(this->transform->a.y > 0)
       {
         this->transform->position.y += 23;
@@ -389,7 +388,7 @@ class BallKeyboardController : public KeyboardController{
         this->transform->position.x -= 33;
       }
 
-      this->transform->a *= 2.2f;
+      this->transform->a *= 2.5f;
     }
 };
 
