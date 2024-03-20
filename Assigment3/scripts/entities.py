@@ -81,40 +81,45 @@ class Enemy(PhysicsEntity):
         super().__init__(game, 'enemy', pos, size)
 
         self.walking = 0
+        self.isDead = False
 
     def update(self, tilemap, movement=(0, 0)):
-        if self.walking:
-            if tilemap.solid_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
-                if (self.collisions['right'] or self.collisions['left']):
-                    self.flip = not self.flip
+        if not self.game.player.isTimeStop():
+            if self.walking:
+                if tilemap.solid_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
+                    if (self.collisions['right'] or self.collisions['left']):
+                        self.flip = not self.flip
+                    else:
+                        movement = (movement[0] - 0.5 if self.flip else 0.5, movement[1])
                 else:
-                    movement = (movement[0] - 0.5 if self.flip else 0.5, movement[1])
+                    self.flip = not self.flip
+                self.walking = max(0, self.walking - 1)
+                if not self.walking:
+                    dis = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
+                    if (abs(dis[1]) < 16):
+                        if (self.flip and dis[0] < 0):
+                            self.game.sfx['shoot'].play()
+                            self.game.enemyProjectiles.append([[self.rect().centerx - 7, self.rect().centery], -1.5, 0])
+                            for i in range(4):
+                                self.game.sparks.append(Spark(self.game, self.game.enemyProjectiles[-1][0], random.random() - 0.5 + math.pi, 2 + random.random()))
+                        if (not self.flip and dis[0] > 0):
+                            self.game.sfx['shoot'].play()
+                            self.game.enemyProjectiles.append([[self.rect().centerx + 7, self.rect().centery], 1.5, 0])
+                            for i in range(4):
+                                self.game.sparks.append(Spark(self.game, self.game.enemyProjectiles[-1][0], random.random() - 0.5, 2 + random.random()))
+            elif random.random() < 0.01:
+                self.walking = random.randint(30, 120)
+
+            super().update(tilemap, movement=movement)
+
+            if movement[0] != 0:
+                self.set_action('run')
             else:
-                self.flip = not self.flip
-            self.walking = max(0, self.walking - 1)
-            if not self.walking:
-                dis = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
-                if (abs(dis[1]) < 16):
-                    if (self.flip and dis[0] < 0):
-                        self.game.sfx['shoot'].play()
-                        self.game.enemyProjectiles.append([[self.rect().centerx - 7, self.rect().centery], -1.5, 0])
-                        for i in range(4):
-                            self.game.sparks.append(Spark(self.game.enemyProjectiles[-1][0], random.random() - 0.5 + math.pi, 2 + random.random()))
-                    if (not self.flip and dis[0] > 0):
-                        self.game.sfx['shoot'].play()
-                        self.game.enemyProjectiles.append([[self.rect().centerx + 7, self.rect().centery], 1.5, 0])
-                        for i in range(4):
-                            self.game.sparks.append(Spark(self.game.enemyProjectiles[-1][0], random.random() - 0.5, 2 + random.random()))
-        elif random.random() < 0.01:
-            self.walking = random.randint(30, 120)
+                self.set_action('idle')
 
-        super().update(tilemap, movement=movement)
+        self.isKilled()
 
-        if movement[0] != 0:
-            self.set_action('run')
-        else:
-            self.set_action('idle')
-
+    def isKilled(self):
         if abs(self.game.player.dashing) >= 50:
             if self.rect().colliderect(self.game.player.rect()):
                 self.game.screenshake = max(16, self.game.screenshake)
@@ -122,11 +127,14 @@ class Enemy(PhysicsEntity):
                 for i in range(30):
                     angle = random.random() * math.pi * 2
                     speed = random.random() * 5
-                    self.game.sparks.append(Spark(self.rect().center, angle, 2 + random.random()))
+                    if self.game.player.isTimeStop():
+                        self.game.sparks.append(Spark(self.game, self.rect().center, angle, 0.1 + random.random()))
+                    else:
+                        self.game.sparks.append(Spark(self.game, self.rect().center, angle, 2 + random.random()))
                     self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
-                self.game.sparks.append(Spark(self.rect().center, 0, 5 + random.random()))
-                self.game.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
-                return True
+                self.game.sparks.append(Spark(self.game, self.rect().center, 0, 5 + random.random()))
+                self.game.sparks.append(Spark(self.game, self.rect().center, math.pi, 5 + random.random()))
+                self.isDead = True
 
         # [[x, y], direction, timer]
         for projectile in self.game.playerProjectiles.copy():
@@ -136,9 +144,14 @@ class Enemy(PhysicsEntity):
                 for i in range(30):
                     angle = random.random() * math.pi * 2
                     speed = random.random() * 5
-                    self.game.sparks.append(Spark(self.rect().center, angle, 2 + random.random()))
+                    if self.game.player.isTimeStop():
+                        self.game.sparks.append(Spark(self.game, self.rect().center, angle, 0.1 + random.random()))
+                    else:
+                        self.game.sparks.append(Spark(self.game, self.rect().center, angle, 2 + random.random()))
                     self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
-                return True
+                self.isDead = True
+
+
 
     def render(self, surf, offset=(0, 0)):
         super().render(surf, offset=offset)
@@ -159,6 +172,7 @@ class Player(PhysicsEntity):
 
         # teleport ability
         self.teleport = {
+            "enable": True,
             "previousPosition": None,
             "telePhase": 0
         }
@@ -221,6 +235,10 @@ class Player(PhysicsEntity):
         if abs(self.dashing) <= 50:
             super().render(surf, offset=offset)
 
+        if self.isTimeStop():
+            surf.blit(self.game.assets["star"], (self.teleport["previousPosition"][0] - offset[0], self.teleport["previousPosition"][1] - offset[1]))
+
+
     def shoot(self):
         if self.bullets > 0:
             self.bullets -= 1
@@ -232,18 +250,26 @@ class Player(PhysicsEntity):
 
     def tele(self):
 
-        if self.teleport["telePhase"] == 0:
-            # TODO: SET TELE POINT
-            self.teleport["previousPosition"] = self.pos.copy()
-            self.teleport["telePhase"] += 1
-        else:
-            # TODO: TELE TO TELE POINT
-            self.pos = self.teleport["previousPosition"]
-            self.resetTele()
+        if self.teleport["enable"]:
+            if self.teleport["telePhase"] == 0:
+                # TODO: SET TELE POINT
+                self.game.sfx['timeStop'].play()
+                self.teleport["previousPosition"] = self.pos.copy()
+                self.teleport["telePhase"] += 1
+                self.game.stopTimer.reset()
+                self.game.alphaTimer.reset()
+                self.game.alpha = 100
+            else:
+                # TODO: TELE TO TELE POINT
+                self.pos = self.teleport["previousPosition"]
+                self.resetTele()
 
     def resetTele(self):
         self.teleport["previousPosition"] = None
         self.teleport["telePhase"] = 0
+        self.game.stopTimer.reset()
+        self.game.alphaTimer.reset()
+        self.game.alpha = 0
 
     def jump(self):
         if self.wall_slide:
@@ -273,3 +299,6 @@ class Player(PhysicsEntity):
                 self.dashing = -60
             else:
                 self.dashing = 60
+
+    def isTimeStop(self):
+        return self.teleport["enable"] and self.teleport["telePhase"] == 1
