@@ -86,7 +86,8 @@ class Game:
             else:
                 self.enemies.append(Enemy(self, spawner['pos'], (8, 15)))
 
-        self.projectiles = []
+        self.enemyProjectiles = []
+        self.playerProjectiles = []
         self.particles = []
         self.sparks = []
 
@@ -108,6 +109,7 @@ class Game:
             self.screenshake = max(0, self.screenshake - 1)
 
             if not len(self.enemies):
+                self.player.resetTele()
                 self.transition += 1
                 if self.transition > 30:
                     self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
@@ -116,6 +118,7 @@ class Game:
                 self.transition += 1
 
             if self.dead:
+                self.player.resetTele()
                 self.dead += 1
                 if self.dead >= 10:
                     self.transition = min(30, self.transition + 1)
@@ -140,27 +143,43 @@ class Game:
                 kill = enemy.update(self.tilemap, (0, 0))
                 enemy.render(self.display, offset=render_scroll)
                 if kill:
+                    self.player.bullets += 1
                     self.enemies.remove(enemy)
 
             if not self.dead:
                 self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
                 self.player.render(self.display, offset=render_scroll)
 
+            # player shoot
             # [[x, y], direction, timer]
-            for projectile in self.projectiles.copy():
+            for projectile in self.playerProjectiles.copy():
                 projectile[0][0] += projectile[1]
                 projectile[2] += 1
                 img = self.assets['projectile']
                 self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
                 if self.tilemap.solid_check(projectile[0]):
-                    self.projectiles.remove(projectile)
+                    self.playerProjectiles.remove(projectile)
                     for i in range(4):
                         self.sparks.append(Spark(projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
                 elif projectile[2] > 360:
-                    self.projectiles.remove(projectile)
+                    self.playerProjectiles.remove(projectile)
+
+            # enemy shoot
+            # [[x, y], direction, timer]
+            for projectile in self.enemyProjectiles.copy():
+                projectile[0][0] += projectile[1]
+                projectile[2] += 1
+                img = self.assets['projectile']
+                self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
+                if self.tilemap.solid_check(projectile[0]):
+                    self.enemyProjectiles.remove(projectile)
+                    for i in range(4):
+                        self.sparks.append(Spark(projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
+                elif projectile[2] > 360:
+                    self.enemyProjectiles.remove(projectile)
                 elif abs(self.player.dashing) < 50:
                     if self.player.rect().collidepoint(projectile[0]):
-                        self.projectiles.remove(projectile)
+                        self.enemyProjectiles.remove(projectile)
                         self.dead += 1
                         self.sfx['hit'].play()
                         self.screenshake = max(16, self.screenshake)
@@ -194,19 +213,23 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
+                    if event.key == pygame.K_a:
                         self.movement[0] = True
-                    if event.key == pygame.K_RIGHT:
+                    if event.key == pygame.K_d:
                         self.movement[1] = True
-                    if event.key == pygame.K_UP:
+                    if event.key == pygame.K_w:
                         if self.player.jump():
                             self.sfx['jump'].play()
-                    if event.key == pygame.K_x:
+                    if event.key == pygame.K_f:
+                        self.player.shoot()
+                    if event.key == pygame.K_e:
+                        self.player.tele()
+                    if event.key == pygame.K_SPACE:
                         self.player.dash()
                 if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_LEFT:
+                    if event.key == pygame.K_a:
                         self.movement[0] = False
-                    if event.key == pygame.K_RIGHT:
+                    if event.key == pygame.K_d:
                         self.movement[1] = False
 
             if self.transition:
