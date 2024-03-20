@@ -5,12 +5,13 @@ import random
 
 import pygame
 
-from scripts.utils import load_image, load_images, Animation
+from scripts.utils import load_image, load_images, Animation, Timer
 from scripts.entities import PhysicsEntity, Player, Enemy
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
 from scripts.particle import Particle
 from scripts.spark import Spark
+from scripts.config import *
 
 class Game:
     def __init__(self):
@@ -22,6 +23,8 @@ class Game:
         self.display_2 = pygame.Surface((320, 240))
 
         self.clock = pygame.time.Clock()
+        self.stopTimer = Timer(5)
+        self.alphaTimer = Timer(0.5)
 
         self.movement = [False, False]
 
@@ -44,6 +47,7 @@ class Game:
             'particle/particle': Animation(load_images('particles/particle'), img_dur=6, loop=False),
             'gun': load_image('gun.png'),
             'projectile': load_image('projectile.png'),
+            'star': pygame.transform.scale(load_image("star.png"), (18, 18))
         }
 
         self.sfx = {
@@ -52,6 +56,7 @@ class Game:
             'hit': pygame.mixer.Sound('data/sfx/hit.wav'),
             'shoot': pygame.mixer.Sound('data/sfx/shoot.wav'),
             'ambience': pygame.mixer.Sound('data/sfx/ambience.wav'),
+            'timeStop': pygame.mixer.Sound('data/sfx/timestop.mp3')
         }
 
         self.sfx['ambience'].set_volume(0.2)
@@ -94,16 +99,13 @@ class Game:
         self.scroll = [0, 0]
         self.dead = 0
         self.transition = -30
+        self.alpha = 0
 
     def run(self):
-        pygame.mixer.music.load('data/music.wav')
-        pygame.mixer.music.set_volume(0.5)
-        pygame.mixer.music.play(-1)
-
-        self.sfx['ambience'].play(-1)
-
+        self.playMusic()
         while True:
-            self.display.fill((0, 0, 0, 0))
+            self.display.fill((self.alpha*2, 0, 0, self.alpha))
+
             self.display_2.blit(self.assets['background'], (0, 0))
 
             self.screenshake = max(0, self.screenshake - 1)
@@ -134,15 +136,16 @@ class Game:
                     pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
                     self.particles.append(Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
 
-            self.clouds.update()
+            if not self.player.isTimeStop():
+                self.clouds.update()
             self.clouds.render(self.display_2, offset=render_scroll)
 
             self.tilemap.render(self.display, offset=render_scroll)
 
             for enemy in self.enemies.copy():
-                kill = enemy.update(self.tilemap, (0, 0))
+                enemy.update(self.tilemap, (0, 0))
                 enemy.render(self.display, offset=render_scroll)
-                if kill:
+                if enemy.isDead:
                     self.player.bullets += 1
                     self.enemies.remove(enemy)
 
@@ -150,50 +153,23 @@ class Game:
                 self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
                 self.player.render(self.display, offset=render_scroll)
 
-            # player shoot
-            # [[x, y], direction, timer]
-            for projectile in self.playerProjectiles.copy():
-                projectile[0][0] += projectile[1]
-                projectile[2] += 1
-                img = self.assets['projectile']
-                self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
-                if self.tilemap.solid_check(projectile[0]):
-                    self.playerProjectiles.remove(projectile)
-                    for i in range(4):
-                        self.sparks.append(Spark(projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
-                elif projectile[2] > 360:
-                    self.playerProjectiles.remove(projectile)
-
-            # enemy shoot
-            # [[x, y], direction, timer]
-            for projectile in self.enemyProjectiles.copy():
-                projectile[0][0] += projectile[1]
-                projectile[2] += 1
-                img = self.assets['projectile']
-                self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
-                if self.tilemap.solid_check(projectile[0]):
-                    self.enemyProjectiles.remove(projectile)
-                    for i in range(4):
-                        self.sparks.append(Spark(projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
-                elif projectile[2] > 360:
-                    self.enemyProjectiles.remove(projectile)
-                elif abs(self.player.dashing) < 50:
-                    if self.player.rect().collidepoint(projectile[0]):
-                        self.enemyProjectiles.remove(projectile)
-                        self.dead += 1
-                        self.sfx['hit'].play()
-                        self.screenshake = max(16, self.screenshake)
-                        for i in range(30):
-                            angle = random.random() * math.pi * 2
-                            speed = random.random() * 5
-                            self.sparks.append(Spark(self.player.rect().center, angle, 2 + random.random()))
-                            self.particles.append(Particle(self, 'particle', self.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+            self.checkCollisions(render_scroll)
 
             for spark in self.sparks.copy():
                 kill = spark.update()
                 spark.render(self.display, offset=render_scroll)
                 if kill:
                     self.sparks.remove(spark)
+
+            if self.player.isTimeStop():
+
+                if self.alphaTimer.getFlag():
+                    self.alpha -= 5
+
+                if self.stopTimer.getFlag():
+                    self.player.tele()
+                    self.alpha = 0
+
 
             display_mask = pygame.mask.from_surface(self.display)
             display_sillhouette = display_mask.to_surface(setcolor=(0, 0, 0, 180), unsetcolor=(0, 0, 0, 0))
@@ -223,7 +199,7 @@ class Game:
                     if event.key == pygame.K_f:
                         self.player.shoot()
                     if event.key == pygame.K_e:
-                        self.player.tele()
+                            self.player.tele()
                     if event.key == pygame.K_SPACE:
                         self.player.dash()
                 if event.type == pygame.KEYUP:
@@ -240,9 +216,65 @@ class Game:
 
             self.display_2.blit(self.display, (0, 0))
 
+
             screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2, random.random() * self.screenshake - self.screenshake / 2)
             self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset)
-            pygame.display.update()
-            self.clock.tick(60)
 
-Game().run()
+            pygame.display.update()
+            self.clock.tick(FPS)
+
+    def checkCollisions(self, render_scroll):
+        self.playerProjectilesCollision(render_scroll)
+        self.enemyProjectilesCollision(render_scroll)
+
+    def playerProjectilesCollision(self, render_scroll):
+        # player shoot
+        # [[x, y], direction, timer]
+        for projectile in self.playerProjectiles.copy():
+            projectile[0][0] += projectile[1]
+            projectile[2] += 1
+            img = self.assets['projectile']
+            self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
+            if self.tilemap.solid_check(projectile[0]):
+                self.playerProjectiles.remove(projectile)
+                for i in range(4):
+                    self.sparks.append(Spark(self, projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
+            elif projectile[2] > 360:
+                self.playerProjectiles.remove(projectile)
+
+    def enemyProjectilesCollision(self, render_scroll):
+        # enemy shoot
+        # [[x, y], direction, timer]
+        for projectile in self.enemyProjectiles.copy():
+            if not self.player.isTimeStop():
+                projectile[0][0] += projectile[1]
+                projectile[2] += 1
+            img = self.assets['projectile']
+            self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
+            if self.tilemap.solid_check(projectile[0]):
+                self.enemyProjectiles.remove(projectile)
+                for i in range(4):
+                    self.sparks.append(Spark(self, projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
+            elif projectile[2] > 360:
+                self.enemyProjectiles.remove(projectile)
+            elif abs(self.player.dashing) < 50:
+                if self.player.rect().collidepoint(projectile[0]):
+                    self.enemyProjectiles.remove(projectile)
+                    self.dead += 1
+                    self.sfx['hit'].play()
+                    self.screenshake = max(16, self.screenshake)
+                    for i in range(30):
+                        angle = random.random() * math.pi * 2
+                        speed = random.random() * 5
+                        self.sparks.append(Spark(self, self.player.rect().center, angle, 2 + random.random()))
+                        self.particles.append(Particle(self, 'particle', self.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+
+    def playMusic(self):
+        pygame.mixer.music.load('data/music.wav')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
+
+        self.sfx['ambience'].play(-1)
+
+if __name__ == "__main__":
+    Game().run()
