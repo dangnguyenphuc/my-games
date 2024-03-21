@@ -7,6 +7,23 @@ from scripts.particle import Particle
 from scripts.spark import Spark
 from scripts.abilities import Slash, Boom, Ability
 
+class Bar:
+    def __init__(self, maxValue, currentValue, size, backgroundColor):
+        self.maxValue = maxValue
+        self.currentValue = currentValue
+        self.size = size
+        self.bColor = backgroundColor
+
+    def update(self, value):
+        self.currentValue = value
+
+    def render(self, surf, pos):
+        pygame.draw.rect(surf, self.bColor, (
+            pos[0],
+            pos[1],
+            int(self.currentValue / self.maxValue*self.size[0]),
+            self.size[1]))
+
 class PhysicsEntity:
     def __init__(self, game, e_type, pos, size):
         self.game = game
@@ -78,11 +95,18 @@ class PhysicsEntity:
         surf.blit(pygame.transform.flip(self.animation.img(), self.flip, False), (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
 
 class Enemy(PhysicsEntity):
+
+    MAX_HEALTH = 3
+    HEALTH_BAR_OFFSET = (8,6)
+
     def __init__(self, game, pos, size):
         super().__init__(game, 'enemy', pos, size)
 
         self.walking = 0
         self.isDead = False
+        self.health = Enemy.MAX_HEALTH
+
+        self.healthBar = Bar(maxValue=Enemy.MAX_HEALTH , currentValue=Enemy.MAX_HEALTH, size=(16,3), backgroundColor=(255,0,0))
 
     def update(self, tilemap, movement=(0, 0)):
         if not self.game.player.isTimeStop():
@@ -119,6 +143,7 @@ class Enemy(PhysicsEntity):
                 self.set_action('idle')
 
         self.isKilled()
+        self.healthBar.update(self.health)
 
     def isKilled(self):
         if abs(self.game.player.dashing) >= 50:
@@ -135,7 +160,9 @@ class Enemy(PhysicsEntity):
                     self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
                 self.game.sparks.append(Spark(self.game, self.rect().center, 0, 5 + random.random()))
                 self.game.sparks.append(Spark(self.game, self.rect().center, math.pi, 5 + random.random()))
+                self.health -= 2
                 self.isDead = True
+                return
 
         # [[x, y], direction, timer]
         for projectile in self.game.playerProjectiles.copy():
@@ -150,7 +177,10 @@ class Enemy(PhysicsEntity):
                     else:
                         self.game.sparks.append(Spark(self.game, self.rect().center, angle, 2 + random.random()))
                     self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
-                self.isDead = True
+                self.health -= 1
+                if self.health <= 0:
+                    self.isDead = True
+                return
 
         for slash in self.game.slashes.copy():
             if self.rect().colliderect(slash.rect()):
@@ -164,12 +194,19 @@ class Enemy(PhysicsEntity):
                     else:
                         self.game.sparks.append(Spark(self.game, self.rect().center, angle, 2 + random.random()))
                     self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
-                self.isDead = True
+                self.health -= 1
+                if self.health <= 0:
+                    self.isDead = True
+                return
+
+
 
 
 
     def render(self, surf, offset=(0, 0)):
         super().render(surf, offset=offset)
+
+        self.healthBar.render(surf, (self.rect().centerx - offset[0] - Enemy.HEALTH_BAR_OFFSET[0], self.pos[1] -offset[1] -  Enemy.HEALTH_BAR_OFFSET[1]))
 
         if self.flip:
             surf.blit(pygame.transform.flip(self.game.assets['gun'], True, False), (self.rect().centerx - 4 - self.game.assets['gun'].get_width() - offset[0], self.rect().centery - offset[1]))
@@ -177,14 +214,31 @@ class Enemy(PhysicsEntity):
             surf.blit(self.game.assets['gun'], (self.rect().centerx + 4 - offset[0], self.rect().centery - offset[1]))
 
 class Player(PhysicsEntity):
+
+    MAX_MANA = 2
+    MANA_BAR_OFFSET = (8,6)
+
+    MAX_HEALTH = 3
+    HEALTH_BAR_OFFSET = (8,9)
+
+
+
     def __init__(self, game, pos, size, weapon = 0):
         super().__init__(game, 'player', pos, size)
+        self.reset()
+
+    def reset(self):
         self.air_time = 0
         self.jumps = 1
         self.wall_slide = False
         self.dashing = 0
         self.bullets = 3
         self.weapon = 0
+        self.mana = Player.MAX_MANA
+        self.health = Player.MAX_HEALTH
+
+        self.manaBar = Bar(maxValue=Player.MAX_MANA, currentValue=Player.MAX_MANA, size=(16, 3), backgroundColor=(0,0,255))
+        self.healthBar = Bar(maxValue=Player.MAX_HEALTH , currentValue=Player.MAX_HEALTH, size=(16,3), backgroundColor=(255,0,0))
 
         # teleport ability
         self.teleport = {
@@ -254,7 +308,14 @@ class Player(PhysicsEntity):
         else:
             self.velocity[0] = min(self.velocity[0] + 0.1, 0)
 
+        self.mana = min(self.mana + 0.01, Player.MAX_MANA)
+
+        self.manaBar.update(self.mana)
+        self.healthBar.update(self.health)
+
     def render(self, surf, offset=(0, 0)):
+        self.manaBar.render(surf, (self.rect().centerx - offset[0] - Player.MANA_BAR_OFFSET[0], self.pos[1] -offset[1] -  Player.MANA_BAR_OFFSET[1]))
+        self.healthBar.render(surf, (self.rect().centerx - offset[0] - Player.HEALTH_BAR_OFFSET[0], self.pos[1] -offset[1] -  Player.HEALTH_BAR_OFFSET[1]))
         if abs(self.dashing) <= 50:
             super().render(surf, offset=offset)
 
@@ -317,7 +378,8 @@ class Player(PhysicsEntity):
             return True
 
     def dash(self):
-        if not self.dashing:
+        if self.mana >= 1:
+            self.mana = max(self.mana - 1, 0)
             self.game.sfx['dash'].play()
             if self.flip:
                 self.dashing = -60
