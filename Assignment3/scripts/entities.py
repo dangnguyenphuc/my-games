@@ -96,7 +96,7 @@ class PhysicsEntity:
 
 class Enemy(PhysicsEntity):
 
-    MAX_HEALTH = 3
+    MAX_HEALTH = 2
     HEALTH_BAR_OFFSET = (8,6)
 
     def __init__(self, game, pos, size):
@@ -177,7 +177,7 @@ class Enemy(PhysicsEntity):
                     else:
                         self.game.sparks.append(Spark(self.game, self.rect().center, angle, 2 + random.random()))
                     self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
-                self.health -= 1
+                self.health -= random.choices([1,2], [1,2], k = 1)[0]
                 if self.health <= 0:
                     self.isDead = True
                 return
@@ -232,8 +232,8 @@ class Player(PhysicsEntity):
         self.jumps = 1
         self.wall_slide = False
         self.dashing = 0
-        self.bullets = 3
-        self.weapon = 0
+        self.bullets = 5
+        self.weapon = 1
         self.mana = Player.MAX_MANA
         self.health = Player.MAX_HEALTH
 
