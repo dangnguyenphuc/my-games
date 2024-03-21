@@ -117,7 +117,7 @@ class Game:
             self.screenshake = max(0, self.screenshake - 1)
 
             if not len(self.enemies):
-                self.player.resetTele()
+                self.player.reset()
                 self.transition += 1
                 if self.transition > 30:
                     self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
@@ -132,6 +132,7 @@ class Game:
                     self.player.tele()
 
                 else:
+                    self.player.reset()
                     self.player.resetTele()
                     self.dead += 1
                     if self.dead >= 10:
@@ -210,7 +211,7 @@ class Game:
                         if self.player.jump():
                             self.sfx['jump'].play()
                     if event.key == pygame.K_f:
-                        self.player.boom()
+                        self.player.defaultSkill()
                     if event.key == pygame.K_e:
                         self.player.tele()
                     if event.key == pygame.K_SPACE:
@@ -284,14 +285,17 @@ class Game:
             elif abs(self.player.dashing) < 50:
                 if self.player.rect().collidepoint(projectile[0]):
                     self.enemyProjectiles.remove(projectile)
-                    self.dead += 1
                     self.sfx['hit'].play()
                     self.screenshake = max(16, self.screenshake)
+                    self.player.health -= 1
                     for i in range(30):
-                        angle = random.random() * math.pi * 2
-                        speed = random.random() * 5
-                        self.sparks.append(Spark(self, self.player.rect().center, angle, 2 + random.random()))
-                        self.particles.append(Particle(self, 'particle', self.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+                            angle = random.random() * math.pi * 2
+                            speed = random.random() * 5
+                            self.sparks.append(Spark(self, self.player.rect().center, angle, 2 + random.random()))
+                            self.particles.append(Particle(self, 'particle', self.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+
+                    if self.player.health == 0:
+                        self.dead += 1
 
     def playMusic(self):
         pygame.mixer.music.load('data/music.wav')
