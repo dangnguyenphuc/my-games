@@ -73,55 +73,7 @@ class Game:
         self.load_level(self.level)
 
         self.screenshake = 0
-        # FROM HERE
-        '''MENU VALUES'''
-        startMenuButtonValues = None
-        pauseMenuButtonValues = None
-
-        # Menu background images
-        menuBackgroundImage = pygame.image.load("data/images/menu/menu.png").convert_alpha()
-        menuWeaponBackgroundImage = pygame.image.load("data/images/menu/weapon.png").convert_alpha()
-
-        # Menu weapon items
-        swordImage = pygame.image.load("data/images/menu/sword.png").convert_alpha()
-        gunImage = pygame.image.load("data/images/menu/gun.png").convert_alpha()
-        coinImage = pygame.image.load("data/images/menu/coin.png").convert_alpha()
-
-        # Button images
-        startButtonImage = pygame.image.load("data/images/buttons/start.png").convert_alpha()
-        pauseButtonImage = pygame.image.load("data/images/buttons/pause.png").convert_alpha()
-        exitButtonImage = pygame.image.load("data/images/buttons/exit.png").convert_alpha()
-        continueButtonImage = pygame.image.load("data/images/buttons/continue.png").convert_alpha()
-        storeButtonImage = pygame.image.load("data/images/buttons/store.png").convert_alpha()
-
-        # Buttons      
-        startButton = Button(startButtonImage, padding=(-150,-75))
         
-        '''Start Menu'''
-        startMenu = Menu(
-            buttons = [startButton],
-            menuBackground = menuBackgroundImage,
-            size = (320,240))
-
-        '''Pause Menu'''
-        pauseMenu = Menu(
-            buttons = [startButton],
-            menuBackground = menuBackgroundImage,
-            size = (320,240))
-
-        '''Weapon Menu'''
-        pauseMenu = Menu(
-            buttons = [startButton],
-            menuBackground = menuWeaponBackgroundImage,
-            size = (320,240))
-
-        '''GAME STATES'''
-        previosState = None
-        gameState = GameState.IS_START
-        
-        # Menu
-        self.startMenu = startMenu
-
     def load_level(self, map_id):
         self.tilemap.load('data/maps/' + str(map_id) + '.json')
 

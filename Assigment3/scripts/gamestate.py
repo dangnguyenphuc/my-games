@@ -4,3 +4,4 @@ class GameState:
   OPEN_OPTS = 2
   IS_PLAY = 3
   IS_PAUSE = 4
+  IS_WEAPON = 5
