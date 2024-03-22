@@ -1,5 +1,5 @@
 import pygame
-
+from scripts.tilemap import Tilemap
 class Ability:
   def __init__(self, game, a_type, pos, frame=0):
     self.game = game
@@ -31,3 +31,18 @@ class Slash(Ability):
 class Boom(Ability):
   def __init__(self, game, pos, frame=5):
     super().__init__(game, "boom", pos, frame)
+
+  def update(self):
+    for projectile in self.game.enemyProjectiles.copy():
+      if self.rect().colliderect(projectile[0][0], projectile[0][1], 6, 4):
+        self.game.enemyProjectiles.remove(projectile)
+
+    self.game.tilemap.remove_tiles_and_offgrid_tiles_around(self.pos)
+
+    for enemy in self.game.enemies.copy():
+      if enemy.rect().colliderect(self.rect()):
+        self.game.enemies.remove(enemy)
+
+    return super().update()
+
+
