@@ -105,11 +105,21 @@ class Enemy(PhysicsEntity):
         self.walking = 0
         self.isDead = False
         self.health = Enemy.MAX_HEALTH
+        self.air_time = 0
 
         self.healthBar = Bar(maxValue=Enemy.MAX_HEALTH , currentValue=Enemy.MAX_HEALTH, size=(16,3), backgroundColor=(255,0,0))
 
     def update(self, tilemap, movement=(0, 0)):
         if not self.game.player.isTimeStop():
+            self.air_time += 1
+
+            if self.air_time > 120:
+                self.health = 0
+                self.isDead = True
+
+            if self.collisions['down']:
+                self.air_time = 0
+
             if self.walking:
                 if tilemap.solid_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
                     if (self.collisions['right'] or self.collisions['left']):
@@ -406,7 +416,7 @@ class Player(PhysicsEntity):
                 ]))
 
     def boom(self):
-        # self.game.sfx['shoot'].play()
+        self.game.sfx['boom'].play()
         self.game.booms.append(Boom(self.game, pos=[
             self.rect().centerx,
             self.rect().y

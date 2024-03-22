@@ -60,7 +60,8 @@ class Game:
             'shoot': pygame.mixer.Sound('data/sfx/shoot.wav'),
             'ambience': pygame.mixer.Sound('data/sfx/ambience.wav'),
             'timeStop': pygame.mixer.Sound('data/sfx/timestop.mp3'),
-            'timeResume': pygame.mixer.Sound('data/sfx/timeresume.mp3')
+            'timeResume': pygame.mixer.Sound('data/sfx/timeresume.mp3'),
+            'boom': pygame.mixer.Sound('data/sfx/boom.mp3')
         }
 
         self.sfx['ambience'].set_volume(0.2)
@@ -211,7 +212,7 @@ class Game:
                         if self.player.jump():
                             self.sfx['jump'].play()
                     if event.key == pygame.K_f:
-                        self.player.defaultSkill()
+                        self.player.boom()
                     if event.key == pygame.K_e:
                         self.player.tele()
                     if event.key == pygame.K_SPACE:
@@ -238,8 +239,8 @@ class Game:
             self.clock.tick(FPS)
 
     def checkCollisions(self, render_scroll):
-        self.playerProjectilesCollision(render_scroll)
         self.enemyProjectilesCollision(render_scroll)
+        self.playerProjectilesCollision(render_scroll)
 
     def playerProjectilesCollision(self, render_scroll):
         # player shoot
@@ -287,7 +288,8 @@ class Game:
                     self.enemyProjectiles.remove(projectile)
                     self.sfx['hit'].play()
                     self.screenshake = max(16, self.screenshake)
-                    self.player.health -= 1
+                    if self.player.isTimeStop(): self.player.tele()
+                    else: self.player.health -= 1
                     for i in range(30):
                             angle = random.random() * math.pi * 2
                             speed = random.random() * 5
