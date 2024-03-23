@@ -90,7 +90,7 @@ class Tilemap:
                 del self.tilemap[check_loc_tilemap]
 
         for tile in self.offgrid_tiles.copy():
-            if calculate_distance(tile['pos'], pos) <= 70:
+            if calculate_distance(tile['pos'], pos) <= 60*60:
                 self.offgrid_tiles.remove(tile)
 
 

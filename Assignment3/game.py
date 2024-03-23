@@ -6,7 +6,7 @@ import random
 import pygame
 
 from scripts.utils import load_image, load_images, Animation, Timer
-from scripts.entities import PhysicsEntity, Player, Enemy
+from scripts.entities import PhysicsEntity, Player, Enemy, Boss
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
 from scripts.particle import Particle
@@ -41,13 +41,17 @@ class Game:
             'player/idle': Animation(load_images('entities/player/idle'), img_dur=6),
             'player/run': Animation(load_images('entities/player/run'), img_dur=4),
             'player/jump': Animation(load_images('entities/player/jump')),
-            'player/slide': Animation(load_images('entities/player/slide')),
             'player/wall_slide': Animation(load_images('entities/player/wall_slide')),
+            'boss/idle': Animation(load_images('entities/boss/idle'), img_dur=6),
+            'boss/take_hit': Animation(load_images('entities/boss/slide'), img_dur=4),
+            'boss/run': Animation(load_images('entities/boss/run'), img_dur=4),
+            'boss/shoot': Animation(load_images('entities/boss/wall_slide'), img_dur=4),
+            'boss/slash': Animation(load_images('entities/boss/wall_slide'), img_dur=4),
             'particle/leaf': Animation(load_images('particles/leaf'), img_dur=20, loop=False),
             'particle/particle': Animation(load_images('particles/particle'), img_dur=6, loop=False),
             'gun': load_image('gun.png'),
             'projectile': load_image('projectile.png'),
-            'star': pygame.transform.scale(load_image("star.png"), (18, 18)),
+            'star': load_image("star.png", 1/6),
 
             'abilities/slash': Animation(load_images('abilities/slash', 1/8), img_dur=2, loop=False),
             'abilities/boom': Animation(load_images('abilities/boom', 1/2), img_dur=2, loop=False),
@@ -82,7 +86,8 @@ class Game:
         self.screenshake = 0
 
     def load_level(self, map_id):
-        self.tilemap.load('data/maps/' + str(map_id) + '.json')
+        # self.tilemap.load('data/maps/' + str(map_id) + '.json')
+        self.tilemap.load('data/maps/3.json')
 
         self.leaf_spawners = []
         for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
@@ -96,9 +101,12 @@ class Game:
             else:
                 self.enemies.append(Enemy(self, spawner['pos'], (8, 15)))
 
+        self.boss = Boss(self, pos=[300, 142], size=[8,15])
+
         self.enemyProjectiles = []
         self.playerProjectiles = []
         self.slashes = []
+        self.enemySlashes = []
         self.booms = []
         self.particles = []
         self.sparks = []
@@ -160,8 +168,12 @@ class Game:
                 enemy.update(self.tilemap, (0, 0))
                 enemy.render(self.display, offset=render_scroll)
                 if enemy.isDead:
-                    self.player.bullets += 1
+                    if self.player.weapon:
+                        self.player.bullets += 1
                     self.enemies.remove(enemy)
+
+            self.boss.update(self.tilemap, (0, 0))
+            self.boss.render(self.display, offset=render_scroll)
 
             if not self.dead:
                 self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
@@ -298,6 +310,11 @@ class Game:
 
                     if self.player.health == 0:
                         self.dead += 1
+
+        for slash in self.enemySlashes.copy():
+            if slash.update():
+                self.enemySlashes.remove(slash)
+            slash.render(self.display, render_scroll)
 
     def playMusic(self):
         pygame.mixer.music.load('data/music.wav')
