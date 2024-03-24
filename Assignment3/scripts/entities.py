@@ -245,8 +245,8 @@ class Player(PhysicsEntity):
         self.jumps = 1
         self.wall_slide = False
         self.dashing = 0
-        self.bullets = 5
-        self.weapon = 1
+        self.bullets = 10
+        self.weapon = 0
         self.mana = Player.MAX_MANA
         self.health = Player.MAX_HEALTH
         self.velocity = [0,0]
@@ -436,8 +436,9 @@ class Player(PhysicsEntity):
         else: self.cut()
 
     def cut(self):
-        if len(self.game.slashes) <= 1:
+        if self.mana >= 0.5:
             self.game.sfx['shoot'].play()
+            self.mana = max(0, self.mana - 0.5)
             if self.flip:
                 self.game.slashes.append(Slash(self.game, pos=[
                     self.rect().centerx - 7,
@@ -577,7 +578,8 @@ class Boss(PhysicsEntity):
                     self.dashing = -60
                 else:
                     self.dashing = 60
-
+        if self.health <= 0:
+            self.isDead = True
         self.isKilled()
         self.healthBar.update(self.health)
 
@@ -597,7 +599,6 @@ class Boss(PhysicsEntity):
                 self.game.sparks.append(Spark(self.game, self.rect().center, 0, 5 + random.random()))
                 self.game.sparks.append(Spark(self.game, self.rect().center, math.pi, 5 + random.random()))
                 self.health -= 2
-                return
 
         # [[x, y], direction, timer]
         for projectile in self.game.playerProjectiles.copy():
@@ -613,8 +614,7 @@ class Boss(PhysicsEntity):
                         self.game.sparks.append(Spark(self.game, self.rect().center, angle, 2 + random.random()))
                     self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
                 self.health -= random.choices([1,2], [1,2], k = 1)[0]
-                if self.health <= 0:
-                    self.isDead = True
+
                 return
 
         for slash in self.game.slashes.copy():
@@ -630,8 +630,6 @@ class Boss(PhysicsEntity):
                         self.game.sparks.append(Spark(self.game, self.rect().center, angle, 2 + random.random()))
                     self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
                 self.health -= 1
-                if self.health <= 0:
-                    self.isDead = True
                 return
 
     def render(self, surf, offset=(0, 0)):

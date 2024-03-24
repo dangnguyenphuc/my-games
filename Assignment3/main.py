@@ -14,16 +14,13 @@ from scripts.spark import Spark
 from scripts.button import Button
 from scripts.menu import Menu
 from scripts.gamestate import GameState
+from scripts.config import *
 
 pygame.init()
 
-SCREEN_WIDTH = 320
-SCREEN_HEIGHT = 240
 WINDOW_TITLE = "Assignment 3"
 
-self.screen = pygame.display.set_mode((640, 480))
-self.display = pygame.Surface((320, 240), pygame.SRCALPHA)
-self.display_2 = pygame.Surface((320, 240))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Set title
 pygame.display.set_caption(WINDOW_TITLE)
@@ -32,16 +29,16 @@ pygame.display.set_caption(WINDOW_TITLE)
 startMenuButtonValues = None
 pauseMenuButtonValues = None
 
-# Menu background images
+# Load and scale menu background images
 menuBackgroundImage = pygame.image.load("data/images/menu/menu.png").convert()
 menuWeaponBackgroundImage = pygame.image.load("data/images/menu/weapon.png").convert()
 
-# Menu weapon items
+# Load and scale menu weapon items
 swordImage = pygame.image.load("data/images/menu/sword.png").convert()
 gunImage = pygame.image.load("data/images/menu/gun.png").convert()
 coinImage = pygame.image.load("data/images/menu/coin.png").convert()
 
-# Button images
+# Load and scale button images
 startButtonImage = pygame.image.load("data/images/buttons/start.png").convert()
 pauseButtonImage = pygame.image.load("data/images/buttons/pause.png").convert()
 exitButtonImage = pygame.image.load("data/images/buttons/exit.png").convert()
@@ -50,15 +47,15 @@ storeButtonImage = pygame.image.load("data/images/buttons/store.png").convert()
 backButtonImage = pygame.image.load("data/images/buttons/back.png").convert()
 
 # Buttons
-startButton = Button(startButtonImage, padding=(0,150))
-continueButton = Button(continueButtonImage, padding=(0,150))
-exitButton = Button(exitButtonImage, padding=(0,30))
-storeButton = Button(storeButtonImage, padding=(0,90))
-backButton = Button(backButtonImage, padding=(0,-180))
+startButton = Button(startButtonImage, padding=(0,75))
+continueButton = Button(continueButtonImage, padding=(0,75))
+exitButton = Button(exitButtonImage, padding=(0,15))
+storeButton = Button(storeButtonImage, padding=(0,45))
+backButton = Button(backButtonImage, padding=(0,-90))
 
 # Store menu items
-swordButton = Button(swordImage, padding=(-120, 0))
-gunButton = Button(gunImage, padding=(120, 0))
+swordButton = Button(swordImage, padding=(-60, 0))
+gunButton = Button(gunImage, padding=(60, 0))
 
 '''Start Menu'''
 startMenu = Menu(
@@ -68,9 +65,9 @@ size = (320,240))
 
 '''Pause Menu'''
 pauseMenu = Menu(
-buttons = [startButton, storeButton, exitButton],
-menuBackground = menuBackgroundImage,
-size = (320,240))
+buttons = [startButton, exitButton],
+
+size = (160,120))
 
 '''Weapon Menu'''
 weaponMenu = Menu(
@@ -105,8 +102,9 @@ while gameState:
         startMenuButtonValues = startMenu.draw(screen, mousePosition, mouse)['buttons']
         if startMenuButtonValues[0]: # Click Start button
             startMenu.setIsDisplay(False)
+            pauseMenu.setIsDisplay(True)
             previosState = gameState
-            gameState =  GameState.IS_PLAY
+            gameState =  GameState.IS_PAUSE
         elif startMenuButtonValues[1]: # Click Store button
             startMenu.setIsDisplay(False)
             weaponMenu.setIsDisplay(True)

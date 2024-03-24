@@ -5,3 +5,5 @@ class GameState:
   IS_PLAY = 3
   IS_PAUSE = 4
   IS_WEAPON = 5
+  IS_WEAPON_S = 6
+  IS_WEAPON_G = 7
