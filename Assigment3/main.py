@@ -17,7 +17,7 @@ from scripts.gamestate import GameState
 
 pygame.init()
 
-SCREEN_WIDTH = 640
+SCREEN_WIDTH = 620
 SCREEN_HEIGHT = 480
 WINDOW_TITLE = "Assignment 3"
 
@@ -30,22 +30,40 @@ pygame.display.set_caption(WINDOW_TITLE)
 startMenuButtonValues = None
 pauseMenuButtonValues = None
 
-# Menu background images
-menuBackgroundImage = pygame.image.load("data/images/menu/menu.png").convert_alpha()
-menuWeaponBackgroundImage = pygame.image.load("data/images/menu/weapon.png").convert_alpha()
+# Load and scale menu background images
+menuBackgroundImage = pygame.image.load("data/images/menu/menu.png").convert()
+menuBackgroundImage = pygame.transform.scale(menuBackgroundImage, (menuBackgroundImage.get_width() * 2, menuBackgroundImage.get_height() * 2))
 
-# Menu weapon items
+menuWeaponBackgroundImage = pygame.image.load("data/images/menu/weapon.png").convert()
+menuWeaponBackgroundImage = pygame.transform.scale(menuWeaponBackgroundImage, (menuWeaponBackgroundImage.get_width() * 2, menuWeaponBackgroundImage.get_height() * 2))
+
+# Load and scale menu weapon items
 swordImage = pygame.image.load("data/images/menu/sword.png").convert_alpha()
+swordImage = pygame.transform.scale(swordImage, (swordImage.get_width() * 2, swordImage.get_height() * 2))
+
 gunImage = pygame.image.load("data/images/menu/gun.png").convert_alpha()
+gunImage = pygame.transform.scale(gunImage, (gunImage.get_width() * 2, gunImage.get_height() * 2))
+
 coinImage = pygame.image.load("data/images/menu/coin.png").convert_alpha()
 
-# Button images
+# Load and scale button images
 startButtonImage = pygame.image.load("data/images/buttons/start.png").convert_alpha()
+startButtonImage = pygame.transform.scale(startButtonImage, (startButtonImage.get_width() * 2, startButtonImage.get_height() * 2))
+
 pauseButtonImage = pygame.image.load("data/images/buttons/pause.png").convert_alpha()
+pauseButtonImage = pygame.transform.scale(pauseButtonImage, (pauseButtonImage.get_width() * 2, pauseButtonImage.get_height() * 2))
+
 exitButtonImage = pygame.image.load("data/images/buttons/exit.png").convert_alpha()
+exitButtonImage = pygame.transform.scale(exitButtonImage, (exitButtonImage.get_width() * 2, exitButtonImage.get_height() * 2))
+
 continueButtonImage = pygame.image.load("data/images/buttons/continue.png").convert_alpha()
+continueButtonImage = pygame.transform.scale(continueButtonImage, (continueButtonImage.get_width() * 2, continueButtonImage.get_height() * 2))
+
 storeButtonImage = pygame.image.load("data/images/buttons/store.png").convert_alpha()
+storeButtonImage = pygame.transform.scale(storeButtonImage, (storeButtonImage.get_width() * 2, storeButtonImage.get_height() * 2))
+
 backButtonImage = pygame.image.load("data/images/buttons/back.png").convert_alpha()
+backButtonImage = pygame.transform.scale(backButtonImage, (backButtonImage.get_width() * 2, backButtonImage.get_height() * 2))
 
 # Buttons      
 startButton = Button(startButtonImage, padding=(0,150))
@@ -62,19 +80,19 @@ gunButton = Button(gunImage, padding=(120, 0))
 startMenu = Menu(
 buttons = [startButton, storeButton, exitButton],
 menuBackground = menuBackgroundImage,
-size = (320,240))
+size = (640,480))
 
 '''Pause Menu'''
 pauseMenu = Menu(
 buttons = [startButton, storeButton, exitButton],
 menuBackground = menuBackgroundImage,
-size = (320,240))
+size = (640,480))
 
 '''Weapon Menu'''
 weaponMenu = Menu(
 buttons = [backButton, swordButton, gunButton],
 menuBackground = menuWeaponBackgroundImage,
-size = (320,240))
+size = (640,480))
 
 '''GAME STATES'''
 previosState = None
