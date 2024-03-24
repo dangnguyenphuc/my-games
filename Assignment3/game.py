@@ -5,11 +5,11 @@ import random
 
 import pygame
 
-from scripts.utils import load_image, load_images, Animation, Timer
+from scripts.utils import load_image, load_images, Animation, Timer, drawTextOnScreen
 from scripts.entities import PhysicsEntity, Player, Enemy, Boss
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
-from scripts.particle import Particle
+from scripts.particle import Particle, Coin, Star
 from scripts.spark import Spark
 from scripts.config import *
 
@@ -50,6 +50,7 @@ class Game:
             'particle/leaf': Animation(load_images('particles/leaf'), img_dur=20, loop=False),
             'particle/particle': Animation(load_images('particles/particle'), img_dur=6, loop=False),
             'gun': load_image('gun.png'),
+            'money': load_image('money.png', 1/4),
             'projectile': load_image('projectile.png'),
             'star': load_image("star.png", 1/6),
 
@@ -68,6 +69,10 @@ class Game:
             'boom': pygame.mixer.Sound('data/sfx/boom.mp3')
         }
 
+        self.font = {
+            'normal': pygame.font.Font('data/font/BigBlueTermPlusNerdFont-Regular.ttf', size=10)
+        }
+
         self.sfx['ambience'].set_volume(0.2)
         self.sfx['shoot'].set_volume(0.4)
         self.sfx['hit'].set_volume(0.8)
@@ -84,24 +89,31 @@ class Game:
         self.load_level(self.level)
 
         self.screenshake = 0
+        self.totalMoney = 1000
 
     def load_level(self, map_id):
-        # self.tilemap.load('data/maps/' + str(map_id) + '.json')
+        self.tilemap.load('data/maps/' + str(map_id) + '.json')
         self.tilemap.load('data/maps/3.json')
-
+        self.money = []
+        self.star = []
         self.leaf_spawners = []
         for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
             self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 23, 13))
 
         self.enemies = []
-        for spawner in self.tilemap.extract([('spawners', 0), ('spawners', 1)]):
+        self.boss = None
+        for spawner in self.tilemap.extract([('spawners', 0), ('spawners', 1),  ('spawners', 2)]):
             if spawner['variant'] == 0:
                 self.player.pos = spawner['pos']
                 self.player.air_time = 0
+            elif spawner['variant'] == 2:
+                self.boss = Boss(self, spawner['pos'], size=[8,15])
+                self.player.teleport["enable"] += 2
+                self.player.bomb += 2
             else:
                 self.enemies.append(Enemy(self, spawner['pos'], (8, 15)))
 
-        self.boss = Boss(self, pos=[300, 142], size=[8,15])
+
 
         self.enemyProjectiles = []
         self.playerProjectiles = []
@@ -125,7 +137,7 @@ class Game:
 
             self.screenshake = max(0, self.screenshake - 1)
 
-            if not len(self.enemies):
+            if (not len(self.enemies) and not len(self.money) and not len(self.star) and not self.boss):
                 self.player.reset()
                 self.transition += 1
                 if self.transition > 30:
@@ -133,6 +145,14 @@ class Game:
                     self.load_level(self.level)
             if self.transition < 0:
                 self.transition += 1
+
+            if self.boss:
+                if self.boss.isDead:
+                    self.player.reset()
+                    self.transition += 1
+                    if self.transition > 30:
+                        pass
+
 
             if self.dead:
 
@@ -168,12 +188,20 @@ class Game:
                 enemy.update(self.tilemap, (0, 0))
                 enemy.render(self.display, offset=render_scroll)
                 if enemy.isDead:
+                    pos = 6
+                    for i in range(random.choices([0,1,2], [1,1,1], k = 1)[0]):
+                        self.money.append(Coin(self, (enemy.pos[0] + pos, enemy.pos[1] + 4), pos>0))
+                        pos -= pos
+                    for i in range(random.choices([0,1], [3,1], k = 1)[0]):
+                        self.star.append(Star(self, (enemy.rect().centerx, enemy.rect().centery)))
                     if self.player.weapon:
                         self.player.bullets += 1
                     self.enemies.remove(enemy)
 
-            self.boss.update(self.tilemap, (0, 0))
-            self.boss.render(self.display, offset=render_scroll)
+            if self.boss:
+                self.boss.update(self.tilemap, (0, 0))
+                self.boss.render(self.display, offset=render_scroll)
+
 
             if not self.dead:
                 self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
@@ -210,6 +238,18 @@ class Game:
                 if kill:
                     self.particles.remove(particle)
 
+            for coin in self.money.copy():
+                coin.render(self.display, offset=render_scroll)
+                if coin.update():
+                    self.money.remove(coin)
+
+            for star in self.star.copy():
+                star.render(self.display, offset=render_scroll)
+                if star.update():
+                    self.star.remove(star)
+
+            self.drawMoney()
+            self.drawStop()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -224,9 +264,11 @@ class Game:
                         if self.player.jump():
                             self.sfx['jump'].play()
                     if event.key == pygame.K_f:
-                        self.player.boom()
+                        self.player.defaultSkill()
                     if event.key == pygame.K_e:
                         self.player.tele()
+                    if event.key == pygame.K_r:
+                        self.player.boom()
                     if event.key == pygame.K_SPACE:
                         self.player.dash()
                 if event.type == pygame.KEYUP:
@@ -279,6 +321,9 @@ class Game:
                 self.booms.remove(boom)
             boom.render(self.display, render_scroll)
 
+        if self.player.health == 0:
+            self.dead += 1
+
 
     def enemyProjectilesCollision(self, render_scroll):
         # enemy shoot
@@ -308,9 +353,6 @@ class Game:
                             self.sparks.append(Spark(self, self.player.rect().center, angle, 2 + random.random()))
                             self.particles.append(Particle(self, 'particle', self.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
 
-                    if self.player.health == 0:
-                        self.dead += 1
-
         for slash in self.enemySlashes.copy():
             if slash.update():
                 self.enemySlashes.remove(slash)
@@ -322,6 +364,15 @@ class Game:
         pygame.mixer.music.play(-1)
 
         self.sfx['ambience'].play(-1)
+
+    def drawMoney(self):
+        drawTextOnScreen(self.display, "Money: " + str(self.totalMoney), self.font['normal'], (0,0,0), 0, 0)
+        drawTextOnScreen(self.display, "Star: " + str(self.player.teleport['enable']), self.font['normal'], (0,0,0), 0, 10)
+        drawTextOnScreen(self.display, "Bomb: " + str(self.player.bomb), self.font['normal'], (0,0,0), 0, 20)
+    def drawStop(self):
+        if self.player.isTimeStop():
+            drawTextOnScreen(self.display, "Time Stop", self.font['normal'], (255,255,255), 320 - 70, 0)
+
 
 if __name__ == "__main__":
     Game().run()

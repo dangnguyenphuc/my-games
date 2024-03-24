@@ -249,13 +249,15 @@ class Player(PhysicsEntity):
         self.weapon = 1
         self.mana = Player.MAX_MANA
         self.health = Player.MAX_HEALTH
+        self.velocity = [0,0]
+        self.bomb = 0
 
         self.manaBar = Bar(maxValue=Player.MAX_MANA, currentValue=Player.MAX_MANA, size=(16, 3), backgroundColor=(0,0,255))
         self.healthBar = Bar(maxValue=Player.MAX_HEALTH , currentValue=Player.MAX_HEALTH, size=(16,3), backgroundColor=(255,0,0))
 
         # teleport ability
         self.teleport = {
-            "enable": True,
+            "enable": 0,
             "previousPosition": None,
             "telePhase": 0
         }
@@ -337,6 +339,18 @@ class Player(PhysicsEntity):
 
         self.mana = min(self.mana + 0.01, Player.MAX_MANA)
 
+        if self.game.boss:
+            if abs(self.game.boss.dashing) >= 50:
+                if self.rect().colliderect(self.game.boss.rect()):
+                    self.game.screenshake = max(16, self.game.screenshake)
+                    self.game.sfx['hit'].play()
+                    for i in range(30):
+                        angle = random.random() * math.pi * 2
+                        speed = random.random() * 5
+                        self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+                    self.game.sparks.append(Spark(self.game, self.rect().center, math.pi, 5 + random.random()))
+                    self.health -= 1
+
         self.manaBar.update(self.mana)
         self.healthBar.update(self.health)
 
@@ -377,6 +391,9 @@ class Player(PhysicsEntity):
                 self.resetTele()
 
     def resetTele(self):
+        self.mana = Player.MAX_MANA
+        self.health = min(Player.MAX_HEALTH, self.health + 1)
+        self.teleport["enable"] = max(0, self.teleport["enable"] - 1)
         self.teleport["previousPosition"] = None
         self.teleport["telePhase"] = 0
         self.game.stopTimer.reset()
@@ -433,11 +450,13 @@ class Player(PhysicsEntity):
                 ]))
 
     def boom(self):
-        self.game.sfx['boom'].play()
-        self.game.booms.append(Boom(self.game, pos=[
-            self.rect().centerx,
-            self.rect().y
-        ]))
+        if self.bomb:
+            self.game.sfx['boom'].play()
+            self.game.booms.append(Boom(self.game, pos=[
+                self.rect().centerx,
+                self.rect().y
+            ]))
+            self.bomb = max(0, self.bomb - 1)
 
     def isTimeStop(self):
         return self.teleport["enable"] and self.teleport["telePhase"] == 1
@@ -445,21 +464,22 @@ class Player(PhysicsEntity):
 
 class Boss(PhysicsEntity):
 
-    MAX_HEALTH = 2
-    HEALTH_BAR_OFFSET = (8,6)
+    MAX_HEALTH = 10
+    HEALTH_BAR_OFFSET = (12,6)
 
     def __init__(self, game, pos, size):
         super().__init__(game, 'boss', pos, size)
 
         self.walking = 0
         self.isDead = False
-        self.health = Enemy.MAX_HEALTH
+        self.health = Boss.MAX_HEALTH
         self.air_time = 0
         self.dashing = 0
+        self.jumps = 1
 
         self.timer = Timer(4)
 
-        self.healthBar = Bar(maxValue=Enemy.MAX_HEALTH , currentValue=Enemy.MAX_HEALTH, size=(16,3), backgroundColor=(255,0,0))
+        self.healthBar = Bar(maxValue=Boss.MAX_HEALTH , currentValue=Boss.MAX_HEALTH, size=(24,3), backgroundColor=(255,0,0))
 
     def update(self, tilemap, movement=(0, 0)):
         if not self.game.player.isTimeStop():
@@ -471,13 +491,21 @@ class Boss(PhysicsEntity):
 
             if self.collisions['down']:
                 self.air_time = 0
+                self.jumps = 1
+
+            if (self.collisions['down'] and self.collisions['right']) or (self.collisions['down'] and self.collisions['left']):
+                self.velocity[1] = -3
+                self.jumps -= 1
+                self.air_time = 5
 
             if self.pos[0] - self.game.player.pos[0] > 0:
                 if (self.velocity[0] > 0):
                     self.velocity[0] = -self.velocity[0]
+                    self.flip = False
             else:
                 if (self.velocity[0] < 0):
                     self.velocity[0] = -self.velocity[0]
+                    self.flip = True
 
             if self.walking:
                 if tilemap.solid_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
@@ -490,7 +518,7 @@ class Boss(PhysicsEntity):
                 self.walking = max(0, self.walking - 1)
                 if not self.walking:
                     dis = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
-                    if abs(dis[1]) < 3:
+                    if abs(dis[0]) <= 2:
                         self.game.sfx['shoot'].play()
                         if self.flip:
                             self.game.enemySlashes.append(Slash(self.game, pos=[
@@ -511,7 +539,7 @@ class Boss(PhysicsEntity):
                         self.game.enemyProjectiles.append([[self.rect().centerx + 7, self.rect().centery], 1.5, 0])
                         for i in range(4):
                             self.game.sparks.append(Spark(self.game, self.game.enemyProjectiles[-1][0], random.random() - 0.5, 2 + random.random()))
-            elif random.random() < 0.01:
+            elif random.random() < 0.5:
                 self.walking = random.randint(40, 120)
 
             super().update(tilemap, movement=movement)
