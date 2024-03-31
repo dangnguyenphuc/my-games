@@ -244,6 +244,7 @@ class Game:
                     else:
                         self.player.reset()
                         self.player.resetTele()
+                        self.player.resetAbilities()
                         self.dead += 1
                         if self.dead >= 10:
                             self.transition = min(30, self.transition + 1)
@@ -284,10 +285,11 @@ class Game:
                     self.boss.render(self.display, offset=render_scroll)
 
                     if self.boss.isDead:
-                        print("Boss Dead")
                         self.player.reset()
+                        self.player.resetAbilities()
                         self.transition += 1
                         if self.transition > 30:
+                            self.menus['startMenu'].setIsDisplay(True)
                             self.gameState = GameState.IS_START
                             self.level = 0
                             continue

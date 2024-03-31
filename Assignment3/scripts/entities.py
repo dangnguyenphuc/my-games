@@ -239,6 +239,7 @@ class Player(PhysicsEntity):
     def __init__(self, game, pos, size, weapon = 0):
         super().__init__(game, 'player', pos, size)
         self.reset()
+        self.resetAbilities()
 
     def reset(self):
         self.air_time = 0
@@ -250,17 +251,24 @@ class Player(PhysicsEntity):
         self.mana = Player.MAX_MANA
         self.health = Player.MAX_HEALTH
         self.velocity = [0,0]
-        self.bomb = 0
+
 
         self.manaBar = Bar(maxValue=Player.MAX_MANA, currentValue=Player.MAX_MANA, size=(16, 3), backgroundColor=(0,0,255))
         self.healthBar = Bar(maxValue=Player.MAX_HEALTH , currentValue=Player.MAX_HEALTH, size=(16,3), backgroundColor=(255,0,0))
 
+
+
+    def resetAbilities(self):
         # teleport ability
         self.teleport = {
             "enable": 0,
             "previousPosition": None,
             "telePhase": 0
         }
+        self.bomb = 0
+
+
+
 
     def setWeapon(self, weapon):
         self.weapon = weapon
