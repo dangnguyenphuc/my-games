@@ -30,7 +30,7 @@ public class TankShooting : MonoBehaviour
 
     private void Start()
     {
-        m_FireButton = "Fire" + m_PlayerNumber;
+        m_FireButton = "Fire";
 
         m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
     }

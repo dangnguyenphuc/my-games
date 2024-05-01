@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Unity.Netcode;
 
-public class TankMovement : MonoBehaviour
+public class TankMovement : NetworkBehaviour
 {
     public int m_PlayerNumber = 1;              // Used to identify which tank belongs to which player.  This is set by this tank's manager.
     public float m_Speed = 12f;                 // How fast the tank moves forward and back.
@@ -46,8 +47,8 @@ public class TankMovement : MonoBehaviour
     private void Start ()
     {
         // The axes names are based on player number.
-        m_MovementAxisName = "Vertical" + m_PlayerNumber;
-        m_TurnAxisName = "Horizontal" + m_PlayerNumber;
+        m_MovementAxisName = "Vertical";
+        m_TurnAxisName = "Horizontal";
 
         // Store the original pitch of the audio source.
         m_OriginalPitch = m_MovementAudio.pitch;
@@ -57,6 +58,8 @@ public class TankMovement : MonoBehaviour
     private void Update ()
     {
         // Store the value of both input axes.
+        if (!IsOwner) return;
+
         m_MovementInputValue = Input.GetAxis (m_MovementAxisName);
         m_TurnInputValue = Input.GetAxis (m_TurnAxisName);
 
@@ -94,6 +97,7 @@ public class TankMovement : MonoBehaviour
 
     private void FixedUpdate ()
     {
+        if (!IsOwner) return;
         // Adjust the rigidbodies position and orientation in FixedUpdate.
         Move ();
         Turn ();
