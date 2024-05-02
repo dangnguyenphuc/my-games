@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
-public class TankHealth : MonoBehaviour
+public class TankHealth : NetworkBehaviour
 {
     public float m_StartingHealth = 100f;          
     public Slider m_Slider;                        
@@ -36,13 +37,15 @@ public class TankHealth : MonoBehaviour
     public void TakeDamage(float amount)
     {
         // Adjust the tank's current health, update the UI based on the new health and check whether or not the tank is dead.
-        m_CurrentHealth -= amount;
-        SetHealthUI ();
+        // m_CurrentHealth -= amount;
+        // SetHealthUI ();
 
-        if (m_CurrentHealth <= 0 && !m_Dead)
-        {
-          OnDeath ();
-        }
+        // if (m_CurrentHealth <= 0 && !m_Dead)
+        // {
+        //   OnDeath ();
+        // }
+
+        UpdateHealthClientRpc(amount);
     }
 
 
@@ -64,8 +67,23 @@ public class TankHealth : MonoBehaviour
 
         m_ExplosionParticles.Play ();
 
-        m_ExplosionAudio.Play();
+        m_ExplosionAudio.Play ();
 
         gameObject.SetActive (false);
     }
+
+    [ClientRpc]
+    private void UpdateHealthClientRpc(float amount){
+      // if (!IsHost)
+      //   {
+            m_CurrentHealth -= amount;
+            SetHealthUI ();
+
+            if (m_CurrentHealth <= 0 && !m_Dead)
+            {
+              OnDeath ();
+            }
+        // }
+    }
+
 }

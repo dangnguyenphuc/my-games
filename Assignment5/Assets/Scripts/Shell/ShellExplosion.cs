@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Unity.Netcode;
 
-public class ShellExplosion : MonoBehaviour
+public class ShellExplosion : NetworkBehaviour
 {
     public LayerMask m_TankMask;
     public ParticleSystem m_ExplosionParticles;       
@@ -19,7 +20,55 @@ public class ShellExplosion : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Find all the tanks in an area around the shell and damage them.
+        if (!NetworkManager.Singleton.IsServer || !NetworkObject.IsSpawned)
+        {
+            return;
+        }
+
+        SetExplosionForceClientRpc();
+
+        m_ExplosionParticles.transform.parent = null;
+        m_ExplosionParticles.Play();
+        m_ExplosionAudio.Play();
+
+        
+
+        Destroy(m_ExplosionParticles.gameObject, m_ExplosionParticles.duration);
+        DestroyShell();
+        Destroy(gameObject);
+
+        
+      }
+
+
+    private float CalculateDamage(Vector3 targetPosition)
+    {
+        // Calculate the amount of damage a target should take based on it's position.
+        Vector3 explosionToTarget = targetPosition - transform.position;
+
+        float explosionDistance = explosionToTarget.magnitude;
+
+        float relativeDistance = (m_ExplosionRadius - explosionDistance) / m_ExplosionRadius;
+
+        float damage = relativeDistance * m_MaxDamage;
+
+        damage = Mathf.Max (0.0f, damage);
+        return damage;
+    }
+
+    private void DestroyShell()
+    {
+        if (!NetworkObject.IsSpawned)
+        {
+            return;
+        }
+
+        NetworkObject.Despawn(true);
+    }
+
+    [ClientRpc]
+    private void SetExplosionForceClientRpc(){
+      // Find all the tanks in an area around the shell and damage them.
         Collider[] colliders = Physics.OverlapSphere (transform.position, m_ExplosionRadius, m_TankMask);
 
         for (int i = 0; i < colliders.Length; i++)
@@ -41,28 +90,6 @@ public class ShellExplosion : MonoBehaviour
           float dmg = CalculateDamage(targetRigidbody.position);
           targetHealth.TakeDamage(dmg);
         }
-
-        m_ExplosionParticles.transform.parent = null;
-        m_ExplosionParticles.Play();
-        m_ExplosionAudio.Play();
-
-        Destroy(m_ExplosionParticles.gameObject, m_ExplosionParticles.duration);
-        Destroy(gameObject);
-      }
-
-
-    private float CalculateDamage(Vector3 targetPosition)
-    {
-        // Calculate the amount of damage a target should take based on it's position.
-        Vector3 explosionToTarget = targetPosition - transform.position;
-
-        float explosionDistance = explosionToTarget.magnitude;
-
-        float relativeDistance = (m_ExplosionRadius - explosionDistance) / m_ExplosionRadius;
-
-        float damage = relativeDistance * m_MaxDamage;
-
-        damage = Mathf.Max (0.0f, damage);
-        return damage;
     }
+
 }

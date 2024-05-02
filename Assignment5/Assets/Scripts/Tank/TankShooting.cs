@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
-public class TankShooting : MonoBehaviour
+public class TankShooting : NetworkBehaviour
 {
     public int m_PlayerNumber = 1;       
     public Rigidbody m_Shell;            
@@ -37,6 +38,8 @@ public class TankShooting : MonoBehaviour
 
     private void Update()
     {
+        if (!IsOwner) return;
+
         // Track the current state of the fire button and make decisions based on the current launch force.
         m_AimSlider.value = m_MinLaunchForce;
 
@@ -70,8 +73,15 @@ public class TankShooting : MonoBehaviour
     {
         // Instantiate and launch the shell.
         m_Fired = true;
+        SpawnShellServerRpc();
+    }
 
+    [ServerRpc]
+    private void SpawnShellServerRpc()
+    {
         Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+        
+        shellInstance.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
 
         shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
 
@@ -80,4 +90,5 @@ public class TankShooting : MonoBehaviour
 
         m_CurrentLaunchForce = m_MinLaunchForce;
     }
+
 }

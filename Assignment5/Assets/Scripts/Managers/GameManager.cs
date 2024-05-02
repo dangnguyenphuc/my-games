@@ -2,16 +2,18 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Unity.Netcode;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
-    public int m_NumRoundsToWin = 5;        
+    public NetworkVariable<int> numberOfTanks = new NetworkVariable<int> ();
+    public int m_NumRoundsToWin = 3;        
     public float m_StartDelay = 3f;         
     public float m_EndDelay = 3f;           
     public CameraControl m_CameraControl;   
     public Text m_MessageText;              
     public GameObject m_TankPrefab;         
-    public TankManager[] m_Tanks;           
+    public TankManager[] m_Tanks;       
 
 
     private int m_RoundNumber;              
@@ -23,13 +25,35 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        m_StartWait = new WaitForSeconds(m_StartDelay);
-        m_EndWait = new WaitForSeconds(m_EndDelay);
+        
+        // m_StartWait = new WaitForSeconds(m_StartDelay);
+        // m_EndWait = new WaitForSeconds(m_EndDelay);
 
-        SpawnAllTanks();
-        SetCameraTargets();
+        // SpawnAllTanks();
+        // SetCameraTargets();
 
-        StartCoroutine(GameLoop());
+        // StartCoroutine(GameLoop());
+    }
+
+    public override void OnNetworkSpawn() {
+        if (IsServer)
+            CreatePlayerServerRpc(NetworkManager.Singleton.LocalClientId, 0);
+        else
+            CreatePlayerServerRpc(NetworkManager.Singleton.LocalClientId, 1);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CreatePlayerServerRpc(ulong clientId, int prefabId)
+    {
+        m_Tanks[prefabId].m_Instance = (GameObject)Instantiate(m_TankPrefab, m_Tanks[prefabId].m_SpawnPoint.position, m_Tanks[prefabId].m_SpawnPoint.rotation);
+
+        // m_Tanks[prefabId].m_Instance = tempGO;
+        m_Tanks[prefabId].m_PlayerNumber = prefabId + 1;
+        m_Tanks[prefabId].Setup();
+
+        NetworkObject netObj = m_Tanks[prefabId].m_Instance.GetComponent<NetworkObject>();
+        m_Tanks[prefabId].m_Instance.SetActive(true);
+        netObj.SpawnAsPlayerObject(clientId, true);
     }
 
 
