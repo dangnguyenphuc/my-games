@@ -1,6 +1,29 @@
 ﻿using UnityEngine;
 using Unity.Netcode;
 
+public class Buff
+{
+    public enum BuffType
+    {
+        Health,
+        Energy,
+        Speed,
+        // Rotate,
+        // Triple,
+        // Double,
+        // QuadDamage,
+        // Bounce,
+        // Last
+    };
+
+    public static Color[] buffColors = { Color.red, new Color(0.5f,0.3f,1), Color.cyan, Color.yellow, Color.green, Color.magenta, new Color(1, 0.5f, 0), new Color(0, 1, 0.5f) };
+
+    public static Color GetColor(BuffType bt)
+    {
+        return buffColors[(int)bt];
+    }
+};
+
 public class TankMovement : NetworkBehaviour
 {
     public int m_PlayerNumber = 1;              // Used to identify which tank belongs to which player.  This is set by this tank's manager.
@@ -10,6 +33,9 @@ public class TankMovement : NetworkBehaviour
     public AudioClip m_EngineIdling;            // Audio to play when the tank isn't moving.
     public AudioClip m_EngineDriving;           // Audio to play when the tank is moving.
     public float m_PitchRange = 0.2f;           // The amount by which the pitch of the engine noises can vary.
+    public bool isControlled = false;
+
+    public NetworkVariable<float> SpeedBuffTimer = new NetworkVariable<float>(0f);
 
 
     private string m_MovementAxisName;          // The name of the input axis for moving forward and back.
@@ -63,7 +89,7 @@ public class TankMovement : NetworkBehaviour
         m_MovementInputValue = Input.GetAxis (m_MovementAxisName);
         m_TurnInputValue = Input.GetAxis (m_TurnAxisName);
 
-        EngineAudio ();
+        // EngineAudio ();
     }
 
 
@@ -108,6 +134,10 @@ public class TankMovement : NetworkBehaviour
     {
         // Create a vector in the direction the tank is facing with a magnitude based on the input, speed and the time between frames.
         Vector3 movement = transform.forward * m_MovementInputValue * m_Speed * Time.deltaTime;
+        if (SpeedBuffTimer.Value > NetworkManager.ServerTime.TimeAsFloat)
+        {
+            movement *= 1.5f;
+        }
 
         // Apply this movement to the rigidbody's position.
         m_Rigidbody.MovePosition(m_Rigidbody.position + movement);
@@ -118,11 +148,25 @@ public class TankMovement : NetworkBehaviour
     {
         // Determine the number of degrees to be turned based on the input, speed and time between frames.
         float turn = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
+        if (SpeedBuffTimer.Value > NetworkManager.ServerTime.TimeAsFloat)
+        {
+            turn *= 1.5f;
+        }
+
 
         // Make this into a rotation in the y axis.
         Quaternion turnRotation = Quaternion.Euler (0f, turn, 0f);
 
         // Apply this rotation to the rigidbody's rotation.
         m_Rigidbody.MoveRotation (m_Rigidbody.rotation * turnRotation);
+    }
+
+    public void AddBuff(Buff.BuffType buff)
+    {
+        if (buff == Buff.BuffType.Speed)
+        {
+            SpeedBuffTimer.Value = NetworkManager.ServerTime.TimeAsFloat + 10;
+        }
+
     }
 }

@@ -65,11 +65,14 @@
   <ItemGroup>
     <Compile Include="Assets/_Completed-Assets/Scripts/Tank/TankMovement.cs" />
     <Compile Include="Assets/Scripts/Camera/CameraControl.cs" />
+    <Compile Include="Assets/Scripts/Managers/BuffManager.cs" />
     <Compile Include="Assets/_Completed-Assets/Scripts/Tank/TankShooting.cs" />
+    <Compile Include="Assets/Scripts/TankSpawner.cs" />
     <Compile Include="Assets/Scripts/Managers/NetworkManagerUI.cs" />
     <Compile Include="Assets/_Completed-Assets/Scripts/UI/UIDirectionControl.cs" />
     <Compile Include="Assets/TutorialInfo/Scripts/Readme.cs" />
     <Compile Include="Assets/_Completed-Assets/Scripts/Managers/TankManager.cs" />
+    <Compile Include="Assets/Scripts/Buff/BuffCollider.cs" />
     <Compile Include="Assets/Scripts/Managers/GameManager.cs" />
     <Compile Include="Assets/Scripts/Managers/TankManager.cs" />
     <Compile Include="Assets/Scripts/Tank/TankHealth.cs" />
@@ -80,6 +83,7 @@
     <Compile Include="Assets/_Completed-Assets/Scripts/Tank/TankHealth.cs" />
     <Compile Include="Assets/Scripts/Shell/ShellExplosion.cs" />
     <Compile Include="Assets/_Completed-Assets/Scripts/Camera/CameraControl.cs" />
+    <Compile Include="Assets/Scripts/Tank/HeavyTankAI.cs" />
     <Compile Include="Assets/_Completed-Assets/Scripts/Managers/GameManager.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -972,6 +976,10 @@
       <HintPath>Library/ScriptAssemblies/UnityEngine.Purchasing.Stores.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="com.unity.cinemachine.editor">
+      <HintPath>Library/ScriptAssemblies/com.unity.cinemachine.editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Burst.Editor">
       <HintPath>Library/ScriptAssemblies/Unity.Burst.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1144,6 +1152,10 @@
       <HintPath>Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.AI.Navigation">
+      <HintPath>Library/ScriptAssemblies/Unity.AI.Navigation.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
       <HintPath>Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
       <Private>False</Private>
@@ -1222,6 +1234,10 @@
     </Reference>
     <Reference Include="Unity.Services.Core.Analytics">
       <HintPath>Library/ScriptAssemblies/Unity.Services.Core.Analytics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">
+      <HintPath>Library/ScriptAssemblies/Unity.AI.Navigation.Editor.ConversionSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Profiling.Core">
@@ -1320,6 +1336,10 @@
       <HintPath>Library/ScriptAssemblies/Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.AI.Navigation.Updater">
+      <HintPath>Library/ScriptAssemblies/Unity.AI.Navigation.Updater.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.State.Editor">
       <HintPath>Library/ScriptAssemblies/Unity.VisualScripting.State.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1338,6 +1358,14 @@
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.AI.Navigation.Editor">
+      <HintPath>Library/ScriptAssemblies/Unity.AI.Navigation.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cinemachine">
+      <HintPath>Library/ScriptAssemblies/Cinemachine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Multiplayer.Tools.NetStatsReporting">

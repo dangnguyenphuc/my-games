@@ -4,18 +4,28 @@ using Unity.Netcode;
 
 public class TankHealth : NetworkBehaviour
 {
-    public float m_StartingHealth = 100f;          
-    public Slider m_Slider;                        
-    public Image m_FillImage;                      
+    public float m_StartingHealth = 100f;       
+    public float m_StartingEnergy = 100f;     
+    public Slider m_HealthBar;                        
+    public Image m_HealthFillImage;
+    public Slider m_EnergyBar;                        
+    public Image m_EnergyFillImage;                      
     public Color m_FullHealthColor = Color.green;  
     public Color m_ZeroHealthColor = Color.red;    
+    public Color m_FullEnergyColor = Color.blue;  
+    public Color m_ZeroEnergyColor = Color.gray;   
     public GameObject m_ExplosionPrefab;
     
     private AudioSource m_ExplosionAudio;          
     private ParticleSystem m_ExplosionParticles;   
-    private float m_CurrentHealth;  
     private bool m_Dead;            
 
+    public NetworkVariable<float> Health = new NetworkVariable<float>(100);
+    public NetworkVariable<int> Energy = new NetworkVariable<int>(100);
+    public NetworkVariable<float> SpeedBuffTimer = new NetworkVariable<float>(0f);
+
+    float m_EnergyTimer = 0;
+    bool m_IsBuffed;
 
     private void Awake()
     {
@@ -25,35 +35,51 @@ public class TankHealth : NetworkBehaviour
         m_ExplosionParticles.gameObject.SetActive(false);
     }
 
-
-    private void OnEnable()
+    public override void OnNetworkSpawn()
     {
-        m_CurrentHealth = m_StartingHealth;
-        m_Dead = false;
+        Energy.OnValueChanged += OnEnergyChanged;
+        Health.OnValueChanged += OnHealthChanged;
+        OnEnergyChanged(0, Energy.Value);
+        OnHealthChanged(0, Health.Value);
+    }
 
-        SetHealthUI();
+    public override void OnNetworkDespawn()
+    {
+        Energy.OnValueChanged -= OnEnergyChanged;
+        Health.OnValueChanged -= OnHealthChanged;
+    }
+
+    void OnEnergyChanged(int previousValue, int newValue)
+    {
+        SetEnergyBarValue(newValue);
+    }
+
+    void OnHealthChanged(float previousValue, float newValue)
+    {
+        SetHealthBarValue(newValue);
     }
 
     public void TakeDamage(float amount)
     {
-        // Adjust the tank's current health, update the UI based on the new health and check whether or not the tank is dead.
-        // m_CurrentHealth -= amount;
-        // SetHealthUI ();
+        Health.Value -= amount;
 
-        // if (m_CurrentHealth <= 0 && !m_Dead)
-        // {
-        //   OnDeath ();
-        // }
-
-        UpdateHealthClientRpc(amount);
+        if (Health.Value <= 0 && !m_Dead)
+        {
+          OnDeath ();
+          UpdateHealthClientRpc();
+        }
     }
 
-
-    private void SetHealthUI()
+    void SetHealthBarValue(float healthBarValue)
     {
-        // Adjust the value and colour of the slider.
-        m_Slider.value = m_CurrentHealth;
-        m_FillImage.color = Color.Lerp (m_ZeroHealthColor, m_FullHealthColor, m_CurrentHealth/m_StartingHealth);
+        m_HealthBar.value = healthBarValue;
+        m_HealthFillImage.color = Color.Lerp (m_ZeroHealthColor, m_FullHealthColor, healthBarValue/m_StartingHealth);
+    }
+
+    void SetEnergyBarValue(int resourceBarValue)
+    {
+        m_EnergyBar.value = resourceBarValue;
+        m_EnergyFillImage.color = Color.Lerp (m_ZeroEnergyColor, m_FullEnergyColor, resourceBarValue/m_StartingEnergy);
     }
 
 
@@ -67,23 +93,64 @@ public class TankHealth : NetworkBehaviour
 
         m_ExplosionParticles.Play ();
 
-        m_ExplosionAudio.Play ();
+        // m_ExplosionAudio.Play ();
 
         gameObject.SetActive (false);
     }
 
     [ClientRpc]
-    private void UpdateHealthClientRpc(float amount){
-      // if (!IsHost)
-      //   {
-            m_CurrentHealth -= amount;
-            SetHealthUI ();
+    private void UpdateHealthClientRpc(){
+        OnDeath ();
+    }
 
-            if (m_CurrentHealth <= 0 && !m_Dead)
+    void Update()
+    {
+        if (IsServer)
+        {
+            UpdateServer();
+        }
+    }
+
+    void UpdateServer()
+    {
+        // energy regen
+        if (m_EnergyTimer < NetworkManager.ServerTime.TimeAsFloat)
+        {
+            if (Energy.Value < 100)
             {
-              OnDeath ();
+                if (Energy.Value + 5 > 100)
+                {
+                    Energy.Value = 100;
+                }
+                else
+                {
+                    Energy.Value += 5;
+                }
             }
-        // }
+
+            m_EnergyTimer = NetworkManager.ServerTime.TimeAsFloat + 1;
+        }
+    }
+
+    public void AddBuff(Buff.BuffType buff)
+    {
+        if (buff == Buff.BuffType.Health)
+        {
+            Health.Value += 20;
+            if (Health.Value >= 100)
+            {
+                Health.Value = 100;
+            }
+        }
+
+        if (buff == Buff.BuffType.Energy)
+        {
+            Energy.Value += 50;
+            if (Energy.Value >= 100)
+            {
+                Energy.Value = 100;
+            }
+        }
     }
 
 }

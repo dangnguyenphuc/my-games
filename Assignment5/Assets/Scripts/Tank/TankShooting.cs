@@ -11,84 +11,61 @@ public class TankShooting : NetworkBehaviour
     public AudioSource m_ShootingAudio;  
     public AudioClip m_ChargingClip;     
     public AudioClip m_FireClip;         
-    public float m_MinLaunchForce = 15f; 
-    public float m_MaxLaunchForce = 30f; 
-    public float m_MaxChargeTime = 0.75f;
-
+    public float m_LaunchForce = 20f; 
 
     private string m_FireButton;         
-    private float m_CurrentLaunchForce;  
-    private float m_ChargeSpeed;         
-    private bool m_Fired;                
+    private float m_ChargeSpeed;                      
 
 
     private void OnEnable()
     {
-        m_CurrentLaunchForce = m_MinLaunchForce;
-        m_AimSlider.value = m_MinLaunchForce;
+        m_AimSlider.value = m_LaunchForce;
     }
 
 
     private void Start()
     {
         m_FireButton = "Fire";
-
-        m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
     }
 
     private void Update()
     {
         if (!IsOwner) return;
 
-        // Track the current state of the fire button and make decisions based on the current launch force.
-        m_AimSlider.value = m_MinLaunchForce;
+        if(IsClient)
+        {
+            // Track the current state of the fire button and make decisions based on the current launch force.
+            m_AimSlider.value = m_LaunchForce;
 
-        if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
-        {
-          m_CurrentLaunchForce = m_MaxLaunchForce;
-          Fire();
-        }
-        else if (Input.GetButtonDown(m_FireButton))
-        {
-          m_Fired = false;
-          m_CurrentLaunchForce = m_MinLaunchForce;
-
-          m_ShootingAudio.clip = m_ChargingClip;
-          m_ShootingAudio.Play();
-        }
-        else if (Input.GetButton(m_FireButton) && !m_Fired)
-        {
-          m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
-
-          m_AimSlider.value = m_CurrentLaunchForce;
-        }
-        else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
-        {
-          Fire();
+            if (Input.GetButtonDown(m_FireButton))
+            {
+              FireServerRpc();
+            }
         }
     }
-
 
     private void Fire()
     {
         // Instantiate and launch the shell.
-        m_Fired = true;
-        SpawnShellServerRpc();
-    }
-
-    [ServerRpc]
-    private void SpawnShellServerRpc()
-    {
         Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
         
         shellInstance.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
-
-        shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
-
-        m_ShootingAudio.clip = m_FireClip;
-        m_ShootingAudio.Play();
-
-        m_CurrentLaunchForce = m_MinLaunchForce;
+        shellInstance.AddForce(m_LaunchForce * m_FireTransform.forward, ForceMode.Impulse);
+        // shellInstance.AddForce(transform.up * m_LaunchForce, ForceMode.Impulse);
     }
 
+    [ServerRpc(RequireOwnership=false)]
+    public void FireServerRpc()
+    {
+        if (GetComponent<TankHealth>().Energy.Value >= 20)
+        {
+            Fire();
+
+            GetComponent<TankHealth>().Energy.Value -= 20;
+            if (GetComponent<TankHealth>().Energy.Value <= 0)
+            {
+                GetComponent<TankHealth>().Energy.Value = 0;
+            }
+        }
+    }
 }
